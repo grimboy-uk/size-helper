@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Size Helper - Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/polarisv12/polaris.min.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background-color: #f6f6f7;
+      margin: 0;
+      padding: 20px;
+    }
+    .page-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #202223;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: #6d7175;
+      margin-top: 4px;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e1e3e5;
+      padding-bottom: 12px;
+    }
+    .nav-tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #202223;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    .nav-tab:hover {
+      background-color: #f1f2f3;
+    }
+    .nav-tab.active {
+      background-color: #008060;
+      color: white;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s;
+    }
+    .btn-primary {
+      background-color: #008060;
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #006e52;
+    }
+    .btn-secondary {
+      background-color: #f1f2f3;
+      color: #202223;
+    }
+    .btn-secondary:hover {
+      background-color: #e1e3e5;
+    }
+    .subscription-banner {
+      background: linear-gradient(135deg, #008060 0%, #00a67d 100%);
+      color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .subscription-tier {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .subscription-usage {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+    .action-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #202223;
+      transition: background-color 0.2s;
+    }
+    .action-card:hover {
+      background: #f1f2f3;
+    }
+    .action-icon {
+      width: 48px;
+      height: 48px;
+      background: #008060;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+    }
+    .action-text h3 {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+    }
+    .action-text p {
+      margin: 0;
+      font-size: 13px;
+      color: #6d7175;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6d7175;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <nav class="nav-tabs">
+      <a href="/" class="nav-tab active">Dashboard</a>
+      <a href="/templates" class="nav-tab">Size Templates</a>
+      <a href="/products" class="nav-tab">Products</a>
+      <a href="/analytics" class="nav-tab">Analytics</a>
+      <a href="/settings" class="nav-tab">Settings</a>
+    </nav>
+
+    <div id="subscription-banner" class="subscription-banner">
+      <div class="subscription-tier">Loading...</div>
+      <div class="subscription-usage"></div>
+    </div>
+
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-templates">-</div>
+        <div class="stat-label">Size Templates</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-products">-</div>
+        <div class="stat-label">Products Assigned</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-opens">-</div>
+        <div class="stat-label">Size Guide Opens (30d)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-conversion">-</div>
+        <div class="stat-label">Conversion Rate</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Quick Actions</h2>
+      </div>
+      <div class="quick-actions">
+        <a href="/templates/new" class="action-card">
+          <div class="action-icon">+</div>
+          <div class="action-text">
+            <h3>Create Size Template</h3>
+            <p>Add measurements for a product type</p>
+          </div>
+        </a>
+        <a href="/products" class="action-card">
+          <div class="action-icon">📦</div>
+          <div class="action-text">
+            <h3>Assign Products</h3>
+            <p>Link products to size templates</p>
+          </div>
+        </a>
+        <a href="/analytics" class="action-card">
+          <div class="action-icon">📊</div>
+          <div class="action-text">
+            <h3>View Analytics</h3>
+            <p>See how customers use size guides</p>
+          </div>
+        </a>
+        <a href="/settings" class="action-card">
+          <div class="action-icon">⚙️</div>
+          <div class="action-text">
+            <h3>Manage Subscription</h3>
+            <p>Upgrade or change your plan</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {{authHelpers}}
+
+  <script>
+    async function loadDashboard() {
+      try {
+        await initAppBridge();
+
+        // Load subscription status
+        const subscriptionData = await apiGet('/api/billing/current');
+        const sub = subscriptionData.subscription;
+
+        document.getElementById('subscription-banner').innerHTML = `
+          <div class="subscription-tier">${sub.tierName} Plan</div>
+          <div class="subscription-usage">
+            Using ${sub.productTypeCount} of ${sub.productTypeLimit} product types
+            ${sub.remainingSlots > 0 ? `(${sub.remainingSlots} remaining)` : '(Limit reached - upgrade to add more)'}
+          </div>
+        `;
+
+        // Load analytics
+        const analyticsData = await apiGet('/api/analytics/dashboard');
+
+        document.getElementById('stat-templates').textContent = analyticsData.templateCount;
+        document.getElementById('stat-products').textContent = analyticsData.assignedProducts;
+        document.getElementById('stat-opens').textContent = analyticsData.totals.sizeGuideOpened;
+        document.getElementById('stat-conversion').textContent = analyticsData.conversionRate + '%';
+
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+        showToast('Failed to load dashboard data', true);
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

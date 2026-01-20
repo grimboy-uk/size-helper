@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Size Helper - Products</title>
+  <link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/polarisv12/polaris.min.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background-color: #f6f6f7;
+      margin: 0;
+      padding: 20px;
+    }
+    .page-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e1e3e5;
+      padding-bottom: 12px;
+    }
+    .nav-tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #202223;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    .nav-tab:hover {
+      background-color: #f1f2f3;
+    }
+    .nav-tab.active {
+      background-color: #008060;
+      color: white;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background-color: #008060;
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #006e52;
+    }
+    .btn-secondary {
+      background-color: #f1f2f3;
+      color: #202223;
+    }
+    .btn-secondary:hover {
+      background-color: #e1e3e5;
+    }
+    .btn-danger {
+      background-color: #d72c0d;
+      color: white;
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+    .search-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .search-input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: #008060;
+    }
+    .template-filter {
+      min-width: 200px;
+      padding: 10px 12px;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .product-card {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      transition: background-color 0.2s;
+    }
+    .product-card:hover {
+      background: #f1f2f3;
+    }
+    .product-image {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      background: #e1e3e5;
+    }
+    .product-title {
+      font-weight: 600;
+      margin: 0 0 8px 0;
+      font-size: 15px;
+    }
+    .product-template {
+      font-size: 13px;
+      color: #6d7175;
+      margin-bottom: 12px;
+    }
+    .product-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .assignment-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .assignment-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #f9fafb;
+      border-radius: 8px;
+    }
+    .assignment-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .assignment-image {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 6px;
+      background: #e1e3e5;
+    }
+    .assignment-details h4 {
+      margin: 0 0 4px 0;
+      font-size: 14px;
+    }
+    .assignment-details p {
+      margin: 0;
+      font-size: 13px;
+      color: #6d7175;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6d7175;
+    }
+    .empty-state h3 {
+      margin: 0 0 8px 0;
+      color: #202223;
+    }
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e1e3e5;
+    }
+    .tab {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-weight: 500;
+      color: #6d7175;
+    }
+    .tab.active {
+      color: #008060;
+      border-bottom-color: #008060;
+    }
+    .tab:hover {
+      color: #202223;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6d7175;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .form-select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6d7175;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <nav class="nav-tabs">
+      <a href="/" class="nav-tab">Dashboard</a>
+      <a href="/templates" class="nav-tab">Size Templates</a>
+      <a href="/products" class="nav-tab active">Products</a>
+      <a href="/analytics" class="nav-tab">Analytics</a>
+      <a href="/settings" class="nav-tab">Settings</a>
+    </nav>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Product Assignments</h2>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="assigned">Assigned Products</div>
+        <div class="tab" data-tab="search">Find Products</div>
+      </div>
+
+      <!-- Assigned Products Tab -->
+      <div id="assigned-tab">
+        <div id="assignments-container">
+          <div class="loading">Loading assignments...</div>
+        </div>
+      </div>
+
+      <!-- Search Products Tab -->
+      <div id="search-tab" style="display: none;">
+        <div class="search-bar">
+          <input type="text" class="search-input" id="search-input" placeholder="Search products by title...">
+          <button class="btn btn-primary" onclick="searchProducts()">Search</button>
+        </div>
+        <div id="search-results">
+          <div class="empty-state">
+            <p>Search for products to assign them to a size template</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assignment Modal -->
+  <div class="modal-overlay" id="assign-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Assign Size Template</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Product</label>
+        <p id="modal-product-name" style="margin: 0; font-weight: 500;"></p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Select Template</label>
+        <select class="form-select" id="modal-template-select">
+          <option value="">Choose a template...</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 12px; margin-top: 20px;">
+        <button class="btn btn-primary" onclick="confirmAssignment()">Assign Template</button>
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  {{authHelpers}}
+
+  <script>
+    let assignments = [];
+    let templates = [];
+    let selectedProduct = null;
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        const tabName = tab.dataset.tab;
+        document.getElementById('assigned-tab').style.display = tabName === 'assigned' ? 'block' : 'none';
+        document.getElementById('search-tab').style.display = tabName === 'search' ? 'block' : 'none';
+      });
+    });
+
+    async function init() {
+      try {
+        await initAppBridge();
+        await loadTemplates();
+        await loadAssignments();
+      } catch (error) {
+        console.error('Error initializing:', error);
+        showToast('Failed to load data', true);
+      }
+    }
+
+    async function loadTemplates() {
+      const data = await apiGet('/api/templates?active=true');
+      templates = data.templates;
+      populateTemplateSelect();
+    }
+
+    function populateTemplateSelect() {
+      const select = document.getElementById('modal-template-select');
+      select.innerHTML = '<option value="">Choose a template...</option>';
+      templates.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t.id;
+        option.textContent = `${t.name} (${t.category})`;
+        select.appendChild(option);
+      });
+    }
+
+    async function loadAssignments() {
+      const data = await apiGet('/api/products/assignments');
+      assignments = data.assignments;
+      renderAssignments();
+    }
+
+    function renderAssignments() {
+      const container = document.getElementById('assignments-container');
+
+      if (assignments.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No products assigned yet</h3>
+            <p>Search for products and assign them to size templates</p>
+            <button class="btn btn-primary" onclick="document.querySelector('[data-tab=search]').click()">
+              Find Products
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="assignment-list">
+          ${assignments.map(a => `
+            <div class="assignment-item">
+              <div class="assignment-info">
+                <div class="assignment-details">
+                  <h4>${escapeHtml(a.product_title || 'Product ' + a.product_id)}</h4>
+                  <p>Template: ${escapeHtml(a.template_name)} (${escapeHtml(a.template_category)})</p>
+                </div>
+              </div>
+              <div>
+                <button class="btn btn-secondary btn-sm" onclick="openAssignModal(${a.product_id}, '${escapeHtml(a.product_title)}', ${a.template_id})">
+                  Change
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="unassignProduct(${a.product_id})">
+                  Remove
+                </button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    async function searchProducts() {
+      const query = document.getElementById('search-input').value.trim();
+      const container = document.getElementById('search-results');
+
+      if (!query) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>Enter a search term to find products</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '<div class="loading">Searching...</div>';
+
+      try {
+        const data = await apiGet(`/api/products/search?query=${encodeURIComponent(query)}`);
+        const products = data.products;
+
+        if (products.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <p>No products found matching "${escapeHtml(query)}"</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Check which products are already assigned
+        const assignedIds = new Set(assignments.map(a => String(a.product_id)));
+
+        container.innerHTML = `
+          <div class="product-grid">
+            ${products.map(p => {
+              const isAssigned = assignedIds.has(p.id);
+              const assignment = assignments.find(a => String(a.product_id) === p.id);
+              return `
+                <div class="product-card">
+                  ${p.image ? `<img src="${p.image}" alt="${escapeHtml(p.title)}" class="product-image">` : '<div class="product-image"></div>'}
+                  <h3 class="product-title">${escapeHtml(p.title)}</h3>
+                  <p class="product-template">
+                    ${isAssigned ? `Assigned to: ${escapeHtml(assignment.template_name)}` : 'Not assigned'}
+                  </p>
+                  <div class="product-actions">
+                    <button class="btn ${isAssigned ? 'btn-secondary' : 'btn-primary'} btn-sm"
+                            onclick="openAssignModal('${p.id}', '${escapeHtml(p.title).replace(/'/g, "\\'")}', ${isAssigned ? assignment.template_id : 'null'})">
+                      ${isAssigned ? 'Change Template' : 'Assign Template'}
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+
+      } catch (error) {
+        console.error('Error searching products:', error);
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>Error searching products: ${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // Search on enter
+    document.getElementById('search-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        searchProducts();
+      }
+    });
+
+    function openAssignModal(productId, productTitle, currentTemplateId) {
+      selectedProduct = { id: productId, title: productTitle };
+      document.getElementById('modal-product-name').textContent = productTitle;
+
+      const select = document.getElementById('modal-template-select');
+      select.value = currentTemplateId || '';
+
+      document.getElementById('assign-modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('assign-modal').classList.remove('active');
+      selectedProduct = null;
+    }
+
+    async function confirmAssignment() {
+      const templateId = document.getElementById('modal-template-select').value;
+
+      if (!templateId) {
+        showToast('Please select a template', true);
+        return;
+      }
+
+      try {
+        await apiPost('/api/products/assign', {
+          productId: selectedProduct.id,
+          templateId: parseInt(templateId),
+          productTitle: selectedProduct.title,
+        });
+
+        showToast('Product assigned successfully');
+        closeModal();
+        await loadAssignments();
+
+        // Refresh search results if visible
+        if (document.getElementById('search-tab').style.display !== 'none') {
+          searchProducts();
+        }
+
+      } catch (error) {
+        console.error('Error assigning product:', error);
+        showToast('Failed to assign product', true);
+      }
+    }
+
+    async function unassignProduct(productId) {
+      if (!confirm('Remove this product from its size template?')) {
+        return;
+      }
+
+      try {
+        await apiDelete(`/api/products/unassign/${productId}`);
+        showToast('Product unassigned');
+        await loadAssignments();
+      } catch (error) {
+        console.error('Error unassigning product:', error);
+        showToast('Failed to unassign product', true);
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text || '';
+      return div.innerHTML;
+    }
+
+    init();
+  </script>
+</body>
+</html>

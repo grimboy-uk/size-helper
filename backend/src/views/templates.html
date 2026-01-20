@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Size Helper - Templates</title>
+  <link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/polarisv12/polaris.min.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background-color: #f6f6f7;
+      margin: 0;
+      padding: 20px;
+    }
+    .page-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e1e3e5;
+      padding-bottom: 12px;
+    }
+    .nav-tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #202223;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    .nav-tab:hover {
+      background-color: #f1f2f3;
+    }
+    .nav-tab.active {
+      background-color: #008060;
+      color: white;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background-color: #008060;
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #006e52;
+    }
+    .btn-secondary {
+      background-color: #f1f2f3;
+      color: #202223;
+    }
+    .btn-secondary:hover {
+      background-color: #e1e3e5;
+    }
+    .btn-danger {
+      background-color: #d72c0d;
+      color: white;
+    }
+    .btn-danger:hover {
+      background-color: #bc2200;
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+    .template-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .template-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 8px;
+      transition: background-color 0.2s;
+    }
+    .template-item:hover {
+      background: #f1f2f3;
+    }
+    .template-info h3 {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .template-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      color: #6d7175;
+    }
+    .template-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-active {
+      background: #d4edda;
+      color: #155724;
+    }
+    .badge-inactive {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6d7175;
+    }
+    .empty-state h3 {
+      margin: 0 0 8px 0;
+      color: #202223;
+    }
+    .empty-state p {
+      margin: 0 0 20px 0;
+    }
+    .usage-bar {
+      background: #e1e3e5;
+      border-radius: 4px;
+      height: 8px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .usage-fill {
+      background: #008060;
+      height: 100%;
+      transition: width 0.3s;
+    }
+    .usage-fill.warning {
+      background: #ffc453;
+    }
+    .usage-fill.danger {
+      background: #d72c0d;
+    }
+    .usage-text {
+      font-size: 13px;
+      color: #6d7175;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6d7175;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <nav class="nav-tabs">
+      <a href="/" class="nav-tab">Dashboard</a>
+      <a href="/templates" class="nav-tab active">Size Templates</a>
+      <a href="/products" class="nav-tab">Products</a>
+      <a href="/analytics" class="nav-tab">Analytics</a>
+      <a href="/settings" class="nav-tab">Settings</a>
+    </nav>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Size Templates</h2>
+        <a href="/templates/new" class="btn btn-primary" id="create-btn">+ Create Template</a>
+      </div>
+
+      <div id="usage-container" style="margin-bottom: 20px; display: none;">
+        <div class="usage-bar">
+          <div class="usage-fill" id="usage-fill"></div>
+        </div>
+        <div class="usage-text" id="usage-text"></div>
+      </div>
+
+      <div id="templates-container">
+        <div class="loading">Loading templates...</div>
+      </div>
+    </div>
+  </div>
+
+  {{authHelpers}}
+
+  <script>
+    let templates = [];
+    let subscription = null;
+
+    async function loadTemplates() {
+      try {
+        await initAppBridge();
+
+        const data = await apiGet('/api/templates');
+        templates = data.templates;
+        subscription = data.subscription;
+
+        renderUsage();
+        renderTemplates();
+
+      } catch (error) {
+        console.error('Error loading templates:', error);
+        showToast('Failed to load templates', true);
+        document.getElementById('templates-container').innerHTML = `
+          <div class="empty-state">
+            <h3>Error loading templates</h3>
+            <p>${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    function renderUsage() {
+      if (!subscription) return;
+
+      const container = document.getElementById('usage-container');
+      const fill = document.getElementById('usage-fill');
+      const text = document.getElementById('usage-text');
+
+      const percentage = (subscription.productTypeCount / subscription.productTypeLimit) * 100;
+
+      fill.style.width = percentage + '%';
+      fill.className = 'usage-fill';
+      if (percentage >= 90) {
+        fill.classList.add('danger');
+      } else if (percentage >= 70) {
+        fill.classList.add('warning');
+      }
+
+      text.textContent = `${subscription.productTypeCount} of ${subscription.productTypeLimit} templates used (${subscription.tierName} plan)`;
+      container.style.display = 'block';
+
+      // Disable create button if at limit
+      const createBtn = document.getElementById('create-btn');
+      if (!subscription.canCreateMore) {
+        createBtn.classList.remove('btn-primary');
+        createBtn.classList.add('btn-secondary');
+        createBtn.onclick = (e) => {
+          e.preventDefault();
+          showToast('Template limit reached. Please upgrade your plan.', true);
+        };
+      }
+    }
+
+    function renderTemplates() {
+      const container = document.getElementById('templates-container');
+
+      if (templates.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No templates yet</h3>
+            <p>Create your first size template to start helping customers find their perfect fit.</p>
+            <a href="/templates/new" class="btn btn-primary">+ Create Template</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="template-list">
+          ${templates.map(template => `
+            <div class="template-item" data-id="${template.id}">
+              <div class="template-info">
+                <h3>${escapeHtml(template.name)}</h3>
+                <div class="template-meta">
+                  <span>Category: ${escapeHtml(template.category)}</span>
+                  <span>Sizes: ${template.sizes.length}</span>
+                  <span>Unit: ${template.measurement_unit}</span>
+                  <span class="badge ${template.is_active ? 'badge-active' : 'badge-inactive'}">
+                    ${template.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+              </div>
+              <div class="template-actions">
+                <a href="/templates/${template.id}/edit" class="btn btn-secondary btn-sm">Edit</a>
+                <button class="btn btn-danger btn-sm" onclick="deleteTemplate(${template.id}, '${escapeHtml(template.name)}')">Delete</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    async function deleteTemplate(id, name) {
+      if (!confirm(`Are you sure you want to delete "${name}"? This will also remove all product assignments.`)) {
+        return;
+      }
+
+      try {
+        await apiDelete(`/api/templates/${id}`);
+        showToast('Template deleted successfully');
+        loadTemplates();
+      } catch (error) {
+        console.error('Error deleting template:', error);
+        showToast('Failed to delete template', true);
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    loadTemplates();
+  </script>
+</body>
+</html>

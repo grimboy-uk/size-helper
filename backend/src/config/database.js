@@ -4,26 +4,42 @@ import { createLogger } from '../utils/logger.js';
 const { Pool } = pg;
 const logger = createLogger('Database');
 
-// Create connection pool
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-});
+// Create connection pool lazily
+let pool = null;
 
-// Test connection
-pool.on('connect', () => {
-  logger.debug('New client connected to database');
-});
+function getPool() {
+  if (!pool) {
+    const connectionString = process.env.DATABASE_URL;
 
-pool.on('error', (err) => {
-  logger.error('Unexpected error on idle client', err);
-});
+    if (!connectionString) {
+      throw new Error('DATABASE_URL environment variable is not set');
+    }
+
+    logger.info('Creating database pool');
+
+    pool = new Pool({
+      connectionString,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    });
+
+    pool.on('connect', () => {
+      logger.debug('New client connected to database');
+    });
+
+    pool.on('error', (err) => {
+      logger.error('Unexpected error on idle client', err);
+    });
+  }
+
+  return pool;
+}
 
 /**
  * Initialize database schema
  */
 export async function initializeDatabase() {
-  const client = await pool.connect();
+  const dbPool = getPool();
+  const client = await dbPool.connect();
 
   try {
     logger.info('Initializing database schema...');
@@ -125,9 +141,10 @@ export async function initializeDatabase() {
  * Execute a query with parameters
  */
 export async function query(text, params) {
+  const dbPool = getPool();
   const start = Date.now();
   try {
-    const result = await pool.query(text, params);
+    const result = await dbPool.query(text, params);
     const duration = Date.now() - start;
     logger.db(`Query executed in ${duration}ms`, { rows: result.rowCount });
     return result;
@@ -141,7 +158,8 @@ export async function query(text, params) {
  * Get a client from the pool for transactions
  */
 export async function getClient() {
-  return pool.connect();
+  const dbPool = getPool();
+  return dbPool.connect();
 }
 
-export default { pool, query, getClient, initializeDatabase };
+export default { getPool, query, getClient, initializeDatabase };

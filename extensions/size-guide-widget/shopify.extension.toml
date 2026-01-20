@@ -1,0 +1,15 @@
+# Learn more about configuring this extension at https://shopify.dev/docs/apps/theme-app-extensions
+
+api_version = "2024-01"
+
+[[extensions]]
+uid = "49cfd369-4393-6b61-11b0-955bc0e2303acf8cce55"
+type = "theme"
+name = "Size Guide Widget"
+handle = "size-guide-widget"
+
+[[extensions.categories]]
+type = "product"
+
+[extensions.capabilities]
+ajax_api = true

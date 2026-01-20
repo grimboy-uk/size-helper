@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Size Helper - Template Form</title>
+  <link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/polarisv12/polaris.min.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background-color: #f6f6f7;
+      margin: 0;
+      padding: 20px;
+    }
+    .page-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 20px 0;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #202223;
+    }
+    .form-hint {
+      font-size: 13px;
+      color: #6d7175;
+      margin-top: 4px;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: #008060;
+      box-shadow: 0 0 0 1px #008060;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background-color: #008060;
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #006e52;
+    }
+    .btn-secondary {
+      background-color: #f1f2f3;
+      color: #202223;
+    }
+    .btn-secondary:hover {
+      background-color: #e1e3e5;
+    }
+    .btn-danger {
+      background-color: #d72c0d;
+      color: white;
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #006e52;
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    .size-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    .size-table th, .size-table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #e1e3e5;
+    }
+    .size-table th {
+      font-weight: 500;
+      background: #f9fafb;
+    }
+    .size-table input {
+      width: 80px;
+      padding: 6px 8px;
+      border: 1px solid #c9cccf;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .size-table input:focus {
+      outline: none;
+      border-color: #008060;
+    }
+    .size-name-input {
+      width: 100px !important;
+    }
+    .add-size-btn {
+      margin-top: 12px;
+    }
+    .field-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .field-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: #f9fafb;
+      border-radius: 6px;
+    }
+    .field-item input[type="text"] {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #c9cccf;
+      border-radius: 4px;
+    }
+    .field-item label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .checkbox {
+      width: 16px;
+      height: 16px;
+    }
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #e1e3e5;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6d7175;
+    }
+    .unit-toggle {
+      display: flex;
+      gap: 8px;
+    }
+    .unit-btn {
+      padding: 8px 16px;
+      border: 1px solid #c9cccf;
+      background: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .unit-btn:first-child {
+      border-radius: 6px 0 0 6px;
+    }
+    .unit-btn:last-child {
+      border-radius: 0 6px 6px 0;
+    }
+    .unit-btn.active {
+      background: #008060;
+      color: white;
+      border-color: #008060;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <a href="/templates" class="back-link">← Back to Templates</a>
+
+    <div class="card">
+      <h2 class="card-title" id="page-title">Create Size Template</h2>
+
+      <form id="template-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Template Name *</label>
+            <input type="text" class="form-input" id="name" placeholder="e.g., Men's T-Shirts" required>
+            <p class="form-hint">A descriptive name for this size template</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select class="form-select" id="category" required>
+              <option value="">Select a category...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Measurement Unit</label>
+          <div class="unit-toggle">
+            <button type="button" class="unit-btn active" data-unit="cm">Centimeters (cm)</button>
+            <button type="button" class="unit-btn" data-unit="in">Inches (in)</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Measurement Fields</label>
+          <p class="form-hint">Define which measurements this template uses. Required fields must have values for all sizes.</p>
+          <div class="field-list" id="field-list">
+            <!-- Fields will be populated dynamically -->
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm add-size-btn" onclick="addField()">+ Add Custom Field</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Size Chart *</label>
+          <p class="form-hint">Enter measurements for each size. Values should be in the selected unit.</p>
+          <table class="size-table" id="size-table">
+            <thead>
+              <tr id="size-table-header">
+                <th>Size Name</th>
+                <!-- Measurement columns will be added dynamically -->
+                <th width="60"></th>
+              </tr>
+            </thead>
+            <tbody id="size-table-body">
+              <!-- Size rows will be added dynamically -->
+            </tbody>
+          </table>
+          <button type="button" class="btn btn-secondary btn-sm add-size-btn" onclick="addSize()">+ Add Size</button>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="submit-btn">Create Template</button>
+          <a href="/templates" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {{authHelpers}}
+
+  <script>
+    const MODE = '{{mode}}';
+    const TEMPLATE_ID = '{{templateId}}';
+
+    let categories = {};
+    let measurementUnit = 'cm';
+    let measurementFields = [];
+    let sizes = [];
+
+    async function init() {
+      try {
+        await initAppBridge();
+
+        // Load categories
+        const catData = await apiGet('/api/templates/categories');
+        categories = catData.categories;
+
+        populateCategorySelect();
+
+        if (MODE === 'edit' && TEMPLATE_ID) {
+          document.getElementById('page-title').textContent = 'Edit Size Template';
+          document.getElementById('submit-btn').textContent = 'Save Changes';
+          await loadTemplate();
+        } else {
+          // Default fields for new template
+          setDefaultFields('TOPS');
+          addDefaultSizes();
+        }
+
+        renderFields();
+        renderSizeTable();
+
+      } catch (error) {
+        console.error('Error initializing:', error);
+        showToast('Failed to load form data', true);
+      }
+    }
+
+    function populateCategorySelect() {
+      const select = document.getElementById('category');
+      for (const [key, cat] of Object.entries(categories)) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = `${cat.name} - ${cat.description}`;
+        select.appendChild(option);
+      }
+
+      select.addEventListener('change', (e) => {
+        if (e.target.value && categories[e.target.value]) {
+          setDefaultFields(e.target.value);
+          renderFields();
+          renderSizeTable();
+        }
+      });
+    }
+
+    function setDefaultFields(categoryKey) {
+      const category = categories[categoryKey];
+      if (category && category.defaultFields) {
+        measurementFields = category.defaultFields.map(f => ({ ...f }));
+      }
+    }
+
+    function addDefaultSizes() {
+      sizes = [
+        { name: 'XS', measurements: {} },
+        { name: 'S', measurements: {} },
+        { name: 'M', measurements: {} },
+        { name: 'L', measurements: {} },
+        { name: 'XL', measurements: {} },
+      ];
+    }
+
+    async function loadTemplate() {
+      const data = await apiGet(`/api/templates/${TEMPLATE_ID}`);
+      const template = data.template;
+
+      document.getElementById('name').value = template.name;
+      document.getElementById('category').value = template.category;
+
+      measurementUnit = template.measurement_unit;
+      updateUnitButtons();
+
+      measurementFields = template.measurement_fields;
+      sizes = template.sizes;
+    }
+
+    function updateUnitButtons() {
+      document.querySelectorAll('.unit-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.unit === measurementUnit);
+      });
+    }
+
+    // Unit toggle
+    document.querySelectorAll('.unit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        measurementUnit = btn.dataset.unit;
+        updateUnitButtons();
+        renderSizeTable();
+      });
+    });
+
+    function renderFields() {
+      const container = document.getElementById('field-list');
+      container.innerHTML = measurementFields.map((field, index) => `
+        <div class="field-item" data-index="${index}">
+          <input type="text" value="${escapeHtml(field.label)}" placeholder="Field name"
+                 onchange="updateFieldLabel(${index}, this.value)">
+          <label>
+            <input type="checkbox" class="checkbox" ${field.required ? 'checked' : ''}
+                   onchange="updateFieldRequired(${index}, this.checked)">
+            Required
+          </label>
+          <button type="button" class="btn btn-danger btn-sm" onclick="removeField(${index})">×</button>
+        </div>
+      `).join('');
+    }
+
+    function addField() {
+      const key = 'custom_' + Date.now();
+      measurementFields.push({ key, label: 'New Field', required: false });
+      renderFields();
+      renderSizeTable();
+    }
+
+    function removeField(index) {
+      const field = measurementFields[index];
+      measurementFields.splice(index, 1);
+      // Remove from all sizes
+      sizes.forEach(size => {
+        delete size.measurements[field.key];
+      });
+      renderFields();
+      renderSizeTable();
+    }
+
+    function updateFieldLabel(index, value) {
+      measurementFields[index].label = value;
+      renderSizeTable();
+    }
+
+    function updateFieldRequired(index, value) {
+      measurementFields[index].required = value;
+    }
+
+    function renderSizeTable() {
+      // Update header
+      const header = document.getElementById('size-table-header');
+      header.innerHTML = `
+        <th>Size Name</th>
+        ${measurementFields.map(f => `<th>${escapeHtml(f.label)} (${measurementUnit})${f.required ? ' *' : ''}</th>`).join('')}
+        <th width="60"></th>
+      `;
+
+      // Update body
+      const body = document.getElementById('size-table-body');
+      body.innerHTML = sizes.map((size, sizeIndex) => `
+        <tr data-size-index="${sizeIndex}">
+          <td>
+            <input type="text" class="size-name-input" value="${escapeHtml(size.name)}"
+                   onchange="updateSizeName(${sizeIndex}, this.value)">
+          </td>
+          ${measurementFields.map(field => `
+            <td>
+              <input type="number" step="0.1" min="0"
+                     value="${size.measurements[field.key] || ''}"
+                     onchange="updateMeasurement(${sizeIndex}, '${field.key}', this.value)"
+                     ${field.required ? 'required' : ''}>
+            </td>
+          `).join('')}
+          <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="removeSize(${sizeIndex})">×</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function addSize() {
+      sizes.push({ name: '', measurements: {} });
+      renderSizeTable();
+    }
+
+    function removeSize(index) {
+      sizes.splice(index, 1);
+      renderSizeTable();
+    }
+
+    function updateSizeName(index, value) {
+      sizes[index].name = value;
+    }
+
+    function updateMeasurement(sizeIndex, fieldKey, value) {
+      if (value === '' || value === null) {
+        delete sizes[sizeIndex].measurements[fieldKey];
+      } else {
+        sizes[sizeIndex].measurements[fieldKey] = parseFloat(value);
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text || '';
+      return div.innerHTML;
+    }
+
+    // Form submission
+    document.getElementById('template-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const category = document.getElementById('category').value;
+
+      if (!name) {
+        showToast('Please enter a template name', true);
+        return;
+      }
+
+      if (!category) {
+        showToast('Please select a category', true);
+        return;
+      }
+
+      // Validate sizes
+      const validSizes = sizes.filter(s => s.name.trim());
+      if (validSizes.length === 0) {
+        showToast('Please add at least one size', true);
+        return;
+      }
+
+      // Check required measurements
+      for (const size of validSizes) {
+        for (const field of measurementFields) {
+          if (field.required && !size.measurements[field.key]) {
+            showToast(`Size "${size.name}" is missing required measurement: ${field.label}`, true);
+            return;
+          }
+        }
+      }
+
+      const payload = {
+        name,
+        category,
+        measurementUnit,
+        measurementFields,
+        sizes: validSizes,
+      };
+
+      try {
+        if (MODE === 'edit') {
+          await apiPut(`/api/templates/${TEMPLATE_ID}`, payload);
+          showToast('Template updated successfully');
+        } else {
+          await apiPost('/api/templates', payload);
+          showToast('Template created successfully');
+        }
+
+        // Navigate back to templates list
+        setTimeout(() => {
+          navigateTo('/templates');
+        }, 500);
+
+      } catch (error) {
+        console.error('Error saving template:', error);
+        showToast(error.message || 'Failed to save template', true);
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>

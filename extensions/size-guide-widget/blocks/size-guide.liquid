@@ -1,0 +1,887 @@
+{% comment %}
+  Size Helper Widget - Theme App Extension Block
+  Displays "Size Guide" link on product pages that opens an interactive size finder
+{% endcomment %}
+
+<div id="size-helper-widget"
+     data-shop="{{ shop.permanent_domain }}"
+     data-product-id="{{ product.id }}"
+     data-product-title="{{ product.title | escape }}"
+     style="display: none;">
+
+  <button type="button" id="size-guide-btn" class="size-guide-trigger">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+      <line x1="12" y1="22.08" x2="12" y2="12"/>
+    </svg>
+    <span>{{ block.settings.button_text }}</span>
+  </button>
+</div>
+
+<!-- Size Guide Modal -->
+<div id="size-guide-modal" class="size-guide-modal" style="display: none;">
+  <div class="size-guide-modal-overlay"></div>
+  <div class="size-guide-modal-content">
+    <button type="button" class="size-guide-modal-close" aria-label="Close">&times;</button>
+
+    <div class="size-guide-header">
+      <h2>{{ block.settings.modal_title }}</h2>
+      <p>{{ block.settings.modal_subtitle }}</p>
+    </div>
+
+    <!-- Step 1: Size Chart -->
+    <div class="size-guide-step" data-step="1">
+      <div class="size-guide-unit-toggle">
+        <button type="button" class="unit-btn active" data-unit="cm">cm</button>
+        <button type="button" class="unit-btn" data-unit="in">inches</button>
+      </div>
+      <div id="size-chart-container">
+        <p class="loading-text">Loading size chart...</p>
+      </div>
+      <button type="button" class="size-guide-btn-primary" onclick="sizeHelper.goToStep(2)">
+        Find My Size
+      </button>
+    </div>
+
+    <!-- Step 2: Questionnaire -->
+    <div class="size-guide-step" data-step="2" style="display: none;">
+      <form id="size-finder-form">
+        <div class="form-section">
+          <label class="form-label">What size do you usually wear?</label>
+          <select id="usual-size" class="form-select">
+            <option value="">Select your usual size...</option>
+            <option value="XS">XS / Extra Small</option>
+            <option value="S">S / Small</option>
+            <option value="M">M / Medium</option>
+            <option value="L">L / Large</option>
+            <option value="XL">XL / Extra Large</option>
+            <option value="XXL">XXL / 2XL</option>
+          </select>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">How would you describe your body shape?</label>
+          <div class="body-shapes" id="body-shapes">
+            <!-- Body shapes will be loaded dynamically -->
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">How do you like your fit?</label>
+          <div class="fit-options">
+            <label class="fit-option">
+              <input type="radio" name="fit" value="tight">
+              <span>Fitted</span>
+            </label>
+            <label class="fit-option">
+              <input type="radio" name="fit" value="regular" checked>
+              <span>Regular</span>
+            </label>
+            <label class="fit-option">
+              <input type="radio" name="fit" value="loose">
+              <span>Relaxed</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-section collapsible">
+          <button type="button" class="collapsible-toggle" onclick="sizeHelper.toggleMeasurements()">
+            <span>I know my measurements (optional)</span>
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6,9 12,15 18,9"/>
+            </svg>
+          </button>
+          <div id="measurements-section" class="measurements-inputs" style="display: none;">
+            <!-- Measurement inputs will be loaded dynamically -->
+          </div>
+        </div>
+
+        <button type="submit" class="size-guide-btn-primary">
+          Get My Recommendation
+        </button>
+        <button type="button" class="size-guide-btn-secondary" onclick="sizeHelper.goToStep(1)">
+          Back to Size Chart
+        </button>
+      </form>
+    </div>
+
+    <!-- Step 3: Recommendation -->
+    <div class="size-guide-step" data-step="3" style="display: none;">
+      <div class="recommendation-result">
+        <div class="recommended-size" id="recommended-size">M</div>
+        <div class="confidence-badge" id="confidence-badge">
+          <span class="confidence-icon">✓</span>
+          <span id="confidence-text">Good match</span>
+        </div>
+      </div>
+      <div class="recommendation-reasoning" id="recommendation-reasoning">
+        <!-- Reasoning will be populated dynamically -->
+      </div>
+      <div class="recommendation-actions">
+        <button type="button" class="size-guide-btn-primary" onclick="sizeHelper.closeModal()">
+          Continue Shopping
+        </button>
+        <button type="button" class="size-guide-btn-secondary" onclick="sizeHelper.goToStep(2)">
+          Try Again
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  #size-helper-widget {
+    margin: 12px 0;
+  }
+
+  .size-guide-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: {{ block.settings.button_background }};
+    color: {{ block.settings.button_text_color }};
+    border: 1px solid {{ block.settings.button_border_color }};
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .size-guide-trigger:hover {
+    background: {{ block.settings.button_hover_background }};
+    color: {{ block.settings.button_hover_text_color }};
+  }
+
+  .size-guide-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .size-guide-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .size-guide-modal-content {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .size-guide-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f1f1f1;
+    border-radius: 50%;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    color: #666;
+    transition: background 0.2s;
+  }
+
+  .size-guide-modal-close:hover {
+    background: #e0e0e0;
+  }
+
+  .size-guide-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .size-guide-header h2 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .size-guide-header p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+  }
+
+  .size-guide-unit-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+
+  .unit-btn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .unit-btn:first-child {
+    border-radius: 6px 0 0 6px;
+  }
+
+  .unit-btn:last-child {
+    border-radius: 0 6px 6px 0;
+  }
+
+  .unit-btn.active {
+    background: {{ block.settings.accent_color }};
+    color: white;
+    border-color: {{ block.settings.accent_color }};
+  }
+
+  .size-chart-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+
+  .size-chart-table th,
+  .size-chart-table td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+  }
+
+  .size-chart-table th {
+    background: #f9f9f9;
+    font-weight: 600;
+  }
+
+  .size-chart-table tr:hover {
+    background: #f5f5f5;
+  }
+
+  .form-section {
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .form-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    appearance: none;
+    background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 12px center;
+  }
+
+  .body-shapes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+  }
+
+  .body-shape-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 12px;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .body-shape-option:hover {
+    border-color: #ccc;
+  }
+
+  .body-shape-option.selected {
+    border-color: {{ block.settings.accent_color }};
+    background: {{ block.settings.accent_color }}10;
+  }
+
+  .body-shape-icon {
+    width: 48px;
+    height: 64px;
+    margin-bottom: 8px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+
+  .body-shape-label {
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  .body-shape-desc {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  .fit-options {
+    display: flex;
+    gap: 12px;
+  }
+
+  .fit-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: 2px solid #eee;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .fit-option:has(input:checked) {
+    border-color: {{ block.settings.accent_color }};
+    background: {{ block.settings.accent_color }}10;
+  }
+
+  .fit-option input {
+    display: none;
+  }
+
+  .collapsible-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 0;
+    border: none;
+    background: none;
+    font-size: 14px;
+    color: {{ block.settings.accent_color }};
+    cursor: pointer;
+  }
+
+  .collapsible-toggle .chevron {
+    transition: transform 0.2s;
+  }
+
+  .collapsible-toggle.open .chevron {
+    transform: rotate(180deg);
+  }
+
+  .measurements-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    padding-top: 12px;
+  }
+
+  .measurement-input {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .measurement-input label {
+    font-size: 12px;
+    color: #666;
+  }
+
+  .measurement-input input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  .size-guide-btn-primary {
+    width: 100%;
+    padding: 14px 24px;
+    background: {{ block.settings.accent_color }};
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-top: 12px;
+  }
+
+  .size-guide-btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  .size-guide-btn-secondary {
+    width: 100%;
+    padding: 12px 24px;
+    background: transparent;
+    color: #666;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 8px;
+  }
+
+  .size-guide-btn-secondary:hover {
+    background: #f5f5f5;
+  }
+
+  .recommendation-result {
+    text-align: center;
+    padding: 32px 0;
+  }
+
+  .recommended-size {
+    font-size: 72px;
+    font-weight: 700;
+    color: {{ block.settings.accent_color }};
+    line-height: 1;
+  }
+
+  .confidence-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .confidence-badge.medium {
+    background: #fff3e0;
+    color: #ef6c00;
+  }
+
+  .confidence-badge.low {
+    background: #fce4ec;
+    color: #c2185b;
+  }
+
+  .recommendation-reasoning {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .recommendation-reasoning ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .recommendation-reasoning li {
+    margin-bottom: 6px;
+  }
+
+  .loading-text {
+    text-align: center;
+    color: #888;
+    padding: 40px 0;
+  }
+
+  @media (max-width: 480px) {
+    .size-guide-modal-content {
+      padding: 24px 16px;
+      border-radius: 16px 16px 0 0;
+      max-height: 95vh;
+    }
+
+    .size-guide-modal {
+      align-items: flex-end;
+      padding: 0;
+    }
+
+    .body-shapes {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .fit-options {
+      flex-direction: column;
+    }
+
+    .recommended-size {
+      font-size: 56px;
+    }
+  }
+</style>
+
+<script>
+  (function() {
+    const sizeHelper = {
+      apiBase: '{{ shop.secure_url }}/apps/size-helper/api/public',
+      shop: '{{ shop.permanent_domain }}',
+      productId: '{{ product.id }}',
+      currentUnit: 'cm',
+      sizeChart: null,
+      selectedBodyShape: null,
+
+      async init() {
+        // Check if product has a size guide
+        try {
+          const response = await fetch(
+            `${this.apiBase}/has-size-guide?shop=${this.shop}&productId=${this.productId}`
+          );
+          const data = await response.json();
+
+          if (data.hasSizeGuide) {
+            document.getElementById('size-helper-widget').style.display = 'block';
+            this.attachEventListeners();
+            this.loadSizeChart();
+          }
+        } catch (error) {
+          console.error('Size Helper: Error checking availability', error);
+        }
+      },
+
+      attachEventListeners() {
+        // Open modal
+        document.getElementById('size-guide-btn').addEventListener('click', () => this.openModal());
+
+        // Close modal
+        document.querySelector('.size-guide-modal-overlay').addEventListener('click', () => this.closeModal());
+        document.querySelector('.size-guide-modal-close').addEventListener('click', () => this.closeModal());
+
+        // Unit toggle
+        document.querySelectorAll('.unit-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            this.currentUnit = e.target.dataset.unit;
+            this.renderSizeChart();
+          });
+        });
+
+        // Form submission
+        document.getElementById('size-finder-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.getRecommendation();
+        });
+
+        // ESC key to close
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') this.closeModal();
+        });
+      },
+
+      async loadSizeChart() {
+        try {
+          const response = await fetch(
+            `${this.apiBase}/size-chart?shop=${this.shop}&productId=${this.productId}`
+          );
+          this.sizeChart = await response.json();
+          this.renderSizeChart();
+          this.renderBodyShapes();
+          this.renderMeasurementInputs();
+        } catch (error) {
+          console.error('Size Helper: Error loading size chart', error);
+          document.getElementById('size-chart-container').innerHTML =
+            '<p class="loading-text">Unable to load size chart</p>';
+        }
+      },
+
+      renderSizeChart() {
+        if (!this.sizeChart) return;
+
+        const container = document.getElementById('size-chart-container');
+        const fields = this.sizeChart.measurementFields;
+        const sizes = this.sizeChart.sizes;
+        const unit = this.currentUnit;
+        const chartUnit = this.sizeChart.measurementUnit;
+
+        const convertValue = (val) => {
+          if (val === null || val === undefined) return '-';
+          if (unit === chartUnit) return val;
+          if (chartUnit === 'cm' && unit === 'in') return (val / 2.54).toFixed(1);
+          if (chartUnit === 'in' && unit === 'cm') return (val * 2.54).toFixed(1);
+          return val;
+        };
+
+        let html = `
+          <table class="size-chart-table">
+            <thead>
+              <tr>
+                <th>Size</th>
+                ${fields.map(f => `<th>${f.label} (${unit})</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${sizes.map(size => `
+                <tr>
+                  <td><strong>${size.name}</strong></td>
+                  ${fields.map(f => `<td>${convertValue(size.measurements[f.key])}</td>`).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+
+        container.innerHTML = html;
+      },
+
+      renderBodyShapes() {
+        if (!this.sizeChart || !this.sizeChart.bodyShapes) return;
+
+        const container = document.getElementById('body-shapes');
+
+        // Placeholder icons for body shapes
+        const icons = {
+          slim: '🧍',
+          regular: '🧍',
+          athletic: '💪',
+          relaxed: '🧍'
+        };
+
+        container.innerHTML = this.sizeChart.bodyShapes.map(shape => `
+          <div class="body-shape-option" data-shape="${shape.key}" onclick="sizeHelper.selectBodyShape('${shape.key}')">
+            <div class="body-shape-icon">${icons[shape.key] || '🧍'}</div>
+            <div class="body-shape-label">${shape.label}</div>
+            <div class="body-shape-desc">${shape.description}</div>
+          </div>
+        `).join('');
+      },
+
+      renderMeasurementInputs() {
+        if (!this.sizeChart) return;
+
+        const container = document.getElementById('measurements-section');
+        const fields = this.sizeChart.measurementFields;
+
+        container.innerHTML = fields.map(f => `
+          <div class="measurement-input">
+            <label for="measure-${f.key}">${f.label} (${this.currentUnit})</label>
+            <input type="number" id="measure-${f.key}" step="0.1" min="0" data-field="${f.key}">
+          </div>
+        `).join('');
+      },
+
+      selectBodyShape(key) {
+        this.selectedBodyShape = key;
+        document.querySelectorAll('.body-shape-option').forEach(el => {
+          el.classList.toggle('selected', el.dataset.shape === key);
+        });
+      },
+
+      toggleMeasurements() {
+        const section = document.getElementById('measurements-section');
+        const toggle = document.querySelector('.collapsible-toggle');
+        const isOpen = section.style.display !== 'none';
+
+        section.style.display = isOpen ? 'none' : 'grid';
+        toggle.classList.toggle('open', !isOpen);
+      },
+
+      openModal() {
+        document.getElementById('size-guide-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        this.goToStep(1);
+      },
+
+      closeModal() {
+        document.getElementById('size-guide-modal').style.display = 'none';
+        document.body.style.overflow = '';
+      },
+
+      goToStep(step) {
+        document.querySelectorAll('.size-guide-step').forEach(el => {
+          el.style.display = el.dataset.step == step ? 'block' : 'none';
+        });
+      },
+
+      async getRecommendation() {
+        const usualSize = document.getElementById('usual-size').value;
+        const fit = document.querySelector('input[name="fit"]:checked')?.value;
+
+        // Collect measurements if provided
+        const measurements = {};
+        document.querySelectorAll('#measurements-section input').forEach(input => {
+          if (input.value) {
+            measurements[input.dataset.field] = parseFloat(input.value);
+          }
+        });
+
+        const payload = {
+          shop: this.shop,
+          productId: this.productId,
+          usualSize,
+          bodyShape: this.selectedBodyShape,
+          preferredFit: fit,
+          measurements: Object.keys(measurements).length > 0 ? measurements : null,
+          measurementUnit: this.currentUnit
+        };
+
+        try {
+          const response = await fetch(`${this.apiBase}/recommend`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const result = await response.json();
+
+          if (result.error) {
+            alert(result.error);
+            return;
+          }
+
+          this.showRecommendation(result);
+          this.goToStep(3);
+
+        } catch (error) {
+          console.error('Size Helper: Error getting recommendation', error);
+          alert('Sorry, we couldn\'t get your size recommendation. Please try again.');
+        }
+      },
+
+      showRecommendation(result) {
+        document.getElementById('recommended-size').textContent = result.recommendedSize;
+
+        const badge = document.getElementById('confidence-badge');
+        const confidenceText = document.getElementById('confidence-text');
+
+        badge.className = 'confidence-badge';
+        if (result.confidence === 'high') {
+          confidenceText.textContent = 'Great match!';
+        } else if (result.confidence === 'medium') {
+          badge.classList.add('medium');
+          confidenceText.textContent = 'Good match';
+        } else {
+          badge.classList.add('low');
+          confidenceText.textContent = 'Best estimate';
+        }
+
+        const reasoning = document.getElementById('recommendation-reasoning');
+        if (result.reasoning && result.reasoning.length > 0) {
+          reasoning.innerHTML = `
+            <ul>
+              ${result.reasoning.map(r => `<li>${r}</li>`).join('')}
+            </ul>
+          `;
+          reasoning.style.display = 'block';
+        } else {
+          reasoning.style.display = 'none';
+        }
+      }
+    };
+
+    // Make globally available
+    window.sizeHelper = sizeHelper;
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => sizeHelper.init());
+    } else {
+      sizeHelper.init();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Size Guide",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Size Guide"
+    },
+    {
+      "type": "text",
+      "id": "modal_title",
+      "label": "Modal Title",
+      "default": "Find Your Perfect Fit"
+    },
+    {
+      "type": "text",
+      "id": "modal_subtitle",
+      "label": "Modal Subtitle",
+      "default": "Use our size guide to find the best size for you"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#008060"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Button Border Color",
+      "default": "#dddddd"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "Button Hover Background",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Button Hover Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Button Border Radius",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 6,
+      "unit": "px"
+    }
+  ]
+}
+{% endschema %}

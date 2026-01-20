@@ -1,0 +1,33 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "Size Helper"
+client_id = "154f1d77bd75ca9d8a0c638bcc64059c"
+application_url = "https://offendedly-drys-lauri.ngrok-free.dev"
+embedded = true
+
+[access_scopes]
+scopes = "read_products,read_inventory,write_customers,read_orders"
+
+[auth]
+redirect_urls = [
+  "https://offendedly-drys-lauri.ngrok-free.dev/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-01"
+
+  [[webhooks.subscriptions]]
+  topics = ["app/uninstalled"]
+  uri = "/api/webhooks/app/uninstalled"
+
+[app_proxy]
+url = "/api/public"
+subpath = "size-helper"
+prefix = "apps"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "reedmace.myshopify.com"

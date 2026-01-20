@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Size Helper - Analytics</title>
+  <link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/polarisv12/polaris.min.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background-color: #f6f6f7;
+      margin: 0;
+      padding: 20px;
+    }
+    .page-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e1e3e5;
+      padding-bottom: 12px;
+    }
+    .nav-tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #202223;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    .nav-tab:hover {
+      background-color: #f1f2f3;
+    }
+    .nav-tab.active {
+      background-color: #008060;
+      color: white;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #202223;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: #6d7175;
+      margin-top: 4px;
+    }
+    .chart-container {
+      height: 300px;
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .chart-bar {
+      display: flex;
+      align-items: flex-end;
+      height: 200px;
+      gap: 8px;
+      padding: 0 20px;
+    }
+    .bar-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .bar {
+      width: 100%;
+      max-width: 40px;
+      background: #008060;
+      border-radius: 4px 4px 0 0;
+      min-height: 4px;
+      transition: height 0.3s;
+    }
+    .bar.secondary {
+      background: #95c9b4;
+    }
+    .bar-label {
+      font-size: 11px;
+      color: #6d7175;
+      text-align: center;
+    }
+    .chart-legend {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 16px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+    .product-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .product-table th, .product-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e1e3e5;
+    }
+    .product-table th {
+      font-weight: 500;
+      background: #f9fafb;
+    }
+    .period-select {
+      padding: 8px 12px;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6d7175;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #6d7175;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <nav class="nav-tabs">
+      <a href="/" class="nav-tab">Dashboard</a>
+      <a href="/templates" class="nav-tab">Size Templates</a>
+      <a href="/products" class="nav-tab">Products</a>
+      <a href="/analytics" class="nav-tab active">Analytics</a>
+      <a href="/settings" class="nav-tab">Settings</a>
+    </nav>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Analytics Overview</h2>
+        <select class="period-select" id="period-select" onchange="loadAnalytics()">
+          <option value="7">Last 7 days</option>
+          <option value="30" selected>Last 30 days</option>
+          <option value="90">Last 90 days</option>
+        </select>
+      </div>
+
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-opens">-</div>
+          <div class="stat-label">Size Guide Opens</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-recommendations">-</div>
+          <div class="stat-label">Recommendations Made</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-conversion">-</div>
+          <div class="stat-label">Conversion Rate</div>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <h3 style="margin: 0 0 16px 0; font-size: 16px;">Daily Activity</h3>
+        <div class="chart-bar" id="chart-bars">
+          <div class="loading">Loading chart...</div>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background: #008060;"></div>
+            <span>Size Guide Opens</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #95c9b4;"></div>
+            <span>Recommendations</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Top Products</h2>
+      </div>
+      <div id="top-products">
+        <div class="loading">Loading...</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Recent Recommendations</h2>
+      </div>
+      <div id="recent-recommendations">
+        <div class="loading">Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  {{authHelpers}}
+
+  <script>
+    async function init() {
+      try {
+        await initAppBridge();
+        await loadAnalytics();
+      } catch (error) {
+        console.error('Error initializing:', error);
+        showToast('Failed to load analytics', true);
+      }
+    }
+
+    async function loadAnalytics() {
+      const days = document.getElementById('period-select').value;
+
+      try {
+        // Load all data in parallel
+        const [dashboardData, timelineData, topProductsData, recommendationsData] = await Promise.all([
+          apiGet(`/api/analytics/dashboard?days=${days}`),
+          apiGet(`/api/analytics/timeline?days=${days}`),
+          apiGet(`/api/analytics/top-products?days=${days}&limit=10`),
+          apiGet('/api/analytics/recommendations?limit=20'),
+        ]);
+
+        // Update stats
+        document.getElementById('stat-opens').textContent = dashboardData.totals.sizeGuideOpened.toLocaleString();
+        document.getElementById('stat-recommendations').textContent = dashboardData.totals.recommendationMade.toLocaleString();
+        document.getElementById('stat-conversion').textContent = dashboardData.conversionRate + '%';
+
+        // Render chart
+        renderChart(timelineData.timeline);
+
+        // Render top products
+        renderTopProducts(topProductsData.products);
+
+        // Render recent recommendations
+        renderRecommendations(recommendationsData.recommendations);
+
+      } catch (error) {
+        console.error('Error loading analytics:', error);
+        showToast('Failed to load analytics data', true);
+      }
+    }
+
+    function renderChart(timeline) {
+      const container = document.getElementById('chart-bars');
+
+      if (!timeline || timeline.length === 0) {
+        container.innerHTML = '<div class="empty-state">No data available for this period</div>';
+        return;
+      }
+
+      // Find max value for scaling
+      const maxValue = Math.max(
+        ...timeline.map(d => Math.max(d.sizeGuideOpened, d.recommendationMade)),
+        1
+      );
+
+      // Show last 14 days max for readability
+      const displayData = timeline.slice(-14);
+
+      container.innerHTML = displayData.map(day => {
+        const opensHeight = (day.sizeGuideOpened / maxValue) * 180;
+        const recsHeight = (day.recommendationMade / maxValue) * 180;
+        const dateLabel = new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+        return `
+          <div class="bar-group">
+            <div style="display: flex; gap: 2px; align-items: flex-end; height: 180px;">
+              <div class="bar" style="height: ${opensHeight}px;" title="Opens: ${day.sizeGuideOpened}"></div>
+              <div class="bar secondary" style="height: ${recsHeight}px;" title="Recommendations: ${day.recommendationMade}"></div>
+            </div>
+            <div class="bar-label">${dateLabel}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderTopProducts(products) {
+      const container = document.getElementById('top-products');
+
+      if (!products || products.length === 0) {
+        container.innerHTML = '<div class="empty-state">No product data available</div>';
+        return;
+      }
+
+      container.innerHTML = `
+        <table class="product-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Opens</th>
+              <th>Recommendations</th>
+              <th>Conversion</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${products.map(p => `
+              <tr>
+                <td>${escapeHtml(p.productTitle)}</td>
+                <td>${p.opens.toLocaleString()}</td>
+                <td>${p.recommendations.toLocaleString()}</td>
+                <td>${p.conversionRate}%</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderRecommendations(recommendations) {
+      const container = document.getElementById('recent-recommendations');
+
+      if (!recommendations || recommendations.length === 0) {
+        container.innerHTML = '<div class="empty-state">No recommendations yet</div>';
+        return;
+      }
+
+      container.innerHTML = `
+        <table class="product-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Product</th>
+              <th>Template</th>
+              <th>Recommended Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${recommendations.map(r => `
+              <tr>
+                <td>${new Date(r.created_at).toLocaleString()}</td>
+                <td>${escapeHtml(r.product_title || 'Product ' + r.product_id)}</td>
+                <td>${escapeHtml(r.template_name || '-')}</td>
+                <td><strong>${escapeHtml(r.recommended_size)}</strong></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text || '';
+      return div.innerHTML;
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Size Helper - Settings</title>
+  <link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/polarisv12/polaris.min.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background-color: #f6f6f7;
+      margin: 0;
+      padding: 20px;
+    }
+    .page-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e1e3e5;
+      padding-bottom: 12px;
+    }
+    .nav-tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #202223;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    .nav-tab:hover {
+      background-color: #f1f2f3;
+    }
+    .nav-tab.active {
+      background-color: #008060;
+      color: white;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background-color: #008060;
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #006e52;
+    }
+    .btn-secondary {
+      background-color: #f1f2f3;
+      color: #202223;
+    }
+    .btn-secondary:hover {
+      background-color: #e1e3e5;
+    }
+    .btn-danger {
+      background-color: #d72c0d;
+      color: white;
+    }
+    .btn-danger:hover {
+      background-color: #bc2200;
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+    .pricing-card {
+      border: 2px solid #e1e3e5;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .pricing-card.current {
+      border-color: #008060;
+      background: #f0fdf4;
+    }
+    .pricing-card.recommended {
+      border-color: #008060;
+    }
+    .pricing-tier {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .pricing-price {
+      font-size: 36px;
+      font-weight: 700;
+      color: #008060;
+    }
+    .pricing-price span {
+      font-size: 14px;
+      font-weight: 400;
+      color: #6d7175;
+    }
+    .pricing-features {
+      margin: 20px 0;
+      text-align: left;
+    }
+    .pricing-feature {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+    .pricing-feature::before {
+      content: "✓";
+      color: #008060;
+      font-weight: bold;
+    }
+    .current-badge {
+      display: inline-block;
+      background: #008060;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .usage-section {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .usage-bar {
+      background: #e1e3e5;
+      border-radius: 4px;
+      height: 8px;
+      margin: 12px 0;
+      overflow: hidden;
+    }
+    .usage-fill {
+      background: #008060;
+      height: 100%;
+      transition: width 0.3s;
+    }
+    .usage-fill.warning {
+      background: #ffc453;
+    }
+    .usage-fill.danger {
+      background: #d72c0d;
+    }
+    .usage-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #6d7175;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6d7175;
+    }
+    .info-text {
+      font-size: 14px;
+      color: #6d7175;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <nav class="nav-tabs">
+      <a href="/" class="nav-tab">Dashboard</a>
+      <a href="/templates" class="nav-tab">Size Templates</a>
+      <a href="/products" class="nav-tab">Products</a>
+      <a href="/analytics" class="nav-tab">Analytics</a>
+      <a href="/settings" class="nav-tab active">Settings</a>
+    </nav>
+
+    <div class="card">
+      <h2 class="card-title">Current Usage</h2>
+      <div class="usage-section" id="usage-section">
+        <div class="loading">Loading...</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Subscription Plans</h2>
+      <p class="info-text" style="margin-bottom: 20px;">Choose the plan that best fits your needs. Upgrade or downgrade at any time.</p>
+
+      <div class="pricing-grid" id="pricing-grid">
+        <div class="loading">Loading plans...</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Danger Zone</h2>
+      <p class="info-text">Downgrading to the free plan will cancel your current subscription.</p>
+      <button class="btn btn-danger" id="cancel-btn" onclick="cancelSubscription()" style="margin-top: 12px; display: none;">
+        Cancel Subscription
+      </button>
+    </div>
+  </div>
+
+  {{authHelpers}}
+
+  <script>
+    let currentSubscription = null;
+    let allTiers = [];
+
+    async function init() {
+      try {
+        await initAppBridge();
+
+        // Load tiers and current subscription
+        const [tiersData, subscriptionData] = await Promise.all([
+          apiGet('/api/billing/tiers'),
+          apiGet('/api/billing/current'),
+        ]);
+
+        allTiers = tiersData.tiers;
+        currentSubscription = subscriptionData.subscription;
+
+        renderUsage();
+        renderPricing();
+
+        // Show cancel button if on paid plan
+        if (currentSubscription.tier !== 'STARTUP') {
+          document.getElementById('cancel-btn').style.display = 'inline-flex';
+        }
+
+      } catch (error) {
+        console.error('Error initializing:', error);
+        showToast('Failed to load settings', true);
+      }
+    }
+
+    function renderUsage() {
+      const container = document.getElementById('usage-section');
+      const sub = currentSubscription;
+
+      const percentage = (sub.productTypeCount / sub.productTypeLimit) * 100;
+      let fillClass = '';
+      if (percentage >= 90) fillClass = 'danger';
+      else if (percentage >= 70) fillClass = 'warning';
+
+      container.innerHTML = `
+        <div style="font-weight: 600; margin-bottom: 4px;">
+          ${sub.tierName} Plan - Product Types
+        </div>
+        <div class="usage-bar">
+          <div class="usage-fill ${fillClass}" style="width: ${percentage}%;"></div>
+        </div>
+        <div class="usage-text">
+          <span>${sub.productTypeCount} of ${sub.productTypeLimit} used</span>
+          <span>${sub.remainingSlots} remaining</span>
+        </div>
+        ${sub.billingCycleEnd ? `
+          <div style="font-size: 13px; color: #6d7175; margin-top: 12px;">
+            Billing cycle ends: ${new Date(sub.billingCycleEnd).toLocaleDateString()}
+          </div>
+        ` : ''}
+      `;
+    }
+
+    function renderPricing() {
+      const container = document.getElementById('pricing-grid');
+
+      container.innerHTML = allTiers.map(tier => {
+        const isCurrent = tier.key === currentSubscription.tier;
+        const isUpgrade = tier.price > (allTiers.find(t => t.key === currentSubscription.tier)?.price || 0);
+
+        return `
+          <div class="pricing-card ${isCurrent ? 'current' : ''}">
+            ${isCurrent ? '<div class="current-badge">Current Plan</div>' : ''}
+            <div class="pricing-tier">${tier.name}</div>
+            <div class="pricing-price">
+              ${tier.price === 0 ? 'Free' : `$${tier.price}<span>/month</span>`}
+            </div>
+            <div class="pricing-features">
+              <div class="pricing-feature">Up to ${tier.productTypeLimit} product types</div>
+              <div class="pricing-feature">Unlimited size recommendations</div>
+              <div class="pricing-feature">Analytics dashboard</div>
+              <div class="pricing-feature">Storefront widget</div>
+            </div>
+            ${isCurrent ? `
+              <button class="btn btn-secondary" disabled>Current Plan</button>
+            ` : `
+              <button class="btn btn-primary" onclick="selectPlan('${tier.key}')">
+                ${isUpgrade ? 'Upgrade' : 'Downgrade'} to ${tier.name}
+              </button>
+            `}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function selectPlan(tierKey) {
+      const tier = allTiers.find(t => t.key === tierKey);
+      const currentTier = allTiers.find(t => t.key === currentSubscription.tier);
+
+      // Confirm downgrade
+      if (tier.price < currentTier.price) {
+        if (!confirm(`Downgrade to ${tier.name}? This will reduce your product type limit to ${tier.productTypeLimit}.`)) {
+          return;
+        }
+      }
+
+      try {
+        const result = await apiPost('/api/billing/subscribe', { tier: tierKey });
+
+        if (result.requiresApproval && result.confirmationUrl) {
+          // Redirect to Shopify approval page
+          window.top.location.href = result.confirmationUrl;
+        } else {
+          // Free tier - immediate success
+          showToast('Plan updated successfully');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
+
+      } catch (error) {
+        console.error('Error changing plan:', error);
+        showToast('Failed to change plan', true);
+      }
+    }
+
+    async function cancelSubscription() {
+      if (!confirm('Cancel your subscription and downgrade to the free Startup plan? This will reduce your product type limit to 2.')) {
+        return;
+      }
+
+      try {
+        await apiPost('/api/billing/cancel', {});
+        showToast('Subscription cancelled. You are now on the Startup plan.');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } catch (error) {
+        console.error('Error cancelling subscription:', error);
+        showToast('Failed to cancel subscription', true);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

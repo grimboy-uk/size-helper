@@ -1,4 +1,12 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from backend root (one level up from src)
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -50,6 +58,9 @@ const shopify = shopifyApp({
   },
   sessionStorage,
   useOnlineTokens: false,
+  future: {
+    unstable_managedPricingSupport: true,
+  },
 });
 
 // Store raw body for webhook verification
@@ -144,8 +155,11 @@ app.get(
 
       logger.info('Shop record created/updated:', session.shop);
 
-      // Redirect to app
-      res.redirect(`/?shop=${session.shop}&host=${req.query.host}`);
+      // Redirect to embedded app in Shopify Admin
+      const redirectUrl = `https://${session.shop}/admin/apps/${process.env.SHOPIFY_API_KEY}`;
+
+      logger.info('Redirecting to:', redirectUrl);
+      res.redirect(redirectUrl);
     } catch (error) {
       logger.error('Auth callback error:', error);
       next(error);
@@ -281,7 +295,8 @@ async function start() {
       logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
     });
   } catch (error) {
-    logger.error('Failed to start server:', error);
+    logger.error('Failed to start server:', error.message || error);
+    console.error('Full error:', error);
     process.exit(1);
   }
 }

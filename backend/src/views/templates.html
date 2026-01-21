@@ -4,57 +4,83 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Size Helper - Templates</title>
-  <link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/polarisv12/polaris.min.css">
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background-color: #f6f6f7;
+      background-color: #f1f1f1;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+    }
+    .app-header {
+      background: white;
+      border-bottom: 1px solid #e1e3e5;
+      padding: 0 24px;
+    }
+    .app-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #202223;
+      padding: 16px 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .app-title-icon {
+      width: 24px;
+      height: 24px;
+      background: #d4534a;
+      border-radius: 4px;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 32px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .nav-tab {
+      padding: 12px 0;
+      text-decoration: none;
+      color: #6d7175;
+      font-size: 14px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .nav-tab:hover {
+      color: #202223;
+    }
+    .nav-tab.active {
+      color: #202223;
+      border-bottom-color: #2a9d6e;
     }
     .page-container {
-      max-width: 1200px;
+      max-width: 1000px;
       margin: 0 auto;
+      padding: 24px;
     }
     .card {
       background: white;
       border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
     .card-title {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 600;
-      margin: 0;
-    }
-    .nav-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #e1e3e5;
-      padding-bottom: 12px;
-    }
-    .nav-tab {
-      padding: 8px 16px;
-      border-radius: 6px;
-      text-decoration: none;
       color: #202223;
-      font-weight: 500;
-      transition: background-color 0.2s;
-    }
-    .nav-tab:hover {
-      background-color: #f1f2f3;
-    }
-    .nav-tab.active {
-      background-color: #008060;
-      color: white;
+      margin: 0;
     }
     .btn {
       display: inline-flex;
@@ -66,15 +92,15 @@
       font-weight: 500;
       cursor: pointer;
       border: none;
-      transition: background-color 0.2s;
       text-decoration: none;
+      transition: background-color 0.2s;
     }
     .btn-primary {
-      background-color: #008060;
+      background-color: #2a9d6e;
       color: white;
     }
     .btn-primary:hover {
-      background-color: #006e52;
+      background-color: #238c5f;
     }
     .btn-secondary {
       background-color: #f1f2f3;
@@ -94,6 +120,31 @@
       padding: 6px 12px;
       font-size: 13px;
     }
+    .usage-bar-container {
+      margin-bottom: 20px;
+    }
+    .usage-bar {
+      background: #e1e3e5;
+      border-radius: 4px;
+      height: 8px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .usage-fill {
+      background: #2a9d6e;
+      height: 100%;
+      transition: width 0.3s;
+    }
+    .usage-fill.warning {
+      background: #ffc453;
+    }
+    .usage-fill.danger {
+      background: #d72c0d;
+    }
+    .usage-text {
+      font-size: 13px;
+      color: #6d7175;
+    }
     .template-list {
       display: flex;
       flex-direction: column;
@@ -104,7 +155,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 16px;
-      background: #f9fafb;
+      background: #f8f9fa;
       border-radius: 8px;
       transition: background-color 0.2s;
     }
@@ -113,8 +164,9 @@
     }
     .template-info h3 {
       margin: 0 0 4px 0;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
+      color: #202223;
     }
     .template-meta {
       display: flex;
@@ -134,12 +186,12 @@
       font-weight: 500;
     }
     .badge-active {
-      background: #d4edda;
-      color: #155724;
+      background: #e8f5e9;
+      color: #2a9d6e;
     }
     .badge-inactive {
-      background: #f8d7da;
-      color: #721c24;
+      background: #fdecea;
+      color: #d72c0d;
     }
     .empty-state {
       text-align: center;
@@ -153,28 +205,6 @@
     .empty-state p {
       margin: 0 0 20px 0;
     }
-    .usage-bar {
-      background: #e1e3e5;
-      border-radius: 4px;
-      height: 8px;
-      margin-bottom: 8px;
-      overflow: hidden;
-    }
-    .usage-fill {
-      background: #008060;
-      height: 100%;
-      transition: width 0.3s;
-    }
-    .usage-fill.warning {
-      background: #ffc453;
-    }
-    .usage-fill.danger {
-      background: #d72c0d;
-    }
-    .usage-text {
-      font-size: 13px;
-      color: #6d7175;
-    }
     .loading {
       text-align: center;
       padding: 40px;
@@ -183,22 +213,28 @@
   </style>
 </head>
 <body>
-  <div class="page-container">
+  <header class="app-header">
+    <h1 class="app-title">
+      <span class="app-title-icon"></span>
+      RMS Size Helper
+    </h1>
     <nav class="nav-tabs">
-      <a href="/" class="nav-tab">Dashboard</a>
-      <a href="/templates" class="nav-tab active">Size Templates</a>
-      <a href="/products" class="nav-tab">Products</a>
-      <a href="/analytics" class="nav-tab">Analytics</a>
-      <a href="/settings" class="nav-tab">Settings</a>
+      <a href="#" class="nav-tab" data-path="/">Dashboard</a>
+      <a href="#" class="nav-tab active" data-path="/templates">Size Templates</a>
+      <a href="#" class="nav-tab" data-path="/products">Products</a>
+      <a href="#" class="nav-tab" data-path="/analytics">Analytics</a>
+      <a href="#" class="nav-tab" data-path="/settings">Settings</a>
     </nav>
+  </header>
 
+  <div class="page-container">
     <div class="card">
       <div class="card-header">
         <h2 class="card-title">Size Templates</h2>
-        <a href="/templates/new" class="btn btn-primary" id="create-btn">+ Create Template</a>
+        <a href="#" class="btn btn-primary" id="create-btn" data-path="/templates/new">+ Create Template</a>
       </div>
 
-      <div id="usage-container" style="margin-bottom: 20px; display: none;">
+      <div id="usage-container" class="usage-bar-container" style="display: none;">
         <div class="usage-bar">
           <div class="usage-fill" id="usage-fill"></div>
         </div>
@@ -230,7 +266,6 @@
 
       } catch (error) {
         console.error('Error loading templates:', error);
-        showToast('Failed to load templates', true);
         document.getElementById('templates-container').innerHTML = `
           <div class="empty-state">
             <h3>Error loading templates</h3>
@@ -280,7 +315,7 @@
           <div class="empty-state">
             <h3>No templates yet</h3>
             <p>Create your first size template to start helping customers find their perfect fit.</p>
-            <a href="/templates/new" class="btn btn-primary">+ Create Template</a>
+            <a href="#" class="btn btn-primary" data-path="/templates/new">+ Create Template</a>
           </div>
         `;
         return;
@@ -302,7 +337,7 @@
                 </div>
               </div>
               <div class="template-actions">
-                <a href="/templates/${template.id}/edit" class="btn btn-secondary btn-sm">Edit</a>
+                <a href="#" class="btn btn-secondary btn-sm" data-path="/templates/${template.id}/edit">Edit</a>
                 <button class="btn btn-danger btn-sm" onclick="deleteTemplate(${template.id}, '${escapeHtml(template.name)}')">Delete</button>
               </div>
             </div>

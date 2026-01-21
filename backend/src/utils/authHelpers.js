@@ -4,6 +4,7 @@
  */
 
 export const authHelpersScript = `
+<script data-api-key="{{apiKey}}" src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
 <script>
   // Wait for App Bridge to be available
   function waitForAppBridge(maxWait = 5000) {
@@ -55,6 +56,8 @@ export const authHelpersScript = `
   async function authenticatedFetch(url, options = {}) {
     try {
       const token = await getSessionToken();
+      console.log('Session token obtained:', token ? 'Yes (length: ' + token.length + ')' : 'No');
+      console.log('Making request to:', url, 'Method:', options.method || 'GET');
 
       const headers = {
         ...options.headers,
@@ -62,10 +65,12 @@ export const authHelpersScript = `
         'Authorization': 'Bearer ' + token,
       };
 
+      console.log('Request headers:', headers);
       const response = await fetch(url, {
         ...options,
         headers,
       });
+      console.log('Response status:', response.status);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -122,14 +127,46 @@ export const authHelpersScript = `
     }
   }
 
-  // Navigate using App Bridge
+  // Navigate using App Bridge v4
+  // For embedded apps, simply change the iframe location
   function navigateTo(path) {
-    if (typeof window.shopify !== 'undefined' && window.shopify.navigate) {
-      window.shopify.navigate(path);
-    } else {
-      window.location.href = path;
-    }
+    // Construct full URL from relative path
+    const url = new URL(path, window.location.origin);
+    window.location.href = url.href;
   }
+
+  // Set up event delegation for navigation links
+  function setupNavigation() {
+    console.log('Setting up navigation event delegation');
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('[data-path]');
+      if (link) {
+        e.preventDefault();
+        e.stopPropagation();
+        const path = link.dataset.path;
+        console.log('Navigation click detected, path:', path);
+        navigateTo(path);
+      }
+    }, true); // Use capture phase to ensure this runs first
+  }
+
+  // Auto-setup navigation when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupNavigation);
+  } else {
+    setupNavigation();
+  }
+
+  // Expose functions globally for use in other scripts
+  window.initAppBridge = initAppBridge;
+  window.getSessionToken = getSessionToken;
+  window.authenticatedFetch = authenticatedFetch;
+  window.apiGet = apiGet;
+  window.apiPost = apiPost;
+  window.apiPut = apiPut;
+  window.apiDelete = apiDelete;
+  window.showToast = showToast;
+  window.navigateTo = navigateTo;
 </script>
 `;
 

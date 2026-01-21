@@ -91,7 +91,8 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://cdn.shopify.com'],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://cdn.shopify.com', 'https://*.shopify.com'],
+        scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers
         styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.shopify.com'],
         imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
         connectSrc: ["'self'", 'https://*.myshopify.com', 'https://*.shopify.com'],
@@ -184,101 +185,48 @@ app.use('/api/products', verifyShopMiddleware, productsRouter);
 app.use('/api/billing', verifyShopMiddleware, billingRouter);
 app.use('/api/analytics', verifyShopMiddleware, analyticsRouter);
 
-// Admin pages
-app.get('/', shopify.ensureInstalledOnShop(), async (req, res) => {
+// Helper to serve admin pages
+// ensureInstalledOnShop is only used on the root route when accessed with ?shop= param
+// Internal navigation via App Bridge doesn't need it since the session is maintained
+const serveAdminPage = (templateName, extras = {}) => async (req, res) => {
   try {
-    const html = loadTemplate('dashboard', {
+    const html = loadTemplate(templateName, {
       authHelpers: authHelpersScript,
       apiKey: process.env.SHOPIFY_API_KEY,
+      ...extras,
     });
+    // Prevent caching to ensure fresh content
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
     res.send(html);
   } catch (error) {
-    logger.error('Error loading dashboard:', error);
-    res.status(500).send('Error loading dashboard');
+    logger.error(`Error loading ${templateName} page:`, error);
+    res.status(500).send(`Error loading ${templateName} page`);
   }
-});
+};
 
-app.get('/templates', shopify.ensureInstalledOnShop(), async (req, res) => {
-  try {
-    const html = loadTemplate('templates', {
-      authHelpers: authHelpersScript,
-      apiKey: process.env.SHOPIFY_API_KEY,
-    });
-    res.send(html);
-  } catch (error) {
-    logger.error('Error loading templates page:', error);
-    res.status(500).send('Error loading templates page');
+// Root route - check for shop param and validate installation
+// If shop param is present, use ensureInstalledOnShop
+// If not (internal navigation), just serve the page
+app.get('/', (req, res, next) => {
+  if (req.query.shop) {
+    // External access with shop param - validate installation
+    return shopify.ensureInstalledOnShop()(req, res, next);
   }
-});
+  // Internal navigation - serve page directly
+  next();
+}, serveAdminPage('dashboard'));
 
-app.get('/templates/new', shopify.ensureInstalledOnShop(), async (req, res) => {
-  try {
-    const html = loadTemplate('template-form', {
-      authHelpers: authHelpersScript,
-      apiKey: process.env.SHOPIFY_API_KEY,
-      mode: 'create',
-      templateId: '',
-    });
-    res.send(html);
-  } catch (error) {
-    logger.error('Error loading template form:', error);
-    res.status(500).send('Error loading template form');
-  }
+// Other admin pages - serve directly (App Bridge maintains session)
+app.get('/templates', serveAdminPage('templates'));
+app.get('/templates/new', serveAdminPage('template-form', { mode: 'create', templateId: '' }));
+app.get('/templates/:id/edit', (req, res) => {
+  serveAdminPage('template-form', { mode: 'edit', templateId: req.params.id })(req, res);
 });
-
-app.get('/templates/:id/edit', shopify.ensureInstalledOnShop(), async (req, res) => {
-  try {
-    const html = loadTemplate('template-form', {
-      authHelpers: authHelpersScript,
-      apiKey: process.env.SHOPIFY_API_KEY,
-      mode: 'edit',
-      templateId: req.params.id,
-    });
-    res.send(html);
-  } catch (error) {
-    logger.error('Error loading template form:', error);
-    res.status(500).send('Error loading template form');
-  }
-});
-
-app.get('/products', shopify.ensureInstalledOnShop(), async (req, res) => {
-  try {
-    const html = loadTemplate('products', {
-      authHelpers: authHelpersScript,
-      apiKey: process.env.SHOPIFY_API_KEY,
-    });
-    res.send(html);
-  } catch (error) {
-    logger.error('Error loading products page:', error);
-    res.status(500).send('Error loading products page');
-  }
-});
-
-app.get('/analytics', shopify.ensureInstalledOnShop(), async (req, res) => {
-  try {
-    const html = loadTemplate('analytics', {
-      authHelpers: authHelpersScript,
-      apiKey: process.env.SHOPIFY_API_KEY,
-    });
-    res.send(html);
-  } catch (error) {
-    logger.error('Error loading analytics page:', error);
-    res.status(500).send('Error loading analytics page');
-  }
-});
-
-app.get('/settings', shopify.ensureInstalledOnShop(), async (req, res) => {
-  try {
-    const html = loadTemplate('settings', {
-      authHelpers: authHelpersScript,
-      apiKey: process.env.SHOPIFY_API_KEY,
-    });
-    res.send(html);
-  } catch (error) {
-    logger.error('Error loading settings page:', error);
-    res.status(500).send('Error loading settings page');
-  }
-});
+app.get('/products', serveAdminPage('products'));
+app.get('/analytics', serveAdminPage('analytics'));
+app.get('/settings', serveAdminPage('settings'));
 
 // Error handlers
 app.use(notFoundHandler);

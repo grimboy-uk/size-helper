@@ -39,6 +39,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const shopDomain = res.locals.shopify.shopDomain;
     const { active, category } = req.query;
+    logger.debug('Getting templates:', { shopDomain, active, category });
 
     const templates = await getTemplates(shopDomain, {
       activeOnly: active === 'true',
@@ -83,6 +84,7 @@ router.post(
     const shopDomain = res.locals.shopify.shopDomain;
     const { name, category, measurementUnit, measurementFields, sizes, bodyShapes } = req.body;
 
+    logger.debug('Creating template:', { shopDomain, name });
     // Validation
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Template name is required' });

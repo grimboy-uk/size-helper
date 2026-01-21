@@ -4,29 +4,89 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Size Helper - Template Form</title>
-  <link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/polarisv12/polaris.min.css">
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background-color: #f6f6f7;
+      background-color: #f1f1f1;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+    }
+    .app-header {
+      background: white;
+      border-bottom: 1px solid #e1e3e5;
+      padding: 0 24px;
+    }
+    .app-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #202223;
+      padding: 16px 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .app-title-icon {
+      width: 24px;
+      height: 24px;
+      background: #d4534a;
+      border-radius: 4px;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 32px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .nav-tab {
+      padding: 12px 0;
+      text-decoration: none;
+      color: #6d7175;
+      font-size: 14px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .nav-tab:hover {
+      color: #202223;
+    }
+    .nav-tab.active {
+      color: #202223;
+      border-bottom-color: #2a9d6e;
     }
     .page-container {
       max-width: 900px;
       margin: 0 auto;
+      padding: 24px;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #2a9d6e;
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .back-link:hover {
+      text-decoration: underline;
     }
     .card {
       background: white;
       border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     .card-title {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 600;
-      margin: 0 0 20px 0;
+      color: #202223;
+      margin: 0 0 24px 0;
     }
     .form-group {
       margin-bottom: 20px;
@@ -49,12 +109,11 @@
       border: 1px solid #c9cccf;
       border-radius: 6px;
       font-size: 14px;
-      box-sizing: border-box;
     }
     .form-input:focus, .form-select:focus {
       outline: none;
-      border-color: #008060;
-      box-shadow: 0 0 0 1px #008060;
+      border-color: #2a9d6e;
+      box-shadow: 0 0 0 1px #2a9d6e;
     }
     .form-row {
       display: grid;
@@ -71,15 +130,15 @@
       font-weight: 500;
       cursor: pointer;
       border: none;
-      transition: background-color 0.2s;
       text-decoration: none;
+      transition: background-color 0.2s;
     }
     .btn-primary {
-      background-color: #008060;
+      background-color: #2a9d6e;
       color: white;
     }
     .btn-primary:hover {
-      background-color: #006e52;
+      background-color: #238c5f;
     }
     .btn-secondary {
       background-color: #f1f2f3;
@@ -96,18 +155,6 @@
       padding: 6px 12px;
       font-size: 13px;
     }
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      color: #006e52;
-      text-decoration: none;
-      font-size: 14px;
-      margin-bottom: 16px;
-    }
-    .back-link:hover {
-      text-decoration: underline;
-    }
     .size-table {
       width: 100%;
       border-collapse: collapse;
@@ -120,7 +167,9 @@
     }
     .size-table th {
       font-weight: 500;
-      background: #f9fafb;
+      background: #f8f9fa;
+      font-size: 13px;
+      color: #202223;
     }
     .size-table input {
       width: 80px;
@@ -131,7 +180,7 @@
     }
     .size-table input:focus {
       outline: none;
-      border-color: #008060;
+      border-color: #2a9d6e;
     }
     .size-name-input {
       width: 100px !important;
@@ -150,7 +199,7 @@
       align-items: center;
       gap: 12px;
       padding: 10px;
-      background: #f9fafb;
+      background: #f8f9fa;
       border-radius: 6px;
     }
     .field-item input[type="text"] {
@@ -177,14 +226,9 @@
       padding-top: 20px;
       border-top: 1px solid #e1e3e5;
     }
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: #6d7175;
-    }
     .unit-toggle {
       display: flex;
-      gap: 8px;
+      gap: 0;
     }
     .unit-btn {
       padding: 8px 16px;
@@ -192,23 +236,44 @@
       background: white;
       cursor: pointer;
       font-size: 14px;
+      color: #202223;
     }
     .unit-btn:first-child {
       border-radius: 6px 0 0 6px;
     }
     .unit-btn:last-child {
       border-radius: 0 6px 6px 0;
+      border-left: none;
     }
     .unit-btn.active {
-      background: #008060;
+      background: #2a9d6e;
       color: white;
-      border-color: #008060;
+      border-color: #2a9d6e;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6d7175;
     }
   </style>
 </head>
 <body>
+  <header class="app-header">
+    <h1 class="app-title">
+      <span class="app-title-icon"></span>
+      RMS Size Helper
+    </h1>
+    <nav class="nav-tabs">
+      <a href="#" class="nav-tab" data-path="/">Dashboard</a>
+      <a href="#" class="nav-tab active" data-path="/templates">Size Templates</a>
+      <a href="#" class="nav-tab" data-path="/products">Products</a>
+      <a href="#" class="nav-tab" data-path="/analytics">Analytics</a>
+      <a href="#" class="nav-tab" data-path="/settings">Settings</a>
+    </nav>
+  </header>
+
   <div class="page-container">
-    <a href="/templates" class="back-link">← Back to Templates</a>
+    <a href="#" class="back-link" data-path="/templates">← Back to Templates</a>
 
     <div class="card">
       <h2 class="card-title" id="page-title">Create Size Template</h2>
@@ -225,6 +290,12 @@
             <label class="form-label">Category *</label>
             <select class="form-select" id="category" required>
               <option value="">Select a category...</option>
+              <option value="TOPS">Tops (T-shirts, shirts, blouses)</option>
+              <option value="BOTTOMS">Bottoms (Pants, jeans, skirts)</option>
+              <option value="DRESSES">Dresses & Jumpsuits</option>
+              <option value="OUTERWEAR">Outerwear (Jackets, coats)</option>
+              <option value="FOOTWEAR">Footwear (Shoes, boots)</option>
+              <option value="ACCESSORIES">Accessories (Hats, belts)</option>
             </select>
           </div>
         </div>
@@ -266,7 +337,7 @@
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" id="submit-btn">Create Template</button>
-          <a href="/templates" class="btn btn-secondary">Cancel</a>
+          <a href="#" class="btn btn-secondary" data-path="/templates">Cancel</a>
         </div>
       </form>
     </div>
@@ -278,7 +349,65 @@
     const MODE = '{{mode}}';
     const TEMPLATE_ID = '{{templateId}}';
 
-    let categories = {};
+    // Default categories with measurement fields (fallback if API fails)
+    let categories = {
+      TOPS: {
+        name: 'Tops',
+        description: 'T-shirts, shirts, blouses',
+        defaultFields: [
+          { key: 'chest', label: 'Chest', required: true },
+          { key: 'waist', label: 'Waist', required: false },
+          { key: 'length', label: 'Length', required: true },
+          { key: 'shoulder', label: 'Shoulder', required: false },
+          { key: 'sleeve', label: 'Sleeve', required: false }
+        ]
+      },
+      BOTTOMS: {
+        name: 'Bottoms',
+        description: 'Pants, jeans, skirts',
+        defaultFields: [
+          { key: 'waist', label: 'Waist', required: true },
+          { key: 'hips', label: 'Hips', required: true },
+          { key: 'inseam', label: 'Inseam', required: false },
+          { key: 'length', label: 'Length', required: true }
+        ]
+      },
+      DRESSES: {
+        name: 'Dresses',
+        description: 'Dresses & Jumpsuits',
+        defaultFields: [
+          { key: 'bust', label: 'Bust', required: true },
+          { key: 'waist', label: 'Waist', required: true },
+          { key: 'hips', label: 'Hips', required: true },
+          { key: 'length', label: 'Length', required: true }
+        ]
+      },
+      OUTERWEAR: {
+        name: 'Outerwear',
+        description: 'Jackets, coats',
+        defaultFields: [
+          { key: 'chest', label: 'Chest', required: true },
+          { key: 'shoulder', label: 'Shoulder', required: true },
+          { key: 'sleeve', label: 'Sleeve', required: true },
+          { key: 'length', label: 'Length', required: true }
+        ]
+      },
+      FOOTWEAR: {
+        name: 'Footwear',
+        description: 'Shoes, boots',
+        defaultFields: [
+          { key: 'foot_length', label: 'Foot Length', required: true },
+          { key: 'foot_width', label: 'Foot Width', required: false }
+        ]
+      },
+      ACCESSORIES: {
+        name: 'Accessories',
+        description: 'Hats, belts',
+        defaultFields: [
+          { key: 'circumference', label: 'Circumference', required: true }
+        ]
+      }
+    };
     let measurementUnit = 'cm';
     let measurementFields = [];
     let sizes = [];
@@ -287,11 +416,17 @@
       try {
         await initAppBridge();
 
-        // Load categories
-        const catData = await apiGet('/api/templates/categories');
-        categories = catData.categories;
+        // Try to load categories from API (but use defaults if it fails)
+        try {
+          const catData = await apiGet('/api/templates/categories');
+          if (catData && catData.categories) {
+            categories = catData.categories;
+          }
+        } catch (catError) {
+          console.warn('Using default categories:', catError);
+        }
 
-        populateCategorySelect();
+        setupCategoryChangeHandler();
 
         if (MODE === 'edit' && TEMPLATE_ID) {
           document.getElementById('page-title').textContent = 'Edit Size Template';
@@ -308,19 +443,17 @@
 
       } catch (error) {
         console.error('Error initializing:', error);
-        showToast('Failed to load form data', true);
+        // Still show the form with defaults even if init fails
+        setDefaultFields('TOPS');
+        addDefaultSizes();
+        renderFields();
+        renderSizeTable();
+        showToast('Some data could not be loaded', true);
       }
     }
 
-    function populateCategorySelect() {
+    function setupCategoryChangeHandler() {
       const select = document.getElementById('category');
-      for (const [key, cat] of Object.entries(categories)) {
-        const option = document.createElement('option');
-        option.value = key;
-        option.textContent = `${cat.name} - ${cat.description}`;
-        select.appendChild(option);
-      }
-
       select.addEventListener('change', (e) => {
         if (e.target.value && categories[e.target.value]) {
           setDefaultFields(e.target.value);
@@ -481,24 +614,30 @@
 
     // Form submission
     document.getElementById('template-form').addEventListener('submit', async (e) => {
+      console.log('=== FORM SUBMIT HANDLER TRIGGERED ===');
       e.preventDefault();
 
       const name = document.getElementById('name').value.trim();
       const category = document.getElementById('category').value;
+      console.log('Form values:', { name, category, measurementUnit, measurementFields, sizes });
 
       if (!name) {
+        console.log('Validation failed: no name');
         showToast('Please enter a template name', true);
         return;
       }
 
       if (!category) {
+        console.log('Validation failed: no category');
         showToast('Please select a category', true);
         return;
       }
 
       // Validate sizes
       const validSizes = sizes.filter(s => s.name.trim());
+      console.log('Valid sizes:', validSizes);
       if (validSizes.length === 0) {
+        console.log('Validation failed: no valid sizes');
         showToast('Please add at least one size', true);
         return;
       }
@@ -507,11 +646,13 @@
       for (const size of validSizes) {
         for (const field of measurementFields) {
           if (field.required && !size.measurements[field.key]) {
+            console.log('Validation failed: missing measurement', { size: size.name, field: field.label });
             showToast(`Size "${size.name}" is missing required measurement: ${field.label}`, true);
             return;
           }
         }
       }
+      console.log('All validation passed, making API call...');
 
       const payload = {
         name,
@@ -522,11 +663,16 @@
       };
 
       try {
+        console.log('MODE:', MODE, 'TEMPLATE_ID:', TEMPLATE_ID);
+        console.log('Payload:', JSON.stringify(payload, null, 2));
         if (MODE === 'edit') {
+          console.log('Calling apiPut...');
           await apiPut(`/api/templates/${TEMPLATE_ID}`, payload);
           showToast('Template updated successfully');
         } else {
-          await apiPost('/api/templates', payload);
+          console.log('Calling apiPost...');
+          const result = await apiPost('/api/templates', payload);
+          console.log('apiPost result:', result);
           showToast('Template created successfully');
         }
 

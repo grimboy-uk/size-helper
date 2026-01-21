@@ -4,57 +4,83 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Size Helper - Products</title>
-  <link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/polarisv12/polaris.min.css">
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background-color: #f6f6f7;
+      background-color: #f1f1f1;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+    }
+    .app-header {
+      background: white;
+      border-bottom: 1px solid #e1e3e5;
+      padding: 0 24px;
+    }
+    .app-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #202223;
+      padding: 16px 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .app-title-icon {
+      width: 24px;
+      height: 24px;
+      background: #d4534a;
+      border-radius: 4px;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 32px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .nav-tab {
+      padding: 12px 0;
+      text-decoration: none;
+      color: #6d7175;
+      font-size: 14px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .nav-tab:hover {
+      color: #202223;
+    }
+    .nav-tab.active {
+      color: #202223;
+      border-bottom-color: #2a9d6e;
     }
     .page-container {
-      max-width: 1200px;
+      max-width: 1000px;
       margin: 0 auto;
+      padding: 24px;
     }
     .card {
       background: white;
       border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
     .card-title {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 600;
-      margin: 0;
-    }
-    .nav-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #e1e3e5;
-      padding-bottom: 12px;
-    }
-    .nav-tab {
-      padding: 8px 16px;
-      border-radius: 6px;
-      text-decoration: none;
       color: #202223;
-      font-weight: 500;
-      transition: background-color 0.2s;
-    }
-    .nav-tab:hover {
-      background-color: #f1f2f3;
-    }
-    .nav-tab.active {
-      background-color: #008060;
-      color: white;
+      margin: 0;
     }
     .btn {
       display: inline-flex;
@@ -66,15 +92,15 @@
       font-weight: 500;
       cursor: pointer;
       border: none;
-      transition: background-color 0.2s;
       text-decoration: none;
+      transition: background-color 0.2s;
     }
     .btn-primary {
-      background-color: #008060;
+      background-color: #2a9d6e;
       color: white;
     }
     .btn-primary:hover {
-      background-color: #006e52;
+      background-color: #238c5f;
     }
     .btn-secondary {
       background-color: #f1f2f3;
@@ -91,6 +117,27 @@
       padding: 6px 12px;
       font-size: 13px;
     }
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e1e3e5;
+    }
+    .tab {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-weight: 500;
+      color: #6d7175;
+      font-size: 14px;
+    }
+    .tab.active {
+      color: #2a9d6e;
+      border-bottom-color: #2a9d6e;
+    }
+    .tab:hover {
+      color: #202223;
+    }
     .search-bar {
       display: flex;
       gap: 12px;
@@ -105,14 +152,7 @@
     }
     .search-input:focus {
       outline: none;
-      border-color: #008060;
-    }
-    .template-filter {
-      min-width: 200px;
-      padding: 10px 12px;
-      border: 1px solid #c9cccf;
-      border-radius: 6px;
-      font-size: 14px;
+      border-color: #2a9d6e;
     }
     .product-grid {
       display: grid;
@@ -120,7 +160,7 @@
       gap: 16px;
     }
     .product-card {
-      background: #f9fafb;
+      background: #f8f9fa;
       border-radius: 8px;
       padding: 16px;
       transition: background-color 0.2s;
@@ -140,6 +180,7 @@
       font-weight: 600;
       margin: 0 0 8px 0;
       font-size: 15px;
+      color: #202223;
     }
     .product-template {
       font-size: 13px;
@@ -160,7 +201,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 12px 16px;
-      background: #f9fafb;
+      background: #f8f9fa;
       border-radius: 8px;
     }
     .assignment-info {
@@ -168,16 +209,10 @@
       align-items: center;
       gap: 12px;
     }
-    .assignment-image {
-      width: 48px;
-      height: 48px;
-      object-fit: cover;
-      border-radius: 6px;
-      background: #e1e3e5;
-    }
     .assignment-details h4 {
       margin: 0 0 4px 0;
       font-size: 14px;
+      color: #202223;
     }
     .assignment-details p {
       margin: 0;
@@ -193,25 +228,8 @@
       margin: 0 0 8px 0;
       color: #202223;
     }
-    .tabs {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #e1e3e5;
-    }
-    .tab {
-      padding: 12px 16px;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      font-weight: 500;
-      color: #6d7175;
-    }
-    .tab.active {
-      color: #008060;
-      border-bottom-color: #008060;
-    }
-    .tab:hover {
-      color: #202223;
+    .empty-state p {
+      margin: 0 0 20px 0;
     }
     .modal-overlay {
       display: none;
@@ -247,6 +265,7 @@
       font-size: 18px;
       font-weight: 600;
       margin: 0;
+      color: #202223;
     }
     .modal-close {
       background: none;
@@ -263,6 +282,7 @@
       font-size: 14px;
       font-weight: 500;
       margin-bottom: 6px;
+      color: #202223;
     }
     .form-select {
       width: 100%;
@@ -279,15 +299,21 @@
   </style>
 </head>
 <body>
-  <div class="page-container">
+  <header class="app-header">
+    <h1 class="app-title">
+      <span class="app-title-icon"></span>
+      RMS Size Helper
+    </h1>
     <nav class="nav-tabs">
-      <a href="/" class="nav-tab">Dashboard</a>
-      <a href="/templates" class="nav-tab">Size Templates</a>
-      <a href="/products" class="nav-tab active">Products</a>
-      <a href="/analytics" class="nav-tab">Analytics</a>
-      <a href="/settings" class="nav-tab">Settings</a>
+      <a href="#" class="nav-tab" data-path="/">Dashboard</a>
+      <a href="#" class="nav-tab" data-path="/templates">Size Templates</a>
+      <a href="#" class="nav-tab active" data-path="/products">Products</a>
+      <a href="#" class="nav-tab" data-path="/analytics">Analytics</a>
+      <a href="#" class="nav-tab" data-path="/settings">Settings</a>
     </nav>
+  </header>
 
+  <div class="page-container">
     <div class="card">
       <div class="card-header">
         <h2 class="card-title">Product Assignments</h2>

@@ -4,57 +4,83 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Size Helper - Settings</title>
-  <link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/polarisv12/polaris.min.css">
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background-color: #f6f6f7;
+      background-color: #f1f1f1;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+    }
+    .app-header {
+      background: white;
+      border-bottom: 1px solid #e1e3e5;
+      padding: 0 24px;
+    }
+    .app-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #202223;
+      padding: 16px 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .app-title-icon {
+      width: 24px;
+      height: 24px;
+      background: #d4534a;
+      border-radius: 4px;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 32px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .nav-tab {
+      padding: 12px 0;
+      text-decoration: none;
+      color: #6d7175;
+      font-size: 14px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .nav-tab:hover {
+      color: #202223;
+    }
+    .nav-tab.active {
+      color: #202223;
+      border-bottom-color: #2a9d6e;
     }
     .page-container {
       max-width: 900px;
       margin: 0 auto;
+      padding: 24px;
     }
     .card {
       background: white;
       border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     .card-title {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 600;
-      margin: 0;
-    }
-    .nav-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #e1e3e5;
-      padding-bottom: 12px;
-    }
-    .nav-tab {
-      padding: 8px 16px;
-      border-radius: 6px;
-      text-decoration: none;
       color: #202223;
-      font-weight: 500;
-      transition: background-color 0.2s;
+      margin: 0 0 20px 0;
     }
-    .nav-tab:hover {
-      background-color: #f1f2f3;
-    }
-    .nav-tab.active {
-      background-color: #008060;
-      color: white;
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #202223;
+      margin: 0 0 16px 0;
     }
     .btn {
       display: inline-flex;
@@ -66,15 +92,15 @@
       font-weight: 500;
       cursor: pointer;
       border: none;
-      transition: background-color 0.2s;
       text-decoration: none;
+      transition: background-color 0.2s;
     }
     .btn-primary {
-      background-color: #008060;
+      background-color: #2a9d6e;
       color: white;
     }
     .btn-primary:hover {
-      background-color: #006e52;
+      background-color: #238c5f;
     }
     .btn-secondary {
       background-color: #f1f2f3;
@@ -90,6 +116,35 @@
     .btn-danger:hover {
       background-color: #bc2200;
     }
+    .usage-section {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .usage-bar {
+      background: #e1e3e5;
+      border-radius: 4px;
+      height: 8px;
+      margin: 12px 0;
+      overflow: hidden;
+    }
+    .usage-fill {
+      background: #2a9d6e;
+      height: 100%;
+      transition: width 0.3s;
+    }
+    .usage-fill.warning {
+      background: #ffc453;
+    }
+    .usage-fill.danger {
+      background: #d72c0d;
+    }
+    .usage-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #6d7175;
+    }
     .pricing-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -103,21 +158,19 @@
       transition: border-color 0.2s;
     }
     .pricing-card.current {
-      border-color: #008060;
+      border-color: #2a9d6e;
       background: #f0fdf4;
-    }
-    .pricing-card.recommended {
-      border-color: #008060;
     }
     .pricing-tier {
       font-size: 20px;
       font-weight: 700;
+      color: #202223;
       margin-bottom: 8px;
     }
     .pricing-price {
       font-size: 36px;
       font-weight: 700;
-      color: #008060;
+      color: #2a9d6e;
     }
     .pricing-price span {
       font-size: 14px;
@@ -134,15 +187,16 @@
       gap: 8px;
       padding: 8px 0;
       font-size: 14px;
+      color: #202223;
     }
     .pricing-feature::before {
       content: "✓";
-      color: #008060;
+      color: #2a9d6e;
       font-weight: bold;
     }
     .current-badge {
       display: inline-block;
-      background: #008060;
+      background: #2a9d6e;
       color: white;
       padding: 4px 12px;
       border-radius: 20px;
@@ -150,58 +204,34 @@
       font-weight: 500;
       margin-bottom: 12px;
     }
-    .usage-section {
-      background: #f9fafb;
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 20px;
-    }
-    .usage-bar {
-      background: #e1e3e5;
-      border-radius: 4px;
-      height: 8px;
-      margin: 12px 0;
-      overflow: hidden;
-    }
-    .usage-fill {
-      background: #008060;
-      height: 100%;
-      transition: width 0.3s;
-    }
-    .usage-fill.warning {
-      background: #ffc453;
-    }
-    .usage-fill.danger {
-      background: #d72c0d;
-    }
-    .usage-text {
-      display: flex;
-      justify-content: space-between;
+    .info-text {
       font-size: 14px;
       color: #6d7175;
+      margin-top: 8px;
     }
     .loading {
       text-align: center;
       padding: 40px;
       color: #6d7175;
     }
-    .info-text {
-      font-size: 14px;
-      color: #6d7175;
-      margin-top: 8px;
-    }
   </style>
 </head>
 <body>
-  <div class="page-container">
+  <header class="app-header">
+    <h1 class="app-title">
+      <span class="app-title-icon"></span>
+      RMS Size Helper
+    </h1>
     <nav class="nav-tabs">
-      <a href="/" class="nav-tab">Dashboard</a>
-      <a href="/templates" class="nav-tab">Size Templates</a>
-      <a href="/products" class="nav-tab">Products</a>
-      <a href="/analytics" class="nav-tab">Analytics</a>
-      <a href="/settings" class="nav-tab active">Settings</a>
+      <a href="#" class="nav-tab" data-path="/">Dashboard</a>
+      <a href="#" class="nav-tab" data-path="/templates">Size Templates</a>
+      <a href="#" class="nav-tab" data-path="/products">Products</a>
+      <a href="#" class="nav-tab" data-path="/analytics">Analytics</a>
+      <a href="#" class="nav-tab active" data-path="/settings">Settings</a>
     </nav>
+  </header>
 
+  <div class="page-container">
     <div class="card">
       <h2 class="card-title">Current Usage</h2>
       <div class="usage-section" id="usage-section">
@@ -270,7 +300,7 @@
       else if (percentage >= 70) fillClass = 'warning';
 
       container.innerHTML = `
-        <div style="font-weight: 600; margin-bottom: 4px;">
+        <div style="font-weight: 600; margin-bottom: 4px; color: #202223;">
           ${sub.tierName} Plan - Product Types
         </div>
         <div class="usage-bar">

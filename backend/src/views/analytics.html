@@ -4,86 +4,122 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Size Helper - Analytics</title>
-  <link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/polarisv12/polaris.min.css">
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background-color: #f6f6f7;
+      background-color: #f1f1f1;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+    }
+    .app-header {
+      background: white;
+      border-bottom: 1px solid #e1e3e5;
+      padding: 0 24px;
+    }
+    .app-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #202223;
+      padding: 16px 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .app-title-icon {
+      width: 24px;
+      height: 24px;
+      background: #d4534a;
+      border-radius: 4px;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 32px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .nav-tab {
+      padding: 12px 0;
+      text-decoration: none;
+      color: #6d7175;
+      font-size: 14px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .nav-tab:hover {
+      color: #202223;
+    }
+    .nav-tab.active {
+      color: #202223;
+      border-bottom-color: #2a9d6e;
     }
     .page-container {
-      max-width: 1200px;
+      max-width: 1000px;
       margin: 0 auto;
+      padding: 24px;
     }
     .card {
       background: white;
       border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
     .card-title {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 600;
+      color: #202223;
       margin: 0;
     }
-    .nav-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #e1e3e5;
-      padding-bottom: 12px;
-    }
-    .nav-tab {
-      padding: 8px 16px;
-      border-radius: 6px;
-      text-decoration: none;
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
       color: #202223;
-      font-weight: 500;
-      transition: background-color 0.2s;
-    }
-    .nav-tab:hover {
-      background-color: #f1f2f3;
-    }
-    .nav-tab.active {
-      background-color: #008060;
-      color: white;
+      margin: 0 0 16px 0;
     }
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
     .stat-card {
-      background: #f9fafb;
-      border-radius: 8px;
-      padding: 16px;
-      text-align: center;
-    }
-    .stat-value {
-      font-size: 32px;
-      font-weight: 700;
-      color: #202223;
-    }
-    .stat-label {
-      font-size: 14px;
-      color: #6d7175;
-      margin-top: 4px;
-    }
-    .chart-container {
-      height: 300px;
-      background: #f9fafb;
+      background: #f8f9fa;
       border-radius: 8px;
       padding: 20px;
-      margin-bottom: 20px;
+    }
+    .stat-value {
+      font-size: 36px;
+      font-weight: 600;
+      color: #202223;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #6d7175;
+    }
+    .period-select {
+      padding: 8px 12px;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .chart-container {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
     }
     .chart-bar {
       display: flex;
@@ -102,13 +138,13 @@
     .bar {
       width: 100%;
       max-width: 40px;
-      background: #008060;
+      background: #2a9d6e;
       border-radius: 4px 4px 0 0;
       min-height: 4px;
       transition: height 0.3s;
     }
     .bar.secondary {
-      background: #95c9b4;
+      background: #8fd4b8;
     }
     .bar-label {
       font-size: 11px;
@@ -126,30 +162,30 @@
       align-items: center;
       gap: 8px;
       font-size: 13px;
+      color: #202223;
     }
     .legend-color {
       width: 12px;
       height: 12px;
       border-radius: 2px;
     }
-    .product-table {
+    .data-table {
       width: 100%;
       border-collapse: collapse;
     }
-    .product-table th, .product-table td {
+    .data-table th, .data-table td {
       padding: 12px;
       text-align: left;
       border-bottom: 1px solid #e1e3e5;
-    }
-    .product-table th {
-      font-weight: 500;
-      background: #f9fafb;
-    }
-    .period-select {
-      padding: 8px 12px;
-      border: 1px solid #c9cccf;
-      border-radius: 6px;
       font-size: 14px;
+    }
+    .data-table th {
+      font-weight: 500;
+      background: #f8f9fa;
+      color: #202223;
+    }
+    .data-table td {
+      color: #202223;
     }
     .loading {
       text-align: center;
@@ -161,18 +197,29 @@
       padding: 40px;
       color: #6d7175;
     }
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="page-container">
+  <header class="app-header">
+    <h1 class="app-title">
+      <span class="app-title-icon"></span>
+      RMS Size Helper
+    </h1>
     <nav class="nav-tabs">
-      <a href="/" class="nav-tab">Dashboard</a>
-      <a href="/templates" class="nav-tab">Size Templates</a>
-      <a href="/products" class="nav-tab">Products</a>
-      <a href="/analytics" class="nav-tab active">Analytics</a>
-      <a href="/settings" class="nav-tab">Settings</a>
+      <a href="#" class="nav-tab" data-path="/">Dashboard</a>
+      <a href="#" class="nav-tab" data-path="/templates">Size Templates</a>
+      <a href="#" class="nav-tab" data-path="/products">Products</a>
+      <a href="#" class="nav-tab active" data-path="/analytics">Analytics</a>
+      <a href="#" class="nav-tab" data-path="/settings">Settings</a>
     </nav>
+  </header>
 
+  <div class="page-container">
     <div class="card">
       <div class="card-header">
         <h2 class="card-title">Analytics Overview</h2>
@@ -183,33 +230,33 @@
         </select>
       </div>
 
-      <div class="stats-grid" id="stats-grid">
+      <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-value" id="stat-opens">-</div>
+          <div class="stat-value" id="stat-opens">0</div>
           <div class="stat-label">Size Guide Opens</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="stat-recommendations">-</div>
+          <div class="stat-value" id="stat-recommendations">0</div>
           <div class="stat-label">Recommendations Made</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="stat-conversion">-</div>
+          <div class="stat-value" id="stat-conversion">0%</div>
           <div class="stat-label">Conversion Rate</div>
         </div>
       </div>
 
       <div class="chart-container">
-        <h3 style="margin: 0 0 16px 0; font-size: 16px;">Daily Activity</h3>
+        <h3 class="section-title">Daily Activity</h3>
         <div class="chart-bar" id="chart-bars">
           <div class="loading">Loading chart...</div>
         </div>
         <div class="chart-legend">
           <div class="legend-item">
-            <div class="legend-color" style="background: #008060;"></div>
+            <div class="legend-color" style="background: #2a9d6e;"></div>
             <span>Size Guide Opens</span>
           </div>
           <div class="legend-item">
-            <div class="legend-color" style="background: #95c9b4;"></div>
+            <div class="legend-color" style="background: #8fd4b8;"></div>
             <span>Recommendations</span>
           </div>
         </div>
@@ -217,18 +264,14 @@
     </div>
 
     <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">Top Products</h2>
-      </div>
+      <h3 class="section-title">Top Products</h3>
       <div id="top-products">
         <div class="loading">Loading...</div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">Recent Recommendations</h2>
-      </div>
+      <h3 class="section-title">Recent Recommendations</h3>
       <div id="recent-recommendations">
         <div class="loading">Loading...</div>
       </div>
@@ -261,9 +304,9 @@
         ]);
 
         // Update stats
-        document.getElementById('stat-opens').textContent = dashboardData.totals.sizeGuideOpened.toLocaleString();
-        document.getElementById('stat-recommendations').textContent = dashboardData.totals.recommendationMade.toLocaleString();
-        document.getElementById('stat-conversion').textContent = dashboardData.conversionRate + '%';
+        document.getElementById('stat-opens').textContent = (dashboardData.totals?.sizeGuideOpened || 0).toLocaleString();
+        document.getElementById('stat-recommendations').textContent = (dashboardData.totals?.recommendationMade || 0).toLocaleString();
+        document.getElementById('stat-conversion').textContent = (dashboardData.conversionRate || 0) + '%';
 
         // Render chart
         renderChart(timelineData.timeline);
@@ -290,7 +333,7 @@
 
       // Find max value for scaling
       const maxValue = Math.max(
-        ...timeline.map(d => Math.max(d.sizeGuideOpened, d.recommendationMade)),
+        ...timeline.map(d => Math.max(d.sizeGuideOpened || 0, d.recommendationMade || 0)),
         1
       );
 
@@ -298,15 +341,15 @@
       const displayData = timeline.slice(-14);
 
       container.innerHTML = displayData.map(day => {
-        const opensHeight = (day.sizeGuideOpened / maxValue) * 180;
-        const recsHeight = (day.recommendationMade / maxValue) * 180;
+        const opensHeight = ((day.sizeGuideOpened || 0) / maxValue) * 180;
+        const recsHeight = ((day.recommendationMade || 0) / maxValue) * 180;
         const dateLabel = new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
         return `
           <div class="bar-group">
             <div style="display: flex; gap: 2px; align-items: flex-end; height: 180px;">
-              <div class="bar" style="height: ${opensHeight}px;" title="Opens: ${day.sizeGuideOpened}"></div>
-              <div class="bar secondary" style="height: ${recsHeight}px;" title="Recommendations: ${day.recommendationMade}"></div>
+              <div class="bar" style="height: ${opensHeight}px;" title="Opens: ${day.sizeGuideOpened || 0}"></div>
+              <div class="bar secondary" style="height: ${recsHeight}px;" title="Recommendations: ${day.recommendationMade || 0}"></div>
             </div>
             <div class="bar-label">${dateLabel}</div>
           </div>
@@ -323,7 +366,7 @@
       }
 
       container.innerHTML = `
-        <table class="product-table">
+        <table class="data-table">
           <thead>
             <tr>
               <th>Product</th>
@@ -336,9 +379,9 @@
             ${products.map(p => `
               <tr>
                 <td>${escapeHtml(p.productTitle)}</td>
-                <td>${p.opens.toLocaleString()}</td>
-                <td>${p.recommendations.toLocaleString()}</td>
-                <td>${p.conversionRate}%</td>
+                <td>${(p.opens || 0).toLocaleString()}</td>
+                <td>${(p.recommendations || 0).toLocaleString()}</td>
+                <td>${p.conversionRate || 0}%</td>
               </tr>
             `).join('')}
           </tbody>
@@ -355,7 +398,7 @@
       }
 
       container.innerHTML = `
-        <table class="product-table">
+        <table class="data-table">
           <thead>
             <tr>
               <th>Date</th>

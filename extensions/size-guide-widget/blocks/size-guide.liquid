@@ -49,15 +49,32 @@
       <form id="size-finder-form">
         <div class="form-section">
           <label class="form-label">What size do you usually wear?</label>
-          <select id="usual-size" class="form-select">
-            <option value="">Select your usual size...</option>
-            <option value="XS">XS / Extra Small</option>
-            <option value="S">S / Small</option>
-            <option value="M">M / Medium</option>
-            <option value="L">L / Large</option>
-            <option value="XL">XL / Extra Large</option>
-            <option value="XXL">XXL / 2XL</option>
-          </select>
+          <div class="fit-options">
+            <label class="fit-option">
+              <input type="radio" name="usual-size" value="XS">
+              <span>XS</span>
+            </label>
+            <label class="fit-option">
+              <input type="radio" name="usual-size" value="S" checked>
+              <span>S</span>
+            </label>
+            <label class="fit-option">
+              <input type="radio" name="usual-size" value="M">
+              <span>M</span>
+            </label>
+            <label class="fit-option">
+              <input type="radio" name="usual-size" value="L">
+              <span>L</span>
+            </label>
+            <label class="fit-option">
+              <input type="radio" name="usual-size" value="XL">
+              <span>XL</span>
+            </label>
+            <label class="fit-option">
+              <input type="radio" name="usual-size" value="2XL">
+              <span>2XL</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-section">
@@ -743,7 +760,7 @@
       },
 
       async getRecommendation() {
-        const usualSize = document.getElementById('usual-size').value;
+        const usualSize = document.querySelector('input[name="usual-size"]:checked')?.value;
         const fit = document.querySelector('input[name="fit"]:checked')?.value;
 
         // Collect measurements if provided

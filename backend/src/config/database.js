@@ -69,6 +69,8 @@ export async function initializeDatabase() {
         name VARCHAR(255) NOT NULL,
         category VARCHAR(100) NOT NULL,
         measurement_unit VARCHAR(10) DEFAULT 'cm',
+        measurement_gender VARCHAR(20) DEFAULT 'unisex',
+        size_notation VARCHAR(10) DEFAULT 'US',
         measurement_fields JSONB NOT NULL DEFAULT '[]',
         sizes JSONB NOT NULL DEFAULT '[]',
         body_shapes JSONB DEFAULT '[]',

@@ -263,6 +263,8 @@ export async function getSizeChart(shopDomain, productId, displayUnit = null) {
     templateName: template.name,
     category: template.category,
     measurementUnit: outputUnit,
+    measurementGender: template.measurement_gender,
+    sizeNotation: template.size_notation || 'US',
     measurementFields: template.measurement_fields,
     sizes,
     bodyShapes: template.body_shapes,

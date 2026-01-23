@@ -82,7 +82,7 @@ router.post(
   subscriptionCheck({ enforceLimit: true }),
   asyncHandler(async (req, res) => {
     const shopDomain = res.locals.shopify.shopDomain;
-    const { name, category, measurementUnit, measurementFields, sizes, bodyShapes } = req.body;
+    const { name, category, measurementUnit, measurementGender, sizeNotation, measurementFields, sizes, bodyShapes } = req.body;
 
     logger.debug('Creating template:', { shopDomain, name });
     // Validation
@@ -132,6 +132,8 @@ router.post(
         name: name.trim(),
         category,
         measurementUnit: measurementUnit || 'cm',
+        measurementGender: measurementGender || 'unisex',
+        sizeNotation: sizeNotation || 'US',
         measurementFields,
         sizes,
         bodyShapes: bodyShapes || DEFAULT_BODY_SHAPES,
@@ -157,11 +159,16 @@ router.put(
   asyncHandler(async (req, res) => {
     const shopDomain = res.locals.shopify.shopDomain;
     const { id } = req.params;
-    const { name, category, measurementUnit, measurementFields, sizes, bodyShapes, isActive } = req.body;
+    const { name, category, measurementUnit, measurementGender, sizeNotation, measurementFields, sizes, bodyShapes, isActive } = req.body;
 
     // Validate measurement unit if provided
     if (measurementUnit && !['cm', 'in'].includes(measurementUnit)) {
       return res.status(400).json({ error: 'Measurement unit must be "cm" or "in"' });
+    }
+
+    // Validate size notation if provided
+    if (sizeNotation && !['US', 'UK', 'EU', 'AU', 'JP', 'CN'].includes(sizeNotation)) {
+      return res.status(400).json({ error: 'Invalid size notation' });
     }
 
     // Validate category if provided
@@ -169,11 +176,18 @@ router.put(
       return res.status(400).json({ error: 'Invalid category' });
     }
 
+    // Validate size notation if provided
+    if (sizeNotation && !['US', 'UK', 'EU', 'AU', 'JP', 'CN'].includes(sizeNotation)) {
+      return res.status(400).json({ error: 'Invalid size notation' });
+    }
+
     try {
       const template = await updateTemplate(shopDomain, id, {
         name,
         category,
         measurementUnit,
+        measurementGender,
+        sizeNotation,
         measurementFields,
         sizes,
         bodyShapes,

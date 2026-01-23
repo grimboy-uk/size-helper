@@ -101,6 +101,8 @@ export async function createTemplate(shopDomain, templateData) {
     name,
     category,
     measurementUnit = 'cm',
+    measurementGender = 'unisex',
+    sizeNotation = 'US',
     measurementFields,
     sizes,
     bodyShapes = DEFAULT_BODY_SHAPES,
@@ -108,14 +110,16 @@ export async function createTemplate(shopDomain, templateData) {
 
   try {
     const result = await query(
-      `INSERT INTO size_templates (shop_domain, name, category, measurement_unit, measurement_fields, sizes, body_shapes)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO size_templates (shop_domain, name, category, measurement_unit, measurement_gender, size_notation, measurement_fields, sizes, body_shapes)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
       [
         shopDomain,
         name,
         category,
         measurementUnit,
+        measurementGender,
+        sizeNotation,
         JSON.stringify(measurementFields),
         JSON.stringify(sizes),
         JSON.stringify(bodyShapes),
@@ -141,6 +145,8 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
     name,
     category,
     measurementUnit,
+    measurementGender,
+    sizeNotation,
     measurementFields,
     sizes,
     bodyShapes,
@@ -153,17 +159,21 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
        SET name = COALESCE($1, name),
            category = COALESCE($2, category),
            measurement_unit = COALESCE($3, measurement_unit),
-           measurement_fields = COALESCE($4, measurement_fields),
-           sizes = COALESCE($5, sizes),
-           body_shapes = COALESCE($6, body_shapes),
-           is_active = COALESCE($7, is_active),
+           measurement_gender = COALESCE($4, measurement_gender),
+           size_notation = COALESCE($5, size_notation),
+           measurement_fields = COALESCE($6, measurement_fields),
+           sizes = COALESCE($7, sizes),
+           body_shapes = COALESCE($8, body_shapes),
+           is_active = COALESCE($9, is_active),
            updated_at = CURRENT_TIMESTAMP
-       WHERE id = $8 AND shop_domain = $9
+       WHERE id = $10 AND shop_domain = $11
        RETURNING *`,
       [
         name,
         category,
         measurementUnit,
+        measurementGender,
+        sizeNotation,
         measurementFields ? JSON.stringify(measurementFields) : null,
         sizes ? JSON.stringify(sizes) : null,
         bodyShapes ? JSON.stringify(bodyShapes) : null,
@@ -313,9 +323,96 @@ export function convertMeasurement(value, fromUnit, toUnit) {
   return value;
 }
 
+/**
+ * Size notation conversion maps
+ * These are approximate conversions for general clothing (not footwear)
+ */
+export const SIZE_NOTATION_CONVERSIONS = {
+  // Women's clothing conversions (numeric sizes)
+  women: {
+    US: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+    UK: [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24], // UK = US + 4
+    EU: [30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50], // EU = US + 30
+    AU: [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24], // AU = UK
+    JP: [3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23], // JP = US + 3
+    CN: [155, 160, 165, 170, 175, 180, 185, 190, 195, 200, 205], // CN height-based
+  },
+  // Men's clothing conversions (numeric sizes)
+  men: {
+    US: [34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54],
+    UK: [34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54], // UK = US for men
+    EU: [44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64], // EU = US + 10
+    AU: [34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54], // AU = US
+    JP: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], // JP uses numbered sizes
+    CN: [165, 170, 175, 180, 185, 190, 195, 200, 205, 210, 215], // CN height-based
+  },
+  // Footwear conversions
+  footwear: {
+    women: {
+      US: [5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10],
+      UK: [2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5], // UK = US - 2.5
+      EU: [35, 35.5, 36, 37, 37.5, 38, 38.5, 39, 40, 40.5, 41],
+      AU: [3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5], // AU = US - 1.5
+      JP: [22, 22.5, 23, 23.5, 24, 24.5, 25, 25.5, 26, 26.5, 27], // JP in cm
+      CN: [35, 35.5, 36, 37, 37.5, 38, 38.5, 39, 40, 40.5, 41], // CN = EU
+    },
+    men: {
+      US: [7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12],
+      UK: [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11], // UK = US - 1
+      EU: [40, 40.5, 41, 42, 42.5, 43, 44, 44.5, 45, 45.5, 46],
+      AU: [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11], // AU = UK
+      JP: [25, 25.5, 26, 26.5, 27, 27.5, 28, 28.5, 29, 29.5, 30], // JP in cm
+      CN: [40, 40.5, 41, 42, 42.5, 43, 44, 44.5, 45, 45.5, 46], // CN = EU
+    },
+  },
+};
+
+/**
+ * Convert a numeric size between notation systems
+ * @param {number} size - The size value to convert
+ * @param {string} fromNotation - Source notation (US, UK, EU, AU, JP, CN)
+ * @param {string} toNotation - Target notation
+ * @param {string} gender - 'women' or 'men'
+ * @param {string} category - Product category for context
+ * @returns {number|string} Converted size or original if conversion not possible
+ */
+export function convertSizeNotation(size, fromNotation, toNotation, gender = 'women', category = 'TOPS') {
+  if (fromNotation === toNotation) return size;
+
+  // For letter sizes (XS, S, M, L, XL, etc.), return as-is
+  if (typeof size === 'string' && /^(XXS|XS|S|M|L|XL|XXL|XXXL)$/i.test(size)) {
+    return size;
+  }
+
+  const conversionTable = category === 'FOOTWEAR'
+    ? SIZE_NOTATION_CONVERSIONS.footwear[gender]
+    : SIZE_NOTATION_CONVERSIONS[gender];
+
+  if (!conversionTable) return size;
+
+  const fromSizes = conversionTable[fromNotation];
+  const toSizes = conversionTable[toNotation];
+
+  if (!fromSizes || !toSizes) return size;
+
+  // Find index in source notation
+  const index = fromSizes.indexOf(Number(size));
+  if (index === -1) {
+    // Try to find closest match
+    const closest = fromSizes.reduce((prev, curr) =>
+      Math.abs(curr - size) < Math.abs(prev - size) ? curr : prev
+    );
+    const closestIndex = fromSizes.indexOf(closest);
+    return toSizes[closestIndex] || size;
+  }
+
+  return toSizes[index] || size;
+}
+
 export default {
   PRODUCT_CATEGORIES,
   DEFAULT_BODY_SHAPES,
+  SIZE_NOTATION_CONVERSIONS,
   createTemplate,
   updateTemplate,
   getTemplate,
@@ -323,4 +420,5 @@ export default {
   deleteTemplate,
   getTemplateForProduct,
   convertMeasurement,
+  convertSizeNotation,
 };

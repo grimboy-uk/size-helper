@@ -250,6 +250,52 @@
       color: white;
       border-color: #2a9d6e;
     }
+    .gender-toggle {
+      display: flex;
+      gap: 0;
+    }
+    .gender-btn {
+      padding: 8px 16px;
+      border: 1px solid #c9cccf;
+      background: white;
+      cursor: pointer;
+      font-size: 14px;
+      color: #202223;
+    }
+    .gender-btn:first-child {
+      border-radius: 6px 0 0 6px;
+    }
+    .gender-btn:last-child {
+      border-radius: 0 6px 6px 0;
+      border-left: none;
+    }
+    .gender-btn.active {
+      background: #2a9d6e;
+      color: white;
+      border-color: #2a9d6e;
+    }
+    .notation-select {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .notation-select select {
+      padding: 8px 12px;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      font-size: 14px;
+      background: white;
+      cursor: pointer;
+      min-width: 180px;
+    }
+    .notation-select select:focus {
+      outline: none;
+      border-color: #2a9d6e;
+      box-shadow: 0 0 0 1px #2a9d6e;
+    }
+    .flag-emoji {
+      font-size: 16px;
+    }
     .loading {
       text-align: center;
       padding: 40px;
@@ -300,12 +346,40 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Measurement Unit</label>
-          <div class="unit-toggle">
-            <button type="button" class="unit-btn active" data-unit="cm">Centimeters (cm)</button>
-            <button type="button" class="unit-btn" data-unit="in">Inches (in)</button>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Measurement Unit</label>
+            <div class="unit-toggle">
+              <button type="button" class="unit-btn active" data-unit="cm">Centimeters (cm)</button>
+              <button type="button" class="unit-btn" data-unit="in">Inches (in)</button>
+            </div>
           </div>
+
+          <div class="form-group">
+            <label class="form-label">Measurement Gender</label>
+            <div class="gender-toggle">
+              <button type="button" class="gender-btn active" data-unit="women">Women</button>
+              <button type="button" class="gender-btn" data-unit="men">Men</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Size Notation</label>
+            <div class="notation-select">
+              <select id="size-notation">
+                <option value="US">🇺🇸 US Sizes</option>
+                <option value="UK">🇬🇧 UK Sizes</option>
+                <option value="EU">🇪🇺 EU Sizes</option>
+                <option value="AU">🇦🇺 AU Sizes</option>
+                <option value="JP">🇯🇵 JP Sizes</option>
+                <option value="CN">🇨🇳 CN Sizes</option>
+              </select>
+            </div>
+            <p class="form-hint">The sizing system used for this template's size labels</p>
+          </div>
+          <div class="form-group"></div>
         </div>
 
         <div class="form-group">
@@ -409,6 +483,8 @@
       }
     };
     let measurementUnit = 'cm';
+    let measurementGender = 'women';
+    let sizeNotation = 'US';
     let measurementFields = [];
     let sizes = [];
 
@@ -490,6 +566,12 @@
       measurementUnit = template.measurement_unit;
       updateUnitButtons();
 
+      measurementGender = template.measurement_gender || 'women';
+      updateGenderButtons();
+
+      sizeNotation = template.size_notation || 'US';
+      document.getElementById('size-notation').value = sizeNotation;
+
       measurementFields = template.measurement_fields;
       sizes = template.sizes;
     }
@@ -500,6 +582,12 @@
       });
     }
 
+    function updateGenderButtons() {
+      document.querySelectorAll('.gender-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.unit === measurementGender);
+      });
+    }
+
     // Unit toggle
     document.querySelectorAll('.unit-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -507,6 +595,19 @@
         updateUnitButtons();
         renderSizeTable();
       });
+    });
+
+    // Gender toggle
+    document.querySelectorAll('.gender-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        measurementGender = btn.dataset.unit;
+        updateGenderButtons();
+      });
+    });
+
+    // Size notation select
+    document.getElementById('size-notation').addEventListener('change', (e) => {
+      sizeNotation = e.target.value;
     });
 
     function renderFields() {
@@ -658,6 +759,8 @@
         name,
         category,
         measurementUnit,
+        measurementGender,
+        sizeNotation,
         measurementFields,
         sizes: validSizes,
       };

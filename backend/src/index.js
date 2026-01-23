@@ -29,6 +29,7 @@ import billingRouter, { billingCallbackHandler } from './routes/billing.js';
 import analyticsRouter from './routes/analytics.js';
 import publicRouter from './routes/public.js';
 import webhooksRouter from './routes/webhooks.js';
+import { setShopifyInstance, registerWebhooks } from './services/webhookService.js';
 
 const logger = createLogger('Server');
 
@@ -167,6 +168,9 @@ app.get(
     }
   }
 );
+
+// Pass shopify instance to webhook service (for use by webhooks.js routes)
+setShopifyInstance(shopify);
 
 // Billing callback (not under /api - direct page load)
 app.get('/billing/callback', billingCallbackHandler);

@@ -73,31 +73,12 @@
     <div class="size-guide-step" data-step="2" style="display: none;">
       <form id="size-finder-form">
         <div class="form-section">
-          <label class="form-label">What size do you usually wear?</label>
-          <div class="fit-options">
-            <label class="fit-option">
-              <input type="radio" name="usual-size" value="XS">
-              <span>XS</span>
-            </label>
+          <label class="form-label">What size do you usually wear? <span id="usual-size-notation" class="notation-label"></span></label>
+          <div class="fit-options" id="usual-size-options">
+            <!-- Size options will be populated dynamically based on template -->
             <label class="fit-option">
               <input type="radio" name="usual-size" value="S" checked>
               <span>S</span>
-            </label>
-            <label class="fit-option">
-              <input type="radio" name="usual-size" value="M">
-              <span>M</span>
-            </label>
-            <label class="fit-option">
-              <input type="radio" name="usual-size" value="L">
-              <span>L</span>
-            </label>
-            <label class="fit-option">
-              <input type="radio" name="usual-size" value="XL">
-              <span>XL</span>
-            </label>
-            <label class="fit-option">
-              <input type="radio" name="usual-size" value="2XL">
-              <span>2XL</span>
             </label>
           </div>
         </div>
@@ -347,6 +328,18 @@
     color: #666;
     font-weight: normal;
     font-size: 0.9em;
+  }
+
+  .notation-label {
+    font-weight: normal;
+    color: #888;
+    font-size: 0.9em;
+  }
+
+  .fit-option .size-numeric-inline {
+    color: #666;
+    font-weight: normal;
+    font-size: 0.85em;
   }
 
   .form-section {
@@ -760,6 +753,7 @@
       currentUnit: 'cm',
       currentNotation: null, // Will be set from template's size_notation
       originalNotation: null, // The notation the template was created with
+      buttonColor: null, // Will be set from template's button_color
       sizeChart: null,
       selectedBodyShape: null,
 
@@ -817,6 +811,7 @@
         document.getElementById('size-notation-dropdown').addEventListener('change', (e) => {
           this.currentNotation = e.target.value;
           this.renderSizeChart();
+          this.renderUsualSizeOptions();
         });
 
         // Form submission
@@ -845,6 +840,10 @@
           this.originalNotation = this.sizeChart.sizeNotation || 'US';
           this.currentNotation = this.originalNotation;
 
+          // Set button color from template
+          this.buttonColor = this.sizeChart.buttonColor || '#008060';
+          this.applyButtonColor();
+
           // Update dropdown to show template's notation
           const dropdown = document.getElementById('size-notation-dropdown');
           if (dropdown) {
@@ -854,6 +853,7 @@
           this.renderSizeChart();
           this.renderBodyShapes();
           this.renderMeasurementInputs();
+          this.renderUsualSizeOptions();
         } catch (error) {
           console.error('Size Helper: Error loading size chart', error);
           document.getElementById('size-chart-container').innerHTML =
@@ -910,8 +910,8 @@
           // Check if it's a letter size
           const upperSize = sizeName.toUpperCase();
           if (LETTER_SIZE_INDEX.hasOwnProperty(upperSize)) {
-            // If same notation or no conversion table, just return letter size
-            if (this.currentNotation === this.originalNotation || !conversionTable) {
+            // Always show numeric equivalent in brackets for letter sizes
+            if (!conversionTable) {
               return sizeName;
             }
 
@@ -1017,6 +1017,96 @@
             <input type="number" id="measure-${f.key}" step="0.1" min="0" data-field="${f.key}">
           </div>
         `).join('');
+      },
+
+      renderUsualSizeOptions() {
+        if (!this.sizeChart) return;
+
+        const container = document.getElementById('usual-size-options');
+        const notationLabel = document.getElementById('usual-size-notation');
+        const gender = this.sizeChart.measurementGender || 'women';
+        const category = this.sizeChart.category;
+
+        // Update notation label with selected country
+        const countryFlags = {
+          US: '🇺🇸', UK: '🇬🇧', EU: '🇪🇺', AU: '🇦🇺', JP: '🇯🇵', CN: '🇨🇳'
+        };
+        notationLabel.textContent = `(${countryFlags[this.currentNotation] || ''} ${this.currentNotation})`;
+
+        // Get conversion table for numeric equivalents
+        let conversionTable;
+        if (category === 'FOOTWEAR') {
+          conversionTable = SIZE_NOTATION_CONVERSIONS.footwear[gender];
+        } else {
+          conversionTable = SIZE_NOTATION_CONVERSIONS[gender];
+        }
+
+        // Letter size to numeric index mapping
+        const LETTER_SIZE_INDEX = {
+          'XXS': 0, 'XS': 1, 'S': 2, 'M': 3, 'L': 4, 'XL': 5, 'XXL': 6, 'XXXL': 7
+        };
+
+        // Standard letter sizes
+        const standardSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
+        const toSizes = conversionTable ? conversionTable[this.currentNotation] : null;
+
+        container.innerHTML = standardSizes.map((size, idx) => {
+          const numericValue = toSizes && LETTER_SIZE_INDEX[size] < toSizes.length
+            ? toSizes[LETTER_SIZE_INDEX[size]]
+            : null;
+          const numericDisplay = numericValue !== null
+            ? `<span class="size-numeric-inline">(${numericValue})</span>`
+            : '';
+          const isChecked = size === 'S' ? 'checked' : '';
+
+          return `
+            <label class="fit-option">
+              <input type="radio" name="usual-size" value="${size}" ${isChecked}>
+              <span>${size} ${numericDisplay}</span>
+            </label>
+          `;
+        }).join('');
+      },
+
+      applyButtonColor() {
+        if (!this.buttonColor) return;
+
+        // Create a style element to override button colors
+        let styleEl = document.getElementById('size-helper-dynamic-styles');
+        if (!styleEl) {
+          styleEl = document.createElement('style');
+          styleEl.id = 'size-helper-dynamic-styles';
+          document.head.appendChild(styleEl);
+        }
+
+        styleEl.textContent = `
+          .size-guide-btn-primary {
+            background: ${this.buttonColor} !important;
+          }
+          .unit-btn.active {
+            background: ${this.buttonColor} !important;
+            border-color: ${this.buttonColor} !important;
+          }
+          .size-notation-select select:focus {
+            border-color: ${this.buttonColor} !important;
+            box-shadow: 0 0 0 1px ${this.buttonColor} !important;
+          }
+          .body-shape-option.selected {
+            border-color: ${this.buttonColor} !important;
+            background: ${this.buttonColor}10 !important;
+          }
+          .fit-option:has(input:checked) {
+            border-color: ${this.buttonColor} !important;
+            background: ${this.buttonColor}10 !important;
+          }
+          .collapsible-toggle {
+            color: ${this.buttonColor} !important;
+          }
+          .recommended-size {
+            color: ${this.buttonColor} !important;
+          }
+        `;
       },
 
       updateMeasurementIllustration() {

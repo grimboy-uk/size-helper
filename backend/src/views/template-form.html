@@ -171,19 +171,133 @@
       font-size: 13px;
       color: #202223;
     }
-    .size-table input {
+    .size-table input[type="number"] {
       width: 80px;
       padding: 6px 8px;
       border: 1px solid #c9cccf;
       border-radius: 4px;
       font-size: 14px;
     }
-    .size-table input:focus {
+    .size-table input[type="number"]:focus {
       outline: none;
       border-color: #2a9d6e;
     }
-    .size-name-input {
-      width: 100px !important;
+    .size-table input[type="number"]:disabled {
+      background: #f5f5f5;
+      color: #999;
+    }
+    .size-name-label {
+      font-weight: 600;
+      color: #202223;
+      min-width: 60px;
+      display: inline-block;
+    }
+    .size-row-hidden {
+      display: none;
+    }
+    .size-row-disabled td {
+      background: #fafafa;
+    }
+    .size-row-disabled .size-name-label {
+      color: #999;
+    }
+    .size-toggle {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+    .size-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+    .size-toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.3s;
+      border-radius: 24px;
+    }
+    .size-toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .size-toggle input:checked + .size-toggle-slider {
+      background-color: #2a9d6e;
+    }
+    .size-toggle input:checked + .size-toggle-slider:before {
+      transform: translateX(20px);
+    }
+    .size-btn-row {
+      display: flex;
+      gap: 8px;
+      margin: 8px 0;
+    }
+    .size-expand-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex: 1;
+      padding: 8px 12px;
+      background: #f8f9fa;
+      border: 1px dashed #c9cccf;
+      border-radius: 6px;
+      color: #6d7175;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .size-expand-btn:hover {
+      background: #f1f2f3;
+      border-color: #2a9d6e;
+      color: #2a9d6e;
+    }
+    .size-expand-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+    .size-hide-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: #fff8f6;
+      border: 1px dashed #e8b4a0;
+      border-radius: 6px;
+      color: #9d5a3a;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .size-hide-btn:hover {
+      background: #fff0ec;
+      border-color: #d4534a;
+      color: #d4534a;
+    }
+    .size-hide-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+    .size-table-wrapper {
+      margin-top: 12px;
     }
     .add-size-btn {
       margin-top: 12px;
@@ -301,6 +415,132 @@
       padding: 40px;
       color: #6d7175;
     }
+    .color-picker-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .color-picker {
+      width: 48px;
+      height: 40px;
+      padding: 2px;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      cursor: pointer;
+      background: white;
+    }
+    .color-picker::-webkit-color-swatch-wrapper {
+      padding: 2px;
+    }
+    .color-picker::-webkit-color-swatch {
+      border-radius: 4px;
+      border: none;
+    }
+    .color-text-input {
+      width: 100px;
+      padding: 10px 12px;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: monospace;
+    }
+    .color-text-input:focus {
+      outline: none;
+      border-color: #2a9d6e;
+      box-shadow: 0 0 0 1px #2a9d6e;
+    }
+    .guidance-section {
+      background: #f0f7ff;
+      border: 1px solid #bbd6f7;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 24px;
+    }
+    .guidance-section h3 {
+      margin: 0 0 12px 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: #0d5aa7;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .guidance-section h3 svg {
+      flex-shrink: 0;
+    }
+    .guidance-section ol {
+      margin: 0;
+      padding-left: 20px;
+      color: #2c5282;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .guidance-section li {
+      margin-bottom: 8px;
+    }
+    .guidance-section li:last-child {
+      margin-bottom: 0;
+    }
+    .guidance-section code {
+      background: #e2efff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: monospace;
+    }
+    .size-style-toggle {
+      display: flex;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .size-style-btn {
+      padding: 10px 16px;
+      border: 1px solid #c9cccf;
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+      color: #202223;
+      transition: all 0.2s;
+    }
+    .size-style-btn:first-child {
+      border-radius: 6px 0 0 6px;
+    }
+    .size-style-btn:last-child {
+      border-radius: 0 6px 6px 0;
+    }
+    .size-style-btn:not(:first-child) {
+      border-left: none;
+    }
+    .size-style-btn.active {
+      background: #2a9d6e;
+      color: white;
+      border-color: #2a9d6e;
+    }
+    .size-style-btn:hover:not(.active) {
+      background: #f8f9fa;
+    }
+    .size-style-group {
+      display: none;
+      margin-bottom: 20px;
+    }
+    .size-style-group.visible {
+      display: block;
+    }
+    .length-options {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .length-option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+    .length-option input {
+      width: 16px;
+      height: 16px;
+    }
   </style>
 </head>
 <body>
@@ -346,6 +586,30 @@
           </div>
         </div>
 
+        <div class="form-group size-style-group" id="size-style-group">
+          <label class="form-label">Size Style</label>
+          <div class="size-style-toggle">
+            <button type="button" class="size-style-btn active" data-style="letter">Standard (S, M, L, XL)</button>
+            <button type="button" class="size-style-btn" data-style="waist-length">Waist + Length (32S, 32R, 32L)</button>
+            <button type="button" class="size-style-btn" data-style="waist-only">Waist Only (28, 30, 32, 34)</button>
+          </div>
+          <p class="form-hint">Choose the sizing format for this template</p>
+          <div class="length-options" id="length-options" style="display: none;">
+            <label class="length-option">
+              <input type="checkbox" id="length-short" checked>
+              Short (S)
+            </label>
+            <label class="length-option">
+              <input type="checkbox" id="length-regular" checked>
+              Regular (R)
+            </label>
+            <label class="length-option">
+              <input type="checkbox" id="length-long" checked>
+              Long (L)
+            </label>
+          </div>
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Measurement Unit</label>
@@ -379,7 +643,14 @@
             </div>
             <p class="form-hint">The sizing system used for this template's size labels</p>
           </div>
-          <div class="form-group"></div>
+          <div class="form-group">
+            <label class="form-label">Modal Button Colour</label>
+            <div class="color-picker-wrapper">
+              <input type="color" id="button-color" value="#008060" class="color-picker">
+              <input type="text" id="button-color-text" value="#008060" class="color-text-input" placeholder="#008060">
+            </div>
+            <p class="form-hint">The colour of buttons in the size guide modal on your storefront</p>
+          </div>
         </div>
 
         <div class="form-group">
@@ -393,20 +664,69 @@
 
         <div class="form-group">
           <label class="form-label">Size Chart *</label>
-          <p class="form-hint">Enter measurements for each size. Values should be in the selected unit.</p>
-          <table class="size-table" id="size-table">
-            <thead>
-              <tr id="size-table-header">
-                <th>Size Name</th>
-                <!-- Measurement columns will be added dynamically -->
-                <th width="60"></th>
-              </tr>
-            </thead>
-            <tbody id="size-table-body">
-              <!-- Size rows will be added dynamically -->
-            </tbody>
-          </table>
-          <button type="button" class="btn btn-secondary btn-sm add-size-btn" onclick="addSize()">+ Add Size</button>
+          <p class="form-hint">Toggle sizes on/off and enter measurements. Only enabled sizes will be shown to customers.</p>
+          <div class="size-table-wrapper">
+            <div class="size-btn-row" id="smaller-btn-row" style="display: none;">
+              <button type="button" class="size-expand-btn" id="show-smaller-btn" onclick="showSmallerSizes()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="18,15 12,9 6,15"/>
+                </svg>
+                Show smaller sizes (3XS - XXS)
+              </button>
+              <button type="button" class="size-hide-btn" id="hide-smaller-btn" onclick="hideSmallerSizes()" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                Hide
+              </button>
+            </div>
+            <table class="size-table" id="size-table">
+              <thead>
+                <tr id="size-table-header">
+                  <th width="80">Size</th>
+                  <!-- Measurement columns will be added dynamically -->
+                  <th width="70">Enabled</th>
+                </tr>
+              </thead>
+              <tbody id="size-table-body">
+                <!-- Size rows will be added dynamically -->
+              </tbody>
+            </table>
+            <div class="size-btn-row" id="larger-btn-row" style="display: none;">
+              <button type="button" class="size-expand-btn" id="show-larger-btn" onclick="showLargerSizes()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6,9 12,15 18,9"/>
+                </svg>
+                Show larger sizes (2XL - 6XL)
+              </button>
+              <button type="button" class="size-hide-btn" id="hide-larger-btn" onclick="hideLargerSizes()" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                Hide
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="guidance-section">
+          <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            How Size Notation Conversion Works
+          </h3>
+          <ol>
+            <li><strong>Use alphabetic sizes</strong> (XS, S, M, L, XL, etc.) as your default size names. These are universally understood.</li>
+            <li>When customers view the size chart, they can select their preferred country (US, UK, EU, etc.) from a dropdown.</li>
+            <li>The app will <strong>automatically display numeric equivalents</strong> next to the alphabetic sizes. For example: <code>M (38)</code> for EU or <code>L (42)</code> for EU.</li>
+            <li>If you use numeric sizes (e.g., 6, 8, 10), they will be <strong>directly converted</strong> to the customer's selected notation system.</li>
+            <li>The <strong>Modal Button Colour</strong> you choose above will be used for all buttons inside the size guide modal on your storefront.</li>
+          </ol>
         </div>
 
         <div class="form-actions">
@@ -485,8 +805,27 @@
     let measurementUnit = 'cm';
     let measurementGender = 'women';
     let sizeNotation = 'US';
+    let buttonColor = '#008060';
     let measurementFields = [];
-    let sizes = [];
+
+    // All predefined sizes from smallest to largest
+    const ALL_SIZES = ['3XS', '2XS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+    // Default visible range (indices)
+    const DEFAULT_VISIBLE_START = 3; // XS
+    const DEFAULT_VISIBLE_END = 7;   // XL (inclusive)
+
+    // Waist sizes for bottoms
+    const WAIST_SIZES = ['26', '28', '30', '32', '34', '36', '38', '40', '42', '44'];
+    const LENGTH_VARIANTS = ['S', 'R', 'L']; // Short, Regular, Long
+
+    // Size style (only applies to BOTTOMS category)
+    let sizeStyle = 'letter'; // 'letter', 'waist-length', 'waist-only'
+    let enabledLengths = { S: true, R: true, L: true };
+
+    // Size data: enabled state and measurements
+    let sizeData = {};
+    let showingSmallerSizes = false;
+    let showingLargerSizes = false;
 
     async function init() {
       try {
@@ -503,6 +842,7 @@
         }
 
         setupCategoryChangeHandler();
+        setupSizeStyleHandler();
 
         if (MODE === 'edit' && TEMPLATE_ID) {
           document.getElementById('page-title').textContent = 'Edit Size Template';
@@ -511,7 +851,7 @@
         } else {
           // Default fields for new template
           setDefaultFields('TOPS');
-          addDefaultSizes();
+          initializeSizeData();
         }
 
         renderFields();
@@ -521,7 +861,7 @@
         console.error('Error initializing:', error);
         // Still show the form with defaults even if init fails
         setDefaultFields('TOPS');
-        addDefaultSizes();
+        initializeSizeData();
         renderFields();
         renderSizeTable();
         showToast('Some data could not be loaded', true);
@@ -533,9 +873,55 @@
       select.addEventListener('change', (e) => {
         if (e.target.value && categories[e.target.value]) {
           setDefaultFields(e.target.value);
+          // Show/hide size style selector for Bottoms
+          updateSizeStyleVisibility(e.target.value);
+          // Reset to letter style when changing category
+          sizeStyle = 'letter';
+          updateSizeStyleButtons();
+          initializeSizeData();
           renderFields();
           renderSizeTable();
         }
+      });
+    }
+
+    function updateSizeStyleVisibility(category) {
+      const sizeStyleGroup = document.getElementById('size-style-group');
+      if (category === 'BOTTOMS') {
+        sizeStyleGroup.classList.add('visible');
+      } else {
+        sizeStyleGroup.classList.remove('visible');
+      }
+    }
+
+    function updateSizeStyleButtons() {
+      document.querySelectorAll('.size-style-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.style === sizeStyle);
+      });
+      // Show/hide length options
+      const lengthOptions = document.getElementById('length-options');
+      lengthOptions.style.display = sizeStyle === 'waist-length' ? 'flex' : 'none';
+    }
+
+    function setupSizeStyleHandler() {
+      document.querySelectorAll('.size-style-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          sizeStyle = btn.dataset.style;
+          updateSizeStyleButtons();
+          initializeSizeData();
+          renderSizeTable();
+        });
+      });
+
+      // Length checkboxes
+      ['short', 'regular', 'long'].forEach((length, idx) => {
+        const checkbox = document.getElementById(`length-${length}`);
+        const key = LENGTH_VARIANTS[idx];
+        checkbox.addEventListener('change', () => {
+          enabledLengths[key] = checkbox.checked;
+          initializeSizeData();
+          renderSizeTable();
+        });
       });
     }
 
@@ -546,14 +932,49 @@
       }
     }
 
-    function addDefaultSizes() {
-      sizes = [
-        { name: 'XS', measurements: {} },
-        { name: 'S', measurements: {} },
-        { name: 'M', measurements: {} },
-        { name: 'L', measurements: {} },
-        { name: 'XL', measurements: {} },
-      ];
+    function initializeSizeData() {
+      // Initialize all sizes with default state based on size style
+      sizeData = {};
+      const category = document.getElementById('category').value;
+
+      if (category === 'BOTTOMS' && sizeStyle === 'waist-length') {
+        // Waist + Length format (32S, 32R, 32L)
+        WAIST_SIZES.forEach((waist, waistIdx) => {
+          LENGTH_VARIANTS.forEach(length => {
+            if (enabledLengths[length]) {
+              const sizeName = `${waist}${length}`;
+              // Default: enable middle waist sizes (30-36)
+              const isEnabled = waistIdx >= 2 && waistIdx <= 5;
+              sizeData[sizeName] = {
+                enabled: isEnabled,
+                measurements: {}
+              };
+            }
+          });
+        });
+      } else if (category === 'BOTTOMS' && sizeStyle === 'waist-only') {
+        // Waist only format (28, 30, 32, 34)
+        WAIST_SIZES.forEach((waist, waistIdx) => {
+          // Default: enable middle waist sizes (30-36)
+          const isEnabled = waistIdx >= 2 && waistIdx <= 5;
+          sizeData[waist] = {
+            enabled: isEnabled,
+            measurements: {}
+          };
+        });
+      } else {
+        // Standard letter sizes (S, M, L, XL)
+        ALL_SIZES.forEach((sizeName, index) => {
+          // By default, only XS to XL are enabled
+          const isEnabled = index >= DEFAULT_VISIBLE_START && index <= DEFAULT_VISIBLE_END;
+          sizeData[sizeName] = {
+            enabled: isEnabled,
+            measurements: {}
+          };
+        });
+      }
+      showingSmallerSizes = false;
+      showingLargerSizes = false;
     }
 
     async function loadTemplate() {
@@ -569,11 +990,101 @@
       measurementGender = template.measurement_gender || 'women';
       updateGenderButtons();
 
-      sizeNotation = template.size_notation || 'US';
+      sizeNotation = template.size_notation || 'UK';
       document.getElementById('size-notation').value = sizeNotation;
 
+      buttonColor = template.button_color || '#008060';
+      document.getElementById('button-color').value = buttonColor;
+      document.getElementById('button-color-text').value = buttonColor;
+
       measurementFields = template.measurement_fields;
-      sizes = template.sizes;
+
+      // Show/hide size style selector for Bottoms
+      updateSizeStyleVisibility(template.category);
+
+      // Detect size style from existing sizes for Bottoms category
+      if (template.category === 'BOTTOMS' && template.sizes.length > 0) {
+        const firstSize = template.sizes[0].name;
+        // Check if it's waist+length format (e.g., "32R", "34S")
+        if (/^\d{2}[SRL]$/i.test(firstSize)) {
+          sizeStyle = 'waist-length';
+          // Detect which lengths are used
+          enabledLengths = { S: false, R: false, L: false };
+          template.sizes.forEach(size => {
+            const lastChar = size.name.slice(-1).toUpperCase();
+            if (LENGTH_VARIANTS.includes(lastChar)) {
+              enabledLengths[lastChar] = true;
+            }
+          });
+          // Update checkboxes
+          document.getElementById('length-short').checked = enabledLengths.S;
+          document.getElementById('length-regular').checked = enabledLengths.R;
+          document.getElementById('length-long').checked = enabledLengths.L;
+        } else if (/^\d{2}$/.test(firstSize)) {
+          // Waist only format (e.g., "32", "34")
+          sizeStyle = 'waist-only';
+        } else {
+          sizeStyle = 'letter';
+        }
+        updateSizeStyleButtons();
+      }
+
+      // Initialize size data based on detected style
+      initializeSizeData();
+
+      // Disable all sizes first
+      Object.keys(sizeData).forEach(sizeName => {
+        sizeData[sizeName].enabled = false;
+      });
+
+      // Enable and populate sizes from template
+      template.sizes.forEach(size => {
+        const sizeName = size.name.toUpperCase();
+
+        if (sizeStyle === 'letter') {
+          // Map common variations for letter sizes
+          const sizeMap = {
+            'XXS': 'XXS', '2XS': '2XS', '3XS': '3XS',
+            'XS': 'XS', 'S': 'S', 'M': 'M', 'L': 'L', 'XL': 'XL',
+            'XXL': '2XL', '2XL': '2XL', '3XL': '3XL', '4XL': '4XL', '5XL': '5XL', '6XL': '6XL'
+          };
+          const mappedSize = sizeMap[sizeName] || sizeName;
+          if (sizeData[mappedSize]) {
+            sizeData[mappedSize].enabled = true;
+            sizeData[mappedSize].measurements = size.measurements || {};
+          }
+        } else {
+          // Waist-based sizes - use as-is
+          if (sizeData[sizeName]) {
+            sizeData[sizeName].enabled = true;
+            sizeData[sizeName].measurements = size.measurements || {};
+          }
+        }
+      });
+
+      // Show smaller/larger if any of those sizes are enabled
+      if (sizeStyle === 'letter') {
+        const smallerSizes = ALL_SIZES.slice(0, DEFAULT_VISIBLE_START);
+        const largerSizes = ALL_SIZES.slice(DEFAULT_VISIBLE_END + 1);
+        showingSmallerSizes = smallerSizes.some(s => sizeData[s] && sizeData[s].enabled);
+        showingLargerSizes = largerSizes.some(s => sizeData[s] && sizeData[s].enabled);
+      } else if (sizeStyle === 'waist-length') {
+        // For waist+length sizes, check if smaller waists (26, 28) or larger (42, 44) are enabled
+        const smallerWaists = ['26', '28'];
+        const largerWaists = ['42', '44'];
+        showingSmallerSizes = smallerWaists.some(w =>
+          LENGTH_VARIANTS.some(l => sizeData[`${w}${l}`] && sizeData[`${w}${l}`].enabled)
+        );
+        showingLargerSizes = largerWaists.some(w =>
+          LENGTH_VARIANTS.some(l => sizeData[`${w}${l}`] && sizeData[`${w}${l}`].enabled)
+        );
+      } else {
+        // For waist-only sizes
+        const smallerWaists = ['26', '28'];
+        const largerWaists = ['42', '44'];
+        showingSmallerSizes = smallerWaists.some(w => sizeData[w] && sizeData[w].enabled);
+        showingLargerSizes = largerWaists.some(w => sizeData[w] && sizeData[w].enabled);
+      }
     }
 
     function updateUnitButtons() {
@@ -610,6 +1121,21 @@
       sizeNotation = e.target.value;
     });
 
+    // Button colour picker
+    document.getElementById('button-color').addEventListener('input', (e) => {
+      buttonColor = e.target.value;
+      document.getElementById('button-color-text').value = buttonColor;
+    });
+
+    document.getElementById('button-color-text').addEventListener('input', (e) => {
+      const value = e.target.value;
+      // Validate hex colour format
+      if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+        buttonColor = value;
+        document.getElementById('button-color').value = buttonColor;
+      }
+    });
+
     function renderFields() {
       const container = document.getElementById('field-list');
       container.innerHTML = measurementFields.map((field, index) => `
@@ -637,8 +1163,8 @@
       const field = measurementFields[index];
       measurementFields.splice(index, 1);
       // Remove from all sizes
-      sizes.forEach(size => {
-        delete size.measurements[field.key];
+      ALL_SIZES.forEach(sizeName => {
+        delete sizeData[sizeName].measurements[field.key];
       });
       renderFields();
       renderSizeTable();
@@ -654,56 +1180,296 @@
     }
 
     function renderSizeTable() {
+      const category = document.getElementById('category').value;
+
       // Update header
       const header = document.getElementById('size-table-header');
       header.innerHTML = `
-        <th>Size Name</th>
+        <th style="width: 80px;">Size</th>
         ${measurementFields.map(f => `<th>${escapeHtml(f.label)} (${measurementUnit})${f.required ? ' *' : ''}</th>`).join('')}
-        <th width="60"></th>
+        <th style="width: 70px;">Enabled</th>
       `;
 
-      // Update body
       const body = document.getElementById('size-table-body');
-      body.innerHTML = sizes.map((size, sizeIndex) => `
-        <tr data-size-index="${sizeIndex}">
+      let html = '';
+
+      // Check if using waist-based sizes for bottoms
+      if (category === 'BOTTOMS' && (sizeStyle === 'waist-length' || sizeStyle === 'waist-only')) {
+        // Hide expand buttons for waist-based sizes
+        document.getElementById('smaller-btn-row').style.display = 'none';
+        document.getElementById('larger-btn-row').style.display = 'none';
+
+        if (sizeStyle === 'waist-length') {
+          // Render waist + length sizes
+          WAIST_SIZES.forEach((waist, waistIdx) => {
+            LENGTH_VARIANTS.forEach(length => {
+              if (enabledLengths[length]) {
+                const sizeName = `${waist}${length}`;
+                if (sizeData[sizeName]) {
+                  // Hide smaller waists (26, 28) and larger waists (42, 44) by default
+                  const isHidden = (waistIdx < 2 && !showingSmallerSizes) || (waistIdx > 5 && !showingLargerSizes);
+                  html += renderSizeRow(sizeName, isHidden);
+                }
+              }
+            });
+          });
+          // Show expand buttons for waist sizes
+          document.getElementById('smaller-btn-row').style.display = 'flex';
+          document.getElementById('larger-btn-row').style.display = 'flex';
+          document.getElementById('show-smaller-btn').innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18,15 12,9 6,15"/>
+            </svg>
+            Show smaller waists (26 - 28)
+          `;
+          document.getElementById('show-larger-btn').innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6,9 12,15 18,9"/>
+            </svg>
+            Show larger waists (42 - 44)
+          `;
+        } else {
+          // Render waist only sizes
+          WAIST_SIZES.forEach((waist, waistIdx) => {
+            if (sizeData[waist]) {
+              const isHidden = (waistIdx < 2 && !showingSmallerSizes) || (waistIdx > 5 && !showingLargerSizes);
+              html += renderSizeRow(waist, isHidden);
+            }
+          });
+          // Show expand buttons for waist sizes
+          document.getElementById('smaller-btn-row').style.display = 'flex';
+          document.getElementById('larger-btn-row').style.display = 'flex';
+          document.getElementById('show-smaller-btn').innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18,15 12,9 6,15"/>
+            </svg>
+            Show smaller waists (26 - 28)
+          `;
+          document.getElementById('show-larger-btn').innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6,9 12,15 18,9"/>
+            </svg>
+            Show larger waists (42 - 44)
+          `;
+        }
+      } else {
+        // Standard letter sizes
+        // Restore expand button text
+        document.getElementById('show-smaller-btn').innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18,15 12,9 6,15"/>
+          </svg>
+          Show smaller sizes (3XS - XXS)
+        `;
+        document.getElementById('show-larger-btn').innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6,9 12,15 18,9"/>
+          </svg>
+          Show larger sizes (2XL - 6XL)
+        `;
+
+        // Determine which sizes to show
+        const smallerSizes = ALL_SIZES.slice(0, DEFAULT_VISIBLE_START); // 3XS, 2XS, XXS
+        const defaultSizes = ALL_SIZES.slice(DEFAULT_VISIBLE_START, DEFAULT_VISIBLE_END + 1); // XS to XL
+        const largerSizes = ALL_SIZES.slice(DEFAULT_VISIBLE_END + 1); // 2XL to 6XL
+
+        // Smaller sizes (hidden by default)
+        smallerSizes.forEach(sizeName => {
+          html += renderSizeRow(sizeName, !showingSmallerSizes);
+        });
+
+        // Default sizes (always visible)
+        defaultSizes.forEach(sizeName => {
+          html += renderSizeRow(sizeName, false);
+        });
+
+        // Larger sizes (hidden by default)
+        largerSizes.forEach(sizeName => {
+          html += renderSizeRow(sizeName, !showingLargerSizes);
+        });
+
+        // Show expand buttons
+        document.getElementById('smaller-btn-row').style.display = 'flex';
+        document.getElementById('larger-btn-row').style.display = 'flex';
+      }
+
+      body.innerHTML = html;
+
+      // Update button rows visibility
+      const showSmallerBtn = document.getElementById('show-smaller-btn');
+      const hideSmallerBtn = document.getElementById('hide-smaller-btn');
+      showSmallerBtn.style.display = showingSmallerSizes ? 'none' : 'flex';
+      hideSmallerBtn.style.display = showingSmallerSizes ? 'flex' : 'none';
+
+      const showLargerBtn = document.getElementById('show-larger-btn');
+      const hideLargerBtn = document.getElementById('hide-larger-btn');
+      showLargerBtn.style.display = showingLargerSizes ? 'none' : 'flex';
+      hideLargerBtn.style.display = showingLargerSizes ? 'flex' : 'none';
+    }
+
+    function renderSizeRow(sizeName, isHidden) {
+      const data = sizeData[sizeName];
+      const isEnabled = data.enabled;
+      const hiddenClass = isHidden ? 'size-row-hidden' : '';
+      const disabledClass = !isEnabled ? 'size-row-disabled' : '';
+
+      return `
+        <tr data-size="${sizeName}" class="${hiddenClass} ${disabledClass}">
           <td>
-            <input type="text" class="size-name-input" value="${escapeHtml(size.name)}"
-                   onchange="updateSizeName(${sizeIndex}, this.value)">
+            <span class="size-name-label">${sizeName}</span>
           </td>
           ${measurementFields.map(field => `
             <td>
               <input type="number" step="0.1" min="0"
-                     value="${size.measurements[field.key] || ''}"
-                     onchange="updateMeasurement(${sizeIndex}, '${field.key}', this.value)"
-                     ${field.required ? 'required' : ''}>
+                     value="${data.measurements[field.key] || ''}"
+                     onchange="updateMeasurement('${sizeName}', '${field.key}', this.value)"
+                     ${!isEnabled ? 'disabled' : ''}>
             </td>
           `).join('')}
           <td>
-            <button type="button" class="btn btn-danger btn-sm" onclick="removeSize(${sizeIndex})">×</button>
+            <label class="size-toggle">
+              <input type="checkbox" ${isEnabled ? 'checked' : ''} onchange="toggleSize('${sizeName}', this.checked)">
+              <span class="size-toggle-slider"></span>
+            </label>
           </td>
         </tr>
-      `).join('');
+      `;
     }
 
-    function addSize() {
-      sizes.push({ name: '', measurements: {} });
+    function toggleSize(sizeName, enabled) {
+      sizeData[sizeName].enabled = enabled;
+      if (!enabled) {
+        // Clear measurements when disabled
+        sizeData[sizeName].measurements = {};
+      }
       renderSizeTable();
     }
 
-    function removeSize(index) {
-      sizes.splice(index, 1);
+    function showSmallerSizes() {
+      showingSmallerSizes = true;
       renderSizeTable();
     }
 
-    function updateSizeName(index, value) {
-      sizes[index].name = value;
-    }
+    function hideSmallerSizes() {
+      showingSmallerSizes = false;
+      const category = document.getElementById('category').value;
 
-    function updateMeasurement(sizeIndex, fieldKey, value) {
-      if (value === '' || value === null) {
-        delete sizes[sizeIndex].measurements[fieldKey];
+      if (category === 'BOTTOMS' && sizeStyle === 'waist-length') {
+        // Disable smaller waist sizes (26, 28)
+        ['26', '28'].forEach(waist => {
+          LENGTH_VARIANTS.forEach(length => {
+            const sizeName = `${waist}${length}`;
+            if (sizeData[sizeName]) {
+              sizeData[sizeName].enabled = false;
+              sizeData[sizeName].measurements = {};
+            }
+          });
+        });
+      } else if (category === 'BOTTOMS' && sizeStyle === 'waist-only') {
+        ['26', '28'].forEach(waist => {
+          if (sizeData[waist]) {
+            sizeData[waist].enabled = false;
+            sizeData[waist].measurements = {};
+          }
+        });
       } else {
-        sizes[sizeIndex].measurements[fieldKey] = parseFloat(value);
+        // Standard letter sizes
+        const smallerSizes = ALL_SIZES.slice(0, DEFAULT_VISIBLE_START);
+        smallerSizes.forEach(sizeName => {
+          if (sizeData[sizeName]) {
+            sizeData[sizeName].enabled = false;
+            sizeData[sizeName].measurements = {};
+          }
+        });
+      }
+      renderSizeTable();
+    }
+
+    function showLargerSizes() {
+      showingLargerSizes = true;
+      renderSizeTable();
+    }
+
+    function hideLargerSizes() {
+      showingLargerSizes = false;
+      const category = document.getElementById('category').value;
+
+      if (category === 'BOTTOMS' && sizeStyle === 'waist-length') {
+        // Disable larger waist sizes (42, 44)
+        ['42', '44'].forEach(waist => {
+          LENGTH_VARIANTS.forEach(length => {
+            const sizeName = `${waist}${length}`;
+            if (sizeData[sizeName]) {
+              sizeData[sizeName].enabled = false;
+              sizeData[sizeName].measurements = {};
+            }
+          });
+        });
+      } else if (category === 'BOTTOMS' && sizeStyle === 'waist-only') {
+        ['42', '44'].forEach(waist => {
+          if (sizeData[waist]) {
+            sizeData[waist].enabled = false;
+            sizeData[waist].measurements = {};
+          }
+        });
+      } else {
+        // Standard letter sizes
+        const largerSizes = ALL_SIZES.slice(DEFAULT_VISIBLE_END + 1);
+        largerSizes.forEach(sizeName => {
+          if (sizeData[sizeName]) {
+            sizeData[sizeName].enabled = false;
+            sizeData[sizeName].measurements = {};
+          }
+        });
+      }
+      renderSizeTable();
+    }
+
+    function updateMeasurement(sizeName, fieldKey, value) {
+      if (value === '' || value === null) {
+        delete sizeData[sizeName].measurements[fieldKey];
+      } else {
+        sizeData[sizeName].measurements[fieldKey] = Number.parseFloat(value);
+      }
+    }
+
+    // Convert sizeData to array format for API submission
+    function getSizesArray() {
+      const category = document.getElementById('category').value;
+
+      if (category === 'BOTTOMS' && sizeStyle === 'waist-length') {
+        // Waist + Length format
+        const sizes = [];
+        WAIST_SIZES.forEach(waist => {
+          LENGTH_VARIANTS.forEach(length => {
+            if (enabledLengths[length]) {
+              const sizeName = `${waist}${length}`;
+              if (sizeData[sizeName] && sizeData[sizeName].enabled) {
+                sizes.push({
+                  name: sizeName,
+                  measurements: sizeData[sizeName].measurements
+                });
+              }
+            }
+          });
+        });
+        return sizes;
+      } else if (category === 'BOTTOMS' && sizeStyle === 'waist-only') {
+        // Waist only format
+        return WAIST_SIZES
+          .filter(waist => sizeData[waist] && sizeData[waist].enabled)
+          .map(waist => ({
+            name: waist,
+            measurements: sizeData[waist].measurements
+          }));
+      } else {
+        // Standard letter sizes
+        return ALL_SIZES
+          .filter(sizeName => sizeData[sizeName] && sizeData[sizeName].enabled)
+          .map(sizeName => ({
+            name: sizeName,
+            measurements: sizeData[sizeName].measurements
+          }));
       }
     }
 
@@ -720,7 +1486,7 @@
 
       const name = document.getElementById('name').value.trim();
       const category = document.getElementById('category').value;
-      console.log('Form values:', { name, category, measurementUnit, measurementFields, sizes });
+      console.log('Form values:', { name, category, measurementUnit, measurementFields, sizeData });
 
       if (!name) {
         console.log('Validation failed: no name');
@@ -735,11 +1501,11 @@
       }
 
       // Validate sizes
-      const validSizes = sizes.filter(s => s.name.trim());
+      const validSizes = getSizesArray();
       console.log('Valid sizes:', validSizes);
       if (validSizes.length === 0) {
         console.log('Validation failed: no valid sizes');
-        showToast('Please add at least one size', true);
+        showToast('Please enable at least one size', true);
         return;
       }
 
@@ -761,6 +1527,7 @@
         measurementUnit,
         measurementGender,
         sizeNotation,
+        buttonColor,
         measurementFields,
         sizes: validSizes,
       };

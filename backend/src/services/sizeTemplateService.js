@@ -103,6 +103,7 @@ export async function createTemplate(shopDomain, templateData) {
     measurementUnit = 'cm',
     measurementGender = 'unisex',
     sizeNotation = 'US',
+    buttonColor = '#008060',
     measurementFields,
     sizes,
     bodyShapes = DEFAULT_BODY_SHAPES,
@@ -110,8 +111,8 @@ export async function createTemplate(shopDomain, templateData) {
 
   try {
     const result = await query(
-      `INSERT INTO size_templates (shop_domain, name, category, measurement_unit, measurement_gender, size_notation, measurement_fields, sizes, body_shapes)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO size_templates (shop_domain, name, category, measurement_unit, measurement_gender, size_notation, button_color, measurement_fields, sizes, body_shapes)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING *`,
       [
         shopDomain,
@@ -120,6 +121,7 @@ export async function createTemplate(shopDomain, templateData) {
         measurementUnit,
         measurementGender,
         sizeNotation,
+        buttonColor,
         JSON.stringify(measurementFields),
         JSON.stringify(sizes),
         JSON.stringify(bodyShapes),
@@ -147,6 +149,7 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
     measurementUnit,
     measurementGender,
     sizeNotation,
+    buttonColor,
     measurementFields,
     sizes,
     bodyShapes,
@@ -161,12 +164,13 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
            measurement_unit = COALESCE($3, measurement_unit),
            measurement_gender = COALESCE($4, measurement_gender),
            size_notation = COALESCE($5, size_notation),
-           measurement_fields = COALESCE($6, measurement_fields),
-           sizes = COALESCE($7, sizes),
-           body_shapes = COALESCE($8, body_shapes),
-           is_active = COALESCE($9, is_active),
+           button_color = COALESCE($6, button_color),
+           measurement_fields = COALESCE($7, measurement_fields),
+           sizes = COALESCE($8, sizes),
+           body_shapes = COALESCE($9, body_shapes),
+           is_active = COALESCE($10, is_active),
            updated_at = CURRENT_TIMESTAMP
-       WHERE id = $10 AND shop_domain = $11
+       WHERE id = $11 AND shop_domain = $12
        RETURNING *`,
       [
         name,
@@ -174,6 +178,7 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
         measurementUnit,
         measurementGender,
         sizeNotation,
+        buttonColor,
         measurementFields ? JSON.stringify(measurementFields) : null,
         sizes ? JSON.stringify(sizes) : null,
         bodyShapes ? JSON.stringify(bodyShapes) : null,

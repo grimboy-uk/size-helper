@@ -71,6 +71,7 @@ export async function initializeDatabase() {
         measurement_unit VARCHAR(10) DEFAULT 'cm',
         measurement_gender VARCHAR(20) DEFAULT 'unisex',
         size_notation VARCHAR(10) DEFAULT 'US',
+        button_color VARCHAR(20) DEFAULT '#008060',
         measurement_fields JSONB NOT NULL DEFAULT '[]',
         sizes JSONB NOT NULL DEFAULT '[]',
         body_shapes JSONB DEFAULT '[]',

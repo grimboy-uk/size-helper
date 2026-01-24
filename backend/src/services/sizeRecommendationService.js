@@ -265,6 +265,7 @@ export async function getSizeChart(shopDomain, productId, displayUnit = null) {
     measurementUnit: outputUnit,
     measurementGender: template.measurement_gender,
     sizeNotation: template.size_notation || 'US',
+    buttonColor: template.button_color || '#008060',
     measurementFields: template.measurement_fields,
     sizes,
     bodyShapes: template.body_shapes,

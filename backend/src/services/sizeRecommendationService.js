@@ -240,6 +240,20 @@ export async function getSizeChart(shopDomain, productId, displayUnit = null) {
     return null;
   }
 
+  // Fetch shop's subscription tier
+  let subscriptionTier = 'STARTUP';
+  try {
+    const shopResult = await query(
+      `SELECT subscription_tier FROM shops WHERE shop_domain = $1`,
+      [shopDomain]
+    );
+    if (shopResult.rows.length > 0) {
+      subscriptionTier = shopResult.rows[0].subscription_tier || 'STARTUP';
+    }
+  } catch (error) {
+    logger.error('Failed to fetch subscription tier:', error);
+  }
+
   const templateUnit = template.measurement_unit;
   const outputUnit = displayUnit || templateUnit;
 
@@ -270,6 +284,7 @@ export async function getSizeChart(shopDomain, productId, displayUnit = null) {
     sizes,
     bodyShapes: template.body_shapes,
     includeSizeHelper: template.include_size_helper !== false,
+    subscriptionTier,
   };
 }
 

@@ -168,6 +168,11 @@
         </button>
       </div>
     </div>
+
+    <!-- Powered by RMS - shown only for Startup tier -->
+    <div class="powered-by-rms" id="powered-by-rms" style="display: none;">
+      <img src="{{ 'powered-by-rms.png' | asset_url }}" alt="Powered by RMS Size Helper" loading="lazy">
+    </div>
   </div>
 </div>
 
@@ -223,6 +228,7 @@
     background: white;
     border-radius: 16px;
     padding: 32px;
+    padding-bottom: 60px; /* Extra padding for powered-by logo */
     max-width: 800px;
     width: 100%;
     max-height: 90vh;
@@ -659,6 +665,28 @@
     padding: 40px 0;
   }
 
+  .powered-by-rms {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding: 12px;
+    background: linear-gradient(to bottom, transparent, white 20%);
+    border-radius: 0 0 16px 16px;
+  }
+
+  .powered-by-rms img {
+    height: 24px;
+    width: auto;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  .powered-by-rms img:hover {
+    opacity: 1;
+  }
+
   @media (max-width: 768px) {
     .size-guide-modal-content {
       max-width: 95vw;
@@ -772,6 +800,7 @@
       currentNotation: null, // Will be set from template's size_notation
       originalNotation: null, // The notation the template was created with
       buttonColor: null, // Will be set from template's button_color
+      subscriptionTier: null, // Will be set from API response
       sizeChart: null,
       selectedBodyShape: null,
 
@@ -862,6 +891,9 @@
           this.buttonColor = this.sizeChart.buttonColor || '#008060';
           this.applyButtonColor();
 
+          // Set subscription tier
+          this.subscriptionTier = this.sizeChart.subscriptionTier || 'STARTUP';
+
           // Update dropdown to show template's notation
           const dropdown = document.getElementById('size-notation-dropdown');
           if (dropdown) {
@@ -879,6 +911,13 @@
             // Show button only if includeSizeHelper is true (defaults to true if not specified)
             const showSizeHelper = this.sizeChart.includeSizeHelper !== false;
             findMySizeBtn.style.display = showSizeHelper ? 'block' : 'none';
+          }
+
+          // Show/hide powered-by logo based on subscription tier
+          // Only visible for STARTUP (free) tier
+          const poweredByEl = document.getElementById('powered-by-rms');
+          if (poweredByEl) {
+            poweredByEl.style.display = this.subscriptionTier === 'STARTUP' ? 'block' : 'none';
           }
         } catch (error) {
           console.error('Size Helper: Error loading size chart', error);

@@ -233,6 +233,17 @@ app.get('/products', serveAdminPage('products'));
 app.get('/analytics', serveAdminPage('analytics'));
 app.get('/settings', serveAdminPage('settings'));
 
+// Public pages (no auth required)
+app.get('/privacy', (req, res) => {
+  try {
+    const html = loadTemplate('privacy', {});
+    res.send(html);
+  } catch (error) {
+    logger.error('Error loading privacy page:', error);
+    res.status(500).send('Error loading privacy policy');
+  }
+});
+
 // Error handlers
 app.use(notFoundHandler);
 app.use(errorHandler);

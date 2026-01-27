@@ -22,6 +22,8 @@ router.get(
     const tiers = Object.entries(SUBSCRIPTION_TIERS).map(([key, tier]) => ({
       key,
       ...tier,
+      // Include both limit types for display
+      productTypeLimit: tier.sizeChartLimit, // Legacy compatibility
     }));
     res.json({ tiers });
   })

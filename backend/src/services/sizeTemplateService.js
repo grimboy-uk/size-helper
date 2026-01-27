@@ -19,7 +19,7 @@ export const PRODUCT_CATEGORIES = {
   },
   BOTTOMS: {
     name: 'Bottoms',
-    description: 'Pants, jeans, shorts, skirts',
+    description: 'Trousers, jeans, shorts, skirts',
     defaultFields: [
       { key: 'waist', label: 'Waist', required: true },
       { key: 'hip', label: 'Hip', required: true },
@@ -64,31 +64,31 @@ export const PRODUCT_CATEGORIES = {
 };
 
 /**
- * Default body shapes with placeholder descriptions
+ * Default body shapes with descriptions
  */
 export const DEFAULT_BODY_SHAPES = [
   {
-    key: 'slim',
-    label: 'Slim',
-    description: 'Narrow build, smaller frame',
+    key: 'lean',
+    label: 'Lean',
+    description: 'Small frame, low muscle/fat',
     adjustment: -1, // Size down tendency
   },
   {
-    key: 'regular',
-    label: 'Regular',
-    description: 'Average build',
+    key: 'balanced',
+    label: 'Balanced',
+    description: 'Moderate proportions',
     adjustment: 0,
   },
   {
-    key: 'athletic',
-    label: 'Athletic',
-    description: 'Broader shoulders, defined muscles',
+    key: 'toned',
+    label: 'Toned',
+    description: 'Muscle definition, straight/broad shoulders',
     adjustment: 0.5,
   },
   {
-    key: 'relaxed',
-    label: 'Relaxed',
-    description: 'Fuller build, prefer looser fit',
+    key: 'curvy',
+    label: 'Curvy',
+    description: 'Fuller, softer body frame',
     adjustment: 1, // Size up tendency
   },
 ];
@@ -102,17 +102,18 @@ export async function createTemplate(shopDomain, templateData) {
     category,
     measurementUnit = 'cm',
     measurementGender = 'unisex',
-    sizeNotation = 'US',
+    sizeNotation = 'UK',
     buttonColor = '#008060',
     measurementFields,
     sizes,
     bodyShapes = DEFAULT_BODY_SHAPES,
+    includeSizeHelper = true,
   } = templateData;
 
   try {
     const result = await query(
-      `INSERT INTO size_templates (shop_domain, name, category, measurement_unit, measurement_gender, size_notation, button_color, measurement_fields, sizes, body_shapes)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `INSERT INTO size_templates (shop_domain, name, category, measurement_unit, measurement_gender, size_notation, button_color, measurement_fields, sizes, body_shapes, include_size_helper)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
       [
         shopDomain,
@@ -125,10 +126,11 @@ export async function createTemplate(shopDomain, templateData) {
         JSON.stringify(measurementFields),
         JSON.stringify(sizes),
         JSON.stringify(bodyShapes),
+        includeSizeHelper,
       ]
     );
 
-    logger.info('Size template created:', { shopDomain, name, id: result.rows[0].id });
+    logger.info('Size template created:', { shopDomain, name, id: result.rows[0].id, includeSizeHelper });
     return result.rows[0];
   } catch (error) {
     if (error.code === '23505') {
@@ -153,6 +155,7 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
     measurementFields,
     sizes,
     bodyShapes,
+    includeSizeHelper,
     isActive,
   } = templateData;
 
@@ -168,9 +171,10 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
            measurement_fields = COALESCE($7, measurement_fields),
            sizes = COALESCE($8, sizes),
            body_shapes = COALESCE($9, body_shapes),
-           is_active = COALESCE($10, is_active),
+           include_size_helper = COALESCE($10, include_size_helper),
+           is_active = COALESCE($11, is_active),
            updated_at = CURRENT_TIMESTAMP
-       WHERE id = $11 AND shop_domain = $12
+       WHERE id = $12 AND shop_domain = $13
        RETURNING *`,
       [
         name,
@@ -182,6 +186,7 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
         measurementFields ? JSON.stringify(measurementFields) : null,
         sizes ? JSON.stringify(sizes) : null,
         bodyShapes ? JSON.stringify(bodyShapes) : null,
+        includeSizeHelper,
         isActive,
         templateId,
         shopDomain,

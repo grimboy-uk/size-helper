@@ -1,10 +1,16 @@
 import express from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { query } from '../config/database.js';
-import { createLogger } from '../utils/logger.js';
 
 const router = express.Router();
-const logger = createLogger('AnalyticsRoute');
+
+// Helper function to format date as YYYY-MM-DD in local timezone
+function formatDateLocal(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
 /**
  * GET /api/analytics/dashboard
@@ -17,8 +23,8 @@ router.get(
     const { days = 30 } = req.query;
 
     const startDate = new Date();
-    startDate.setDate(startDate.getDate() - parseInt(days, 10));
-    const startDateStr = startDate.toISOString().split('T')[0];
+    startDate.setDate(startDate.getDate() - Number.parseInt(days, 10));
+    const startDateStr = formatDateLocal(startDate);
 
     // Get total counts
     const totalsResult = await query(
@@ -38,9 +44,9 @@ router.get(
 
     for (const row of totalsResult.rows) {
       if (row.event_type === 'size_guide_opened') {
-        totals.sizeGuideOpened = parseInt(row.total, 10);
+        totals.sizeGuideOpened = Number.parseInt(row.total, 10);
       } else if (row.event_type === 'recommendation_made') {
-        totals.recommendationMade = parseInt(row.total, 10);
+        totals.recommendationMade = Number.parseInt(row.total, 10);
       }
     }
 
@@ -55,19 +61,19 @@ router.get(
       `SELECT COUNT(*) as count FROM size_templates WHERE shop_domain = $1 AND is_active = true`,
       [shopDomain]
     );
-    const templateCount = parseInt(templateResult.rows[0].count, 10);
+    const templateCount = Number.parseInt(templateResult.rows[0].count, 10);
 
     // Get assigned products count
     const productResult = await query(
       `SELECT COUNT(DISTINCT product_id) as count FROM product_assignments WHERE shop_domain = $1`,
       [shopDomain]
     );
-    const assignedProducts = parseInt(productResult.rows[0].count, 10);
+    const assignedProducts = Number.parseInt(productResult.rows[0].count, 10);
 
     res.json({
       period: `${days} days`,
       totals,
-      conversionRate: parseFloat(conversionRate),
+      conversionRate: Number.parseFloat(conversionRate),
       templateCount,
       assignedProducts,
     });
@@ -85,8 +91,8 @@ router.get(
     const { days = 30 } = req.query;
 
     const startDate = new Date();
-    startDate.setDate(startDate.getDate() - parseInt(days, 10));
-    const startDateStr = startDate.toISOString().split('T')[0];
+    startDate.setDate(startDate.getDate() - Number.parseInt(days, 10));
+    const startDateStr = formatDateLocal(startDate);
 
     const result = await query(
       `SELECT
@@ -101,10 +107,11 @@ router.get(
     );
 
     // Organize by date
+    // Note: event_date is now returned as string 'YYYY-MM-DD' due to pg type parser config
     const timelineMap = {};
 
     for (const row of result.rows) {
-      const date = row.event_date.toISOString().split('T')[0];
+      const date = row.event_date; // Already a string 'YYYY-MM-DD'
       if (!timelineMap[date]) {
         timelineMap[date] = {
           date,
@@ -114,19 +121,21 @@ router.get(
       }
 
       if (row.event_type === 'size_guide_opened') {
-        timelineMap[date].sizeGuideOpened = parseInt(row.total, 10);
+        timelineMap[date].sizeGuideOpened = Number.parseInt(row.total, 10);
       } else if (row.event_type === 'recommendation_made') {
-        timelineMap[date].recommendationMade = parseInt(row.total, 10);
+        timelineMap[date].recommendationMade = Number.parseInt(row.total, 10);
       }
     }
 
     // Fill in missing dates
     const timeline = [];
-    const current = new Date(startDateStr);
+    const [startYear, startMonth, startDay] = startDateStr.split('-').map(Number);
+    const current = new Date(startYear, startMonth - 1, startDay); // Month is 0-indexed
     const end = new Date();
+    end.setHours(23, 59, 59, 999); // Include all of today
 
     while (current <= end) {
-      const dateStr = current.toISOString().split('T')[0];
+      const dateStr = formatDateLocal(current);
       timeline.push(
         timelineMap[dateStr] || {
           date: dateStr,
@@ -152,8 +161,8 @@ router.get(
     const { limit = 10, days = 30 } = req.query;
 
     const startDate = new Date();
-    startDate.setDate(startDate.getDate() - parseInt(days, 10));
-    const startDateStr = startDate.toISOString().split('T')[0];
+    startDate.setDate(startDate.getDate() - Number.parseInt(days, 10));
+    const startDateStr = formatDateLocal(startDate);
 
     const result = await query(
       `SELECT
@@ -167,14 +176,14 @@ router.get(
        GROUP BY a.product_id, pa.product_title
        ORDER BY opens DESC
        LIMIT $3`,
-      [shopDomain, startDateStr, parseInt(limit, 10)]
+      [shopDomain, startDateStr, Number.parseInt(limit, 10)]
     );
 
     const products = result.rows.map((row) => ({
       productId: row.product_id,
       productTitle: row.product_title || `Product ${row.product_id}`,
-      opens: parseInt(row.opens, 10),
-      recommendations: parseInt(row.recommendations, 10),
+      opens: Number.parseInt(row.opens, 10),
+      recommendations: Number.parseInt(row.recommendations, 10),
       conversionRate:
         row.opens > 0 ? ((row.recommendations / row.opens) * 100).toFixed(1) : 0,
     }));
@@ -208,7 +217,7 @@ router.get(
        WHERE sr.shop_domain = $1
        ORDER BY sr.created_at DESC
        LIMIT $2 OFFSET $3`,
-      [shopDomain, parseInt(limit, 10), parseInt(offset, 10)]
+      [shopDomain, Number.parseInt(limit, 10), Number.parseInt(offset, 10)]
     );
 
     res.json({ recommendations: result.rows });

@@ -7,9 +7,14 @@ const logger = createLogger('Subscription');
 /**
  * Middleware to check subscription status and limits
  * Attaches subscription info to req.subscriptionInfo
+ *
+ * Options:
+ * - enforceLimit: If true, blocks creation when size chart limit is reached
+ * - enforceSizeHelperLimit: If true, blocks creation when size helper limit is reached
+ * - checkSizeHelper: If true, check if the request is trying to create a size helper template
  */
 export function subscriptionCheck(options = {}) {
-  const { enforceLimit = false } = options;
+  const { enforceLimit = false, enforceSizeHelperLimit = false } = options;
 
   return async (req, res, next) => {
     try {
@@ -51,31 +56,61 @@ export function subscriptionCheck(options = {}) {
         logger.info('Billing cycle reset for shop:', shopDomain);
       }
 
-      // Get current product type count
+      // Get counts for both template types
       const countResult = await query(
-        `SELECT COUNT(*) as count FROM size_templates WHERE shop_domain = $1 AND is_active = true`,
+        `SELECT
+           COUNT(*) FILTER (WHERE is_active = true) as total_count,
+           COUNT(*) FILTER (WHERE is_active = true AND include_size_helper = true) as size_helper_count
+         FROM size_templates WHERE shop_domain = $1`,
         [shopDomain]
       );
-      const productTypeCount = parseInt(countResult.rows[0].count, 10);
+
+      const counts = countResult.rows[0];
+      const sizeChartCount = Number.parseInt(counts.total_count, 10);
+      const sizeHelperCount = Number.parseInt(counts.size_helper_count, 10);
 
       // Attach subscription info
       req.subscriptionInfo = {
         tier: shop.subscription_tier,
         tierName: tier.name,
-        productTypeLimit: tier.productTypeLimit,
-        productTypeCount,
-        canCreateMore: productTypeCount < tier.productTypeLimit,
-        remainingSlots: tier.productTypeLimit - productTypeCount,
+        // Size chart limits (total templates)
+        sizeChartLimit: tier.sizeChartLimit,
+        sizeChartCount,
+        canCreateSizeChart: sizeChartCount < tier.sizeChartLimit,
+        sizeChartRemaining: tier.sizeChartLimit - sizeChartCount,
+        // Size helper limits (templates with size helper enabled)
+        sizeHelperLimit: tier.sizeHelperLimit,
+        sizeHelperCount,
+        canCreateSizeHelper: sizeHelperCount < tier.sizeHelperLimit,
+        sizeHelperRemaining: tier.sizeHelperLimit - sizeHelperCount,
+        // Legacy fields for backwards compatibility
+        productTypeLimit: tier.sizeChartLimit,
+        productTypeCount: sizeChartCount,
+        canCreateMore: sizeChartCount < tier.sizeChartLimit,
+        remainingSlots: tier.sizeChartLimit - sizeChartCount,
       };
 
-      // Optionally enforce limit
-      if (enforceLimit && !req.subscriptionInfo.canCreateMore) {
+      // Optionally enforce size chart limit
+      if (enforceLimit && !req.subscriptionInfo.canCreateSizeChart) {
         return res.status(403).json({
-          error: 'Product type limit reached',
-          message: `Your ${tier.name} plan allows up to ${tier.productTypeLimit} product types. Please upgrade to add more.`,
-          currentCount: productTypeCount,
-          limit: tier.productTypeLimit,
+          error: 'Size chart limit reached',
+          message: `Your ${tier.name} plan allows up to ${tier.sizeChartLimit} size charts. Please upgrade to add more.`,
+          currentCount: sizeChartCount,
+          limit: tier.sizeChartLimit,
         });
+      }
+
+      // Optionally enforce size helper limit
+      if (enforceSizeHelperLimit) {
+        const requestIncludesSizeHelper = req.body?.includeSizeHelper === true;
+        if (requestIncludesSizeHelper && !req.subscriptionInfo.canCreateSizeHelper) {
+          return res.status(403).json({
+            error: 'Size helper limit reached',
+            message: `Your ${tier.name} plan allows up to ${tier.sizeHelperLimit} templates with Size Helper. Please upgrade or create a Size Chart Only template.`,
+            currentCount: sizeHelperCount,
+            limit: tier.sizeHelperLimit,
+          });
+        }
       }
 
       next();

@@ -5,25 +5,30 @@ const logger = createLogger('Billing');
 
 /**
  * Subscription tier definitions
+ * - sizeChartLimit: Number of "Size Chart Only" templates allowed
+ * - sizeHelperLimit: Number of "Size Chart + Size Helper" templates allowed
  */
 export const SUBSCRIPTION_TIERS = {
   STARTUP: {
     name: 'Startup',
     price: 0,
-    productTypeLimit: 2,
-    description: 'Free tier - up to 2 product types',
+    sizeChartLimit: 5,
+    sizeHelperLimit: 2,
+    description: 'Free tier - 5 size charts, 2 with size helper',
   },
   MICRO_ENTERPRISE: {
     name: 'Micro Enterprise',
     price: 10,
-    productTypeLimit: 10,
-    description: '$10/month - up to 10 product types',
+    sizeChartLimit: 10,
+    sizeHelperLimit: 7,
+    description: '$10/month - 10 size charts, 7 with size helper',
   },
   SMALL_BUSINESS: {
     name: 'Small Business',
     price: 20,
-    productTypeLimit: 30,
-    description: '$20/month - up to 30 product types',
+    sizeChartLimit: 30,
+    sizeHelperLimit: 20,
+    description: '$20/month - 30 size charts, 20 with size helper',
   },
 };
 
@@ -227,20 +232,36 @@ export async function getSubscriptionStatus(shopDomain) {
     const shop = result.rows[0];
     const tier = SUBSCRIPTION_TIERS[shop.subscription_tier] || SUBSCRIPTION_TIERS.STARTUP;
 
-    // Get current product type count
+    // Get counts for both template types
     const countResult = await query(
-      `SELECT COUNT(*) as count FROM size_templates WHERE shop_domain = $1 AND is_active = true`,
+      `SELECT
+         COUNT(*) FILTER (WHERE is_active = true) as total_count,
+         COUNT(*) FILTER (WHERE is_active = true AND include_size_helper = true) as size_helper_count,
+         COUNT(*) FILTER (WHERE is_active = true AND include_size_helper = false) as size_chart_only_count
+       FROM size_templates WHERE shop_domain = $1`,
       [shopDomain]
     );
-    const productTypeCount = parseInt(countResult.rows[0].count, 10);
+
+    const counts = countResult.rows[0];
+    const sizeChartCount = Number.parseInt(counts.total_count, 10);
+    const sizeHelperCount = Number.parseInt(counts.size_helper_count, 10);
 
     return {
       tier: shop.subscription_tier,
       tierName: tier.name,
       price: tier.price,
-      productTypeLimit: tier.productTypeLimit,
-      productTypeCount,
-      remainingSlots: tier.productTypeLimit - productTypeCount,
+      // Size chart limits (total templates)
+      sizeChartLimit: tier.sizeChartLimit,
+      sizeChartCount,
+      sizeChartRemaining: tier.sizeChartLimit - sizeChartCount,
+      // Size helper limits (templates with size helper enabled)
+      sizeHelperLimit: tier.sizeHelperLimit,
+      sizeHelperCount,
+      sizeHelperRemaining: tier.sizeHelperLimit - sizeHelperCount,
+      // Legacy field for backwards compatibility
+      productTypeLimit: tier.sizeChartLimit,
+      productTypeCount: sizeChartCount,
+      remainingSlots: tier.sizeChartLimit - sizeChartCount,
       billingCycleStart: shop.billing_cycle_start,
       billingCycleEnd: shop.billing_cycle_end,
     };

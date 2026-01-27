@@ -19,22 +19,6 @@
       border-bottom: 1px solid #e1e3e5;
       padding: 0 24px;
     }
-    .app-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #202223;
-      padding: 16px 0;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .app-title-icon {
-      width: 24px;
-      height: 24px;
-      background: #d4534a;
-      border-radius: 4px;
-    }
     .nav-tabs {
       display: flex;
       gap: 32px;
@@ -94,7 +78,7 @@
     .form-label {
       display: block;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       margin-bottom: 6px;
       color: #202223;
     }
@@ -541,14 +525,81 @@
       width: 16px;
       height: 16px;
     }
+    .template-type-toggle {
+      display: flex;
+      gap: 0;
+    }
+    .template-type-btn {
+      padding: 12px 20px;
+      border: 1px solid #c9cccf;
+      background: white;
+      cursor: pointer;
+      font-size: 14px;
+      color: #202223;
+      transition: all 0.2s;
+      flex: 1;
+      text-align: center;
+    }
+    .template-type-btn:first-child {
+      border-radius: 6px 0 0 6px;
+    }
+    .template-type-btn:last-child {
+      border-radius: 0 6px 6px 0;
+      border-left: none;
+    }
+    .template-type-btn.active {
+      background: #2a9d6e;
+      color: white;
+      border-color: #2a9d6e;
+    }
+    .template-type-btn:hover:not(.active):not(.disabled) {
+      background: #f8f9fa;
+    }
+    .template-type-btn.disabled {
+      background: #f5f5f5;
+      color: #999;
+      cursor: not-allowed;
+      border-color: #e1e3e5;
+    }
+    .template-type-badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      font-weight: 500;
+    }
+    .template-type-badge.chart-only {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .template-type-badge.with-helper {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .quota-info {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #6d7175;
+    }
+    .quota-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .quota-count {
+      font-weight: 600;
+      color: #202223;
+    }
+    .quota-count.at-limit {
+      color: #d72c0d;
+    }
   </style>
 </head>
 <body>
   <header class="app-header">
-    <h1 class="app-title">
-      <span class="app-title-icon"></span>
-      RMS Size Helper
-    </h1>
     <nav class="nav-tabs">
       <a href="#" class="nav-tab" data-path="/">Dashboard</a>
       <a href="#" class="nav-tab active" data-path="/templates">Size Templates</a>
@@ -577,7 +628,7 @@
             <select class="form-select" id="category" required>
               <option value="">Select a category...</option>
               <option value="TOPS">Tops (T-shirts, shirts, blouses)</option>
-              <option value="BOTTOMS">Bottoms (Pants, jeans, skirts)</option>
+              <option value="BOTTOMS">Bottoms (Trousers, jeans)</option>
               <option value="DRESSES">Dresses & Jumpsuits</option>
               <option value="OUTERWEAR">Outerwear (Jackets, coats)</option>
               <option value="FOOTWEAR">Footwear (Shoes, boots)</option>
@@ -586,8 +637,50 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label class="form-label">Template Type</label>
+          <div class="template-type-toggle">
+            <button type="button" class="template-type-btn active" id="type-with-helper" data-type="with-helper">
+              Size Chart + Size Helper
+              <span class="template-type-badge with-helper">Recommended</span>
+            </button>
+            <button type="button" class="template-type-btn" id="type-chart-only" data-type="chart-only">
+              Size Chart Only
+            </button>
+          </div>
+          <p class="form-hint">Size Chart + Size Helper includes the "Find My Size" questionnaire to help customers find their best fit.</p>
+          <div class="quota-info" id="quota-info">
+            <div class="quota-item">
+              <span>Size Charts:</span>
+              <span class="quota-count" id="quota-charts">-/-</span>
+            </div>
+            <div class="quota-item">
+              <span>With Size Helper:</span>
+              <span class="quota-count" id="quota-helpers">-/-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Measurement Unit</label>
+            <div class="unit-toggle">
+              <button type="button" class="unit-btn active" data-unit="cm">Centimeters (cm)</button>
+              <button type="button" class="unit-btn" data-unit="in">Inches (in)</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Measurement Gender</label>
+            <div class="gender-toggle">
+              <button type="button" class="gender-btn active" data-unit="women">Women</button>
+              <button type="button" class="gender-btn" data-unit="men">Men</button>
+            </div>
+          </div>
+        </div>
+
         <div class="form-group size-style-group" id="size-style-group">
-          <label class="form-label">Size Style</label>
+          <label class="form-label">Size Notation Type</label>
           <div class="size-style-toggle">
             <button type="button" class="size-style-btn active" data-style="letter">Standard (S, M, L, XL)</button>
             <button type="button" class="size-style-btn" data-style="waist-length">Waist + Length (32S, 32R, 32L)</button>
@@ -612,31 +705,13 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Measurement Unit</label>
-            <div class="unit-toggle">
-              <button type="button" class="unit-btn active" data-unit="cm">Centimeters (cm)</button>
-              <button type="button" class="unit-btn" data-unit="in">Inches (in)</button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Measurement Gender</label>
-            <div class="gender-toggle">
-              <button type="button" class="gender-btn active" data-unit="women">Women</button>
-              <button type="button" class="gender-btn" data-unit="men">Men</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Size Notation</label>
+            <label class="form-label">Size Notation Country</label>
             <div class="notation-select">
               <select id="size-notation">
-                <option value="US">🇺🇸 US Sizes</option>
                 <option value="UK">🇬🇧 UK Sizes</option>
-                <option value="EU">🇪🇺 EU Sizes</option>
+                <option value="US">🇺🇸 US Sizes</option>
                 <option value="AU">🇦🇺 AU Sizes</option>
+                <option value="EU">🇪🇺 EU Sizes</option>
                 <option value="JP">🇯🇵 JP Sizes</option>
                 <option value="CN">🇨🇳 CN Sizes</option>
               </select>
@@ -644,7 +719,7 @@
             <p class="form-hint">The sizing system used for this template's size labels</p>
           </div>
           <div class="form-group">
-            <label class="form-label">Modal Button Colour</label>
+            <label class="form-label">Popup Button Colour</label>
             <div class="color-picker-wrapper">
               <input type="color" id="button-color" value="#008060" class="color-picker">
               <input type="text" id="button-color-text" value="#008060" class="color-text-input" placeholder="#008060">
@@ -721,11 +796,13 @@
             How Size Notation Conversion Works
           </h3>
           <ol>
-            <li><strong>Use alphabetic sizes</strong> (XS, S, M, L, XL, etc.) as your default size names. These are universally understood.</li>
-            <li>When customers view the size chart, they can select their preferred country (US, UK, EU, etc.) from a dropdown.</li>
-            <li>The app will <strong>automatically display numeric equivalents</strong> next to the alphabetic sizes. For example: <code>M (38)</code> for EU or <code>L (42)</code> for EU.</li>
-            <li>If you use numeric sizes (e.g., 6, 8, 10), they will be <strong>directly converted</strong> to the customer's selected notation system.</li>
-            <li>The <strong>Modal Button Colour</strong> you choose above will be used for all buttons inside the size guide modal on your storefront.</li>
+            <li>Choose measurement fields, unit, gender and measurement country.</li>
+            <li>Assign matching measurements to each size.</li>
+            <li>When a template is created, find a product to assign it to.</li>
+            <li>When customers view the size guide popup, they can select their preferred country (US, UK, EU, etc.) from a dropdown.</li>
+            <li>The popup displays gender specific information based on the selected gender of the template.</li>
+            <li>The popup app will <strong>automatically display numeric equivalents</strong> next to the alphabetic sizes. For example: <code>M (38)</code> for EU or <code>L (42)</code> for EU.</li>
+            <li>The <strong>Popup Button Colour</strong> you choose above will be used for all buttons inside the size guide modal on your storefront.</li>
           </ol>
         </div>
 
@@ -758,7 +835,7 @@
       },
       BOTTOMS: {
         name: 'Bottoms',
-        description: 'Pants, jeans, skirts',
+        description: 'Trousers, jeans, skirts',
         defaultFields: [
           { key: 'waist', label: 'Waist', required: true },
           { key: 'hips', label: 'Hips', required: true },
@@ -804,9 +881,11 @@
     };
     let measurementUnit = 'cm';
     let measurementGender = 'women';
-    let sizeNotation = 'US';
+    let sizeNotation = 'UK';
     let buttonColor = '#008060';
     let measurementFields = [];
+    let includeSizeHelper = true;
+    let subscriptionInfo = null;
 
     // All predefined sizes from smallest to largest
     const ALL_SIZES = ['3XS', '2XS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
@@ -841,8 +920,21 @@
           console.warn('Using default categories:', catError);
         }
 
+        // Load subscription info for quota display
+        try {
+          const templatesData = await apiGet('/api/templates');
+          if (templatesData && templatesData.subscription) {
+            subscriptionInfo = templatesData.subscription;
+            updateQuotaDisplay();
+            updateTemplateTypeButtons();
+          }
+        } catch (subError) {
+          console.warn('Could not load subscription info:', subError);
+        }
+
         setupCategoryChangeHandler();
         setupSizeStyleHandler();
+        setupTemplateTypeHandler();
 
         if (MODE === 'edit' && TEMPLATE_ID) {
           document.getElementById('page-title').textContent = 'Edit Size Template';
@@ -866,6 +958,63 @@
         renderSizeTable();
         showToast('Some data could not be loaded', true);
       }
+    }
+
+    function setupTemplateTypeHandler() {
+      document.querySelectorAll('.template-type-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.classList.contains('disabled')) return;
+
+          const type = btn.dataset.type;
+          const wantsSizeHelper = type === 'with-helper';
+
+          // Check if we can enable size helper
+          if (wantsSizeHelper && subscriptionInfo && !subscriptionInfo.canCreateSizeHelper) {
+            showToast('Size Helper quota reached. Upgrade your plan or use Size Chart Only.', true);
+            return;
+          }
+
+          includeSizeHelper = wantsSizeHelper;
+          updateTemplateTypeButtons();
+        });
+      });
+    }
+
+    function updateTemplateTypeButtons() {
+      const withHelperBtn = document.getElementById('type-with-helper');
+      const chartOnlyBtn = document.getElementById('type-chart-only');
+
+      // Update active state
+      withHelperBtn.classList.toggle('active', includeSizeHelper);
+      chartOnlyBtn.classList.toggle('active', !includeSizeHelper);
+
+      // Check if size helper option should be disabled (quota reached)
+      if (subscriptionInfo && !subscriptionInfo.canCreateSizeHelper && !includeSizeHelper) {
+        withHelperBtn.classList.add('disabled');
+        withHelperBtn.title = 'Size Helper quota reached. Upgrade to enable.';
+      } else {
+        withHelperBtn.classList.remove('disabled');
+        withHelperBtn.title = '';
+      }
+    }
+
+    function updateQuotaDisplay() {
+      if (!subscriptionInfo) return;
+
+      const chartsEl = document.getElementById('quota-charts');
+      const helpersEl = document.getElementById('quota-helpers');
+
+      const chartCount = subscriptionInfo.sizeChartCount || 0;
+      const chartLimit = subscriptionInfo.sizeChartLimit || 0;
+      const helperCount = subscriptionInfo.sizeHelperCount || 0;
+      const helperLimit = subscriptionInfo.sizeHelperLimit || 0;
+
+      chartsEl.textContent = `${chartCount}/${chartLimit}`;
+      helpersEl.textContent = `${helperCount}/${helperLimit}`;
+
+      // Highlight if at limit
+      chartsEl.classList.toggle('at-limit', chartCount >= chartLimit);
+      helpersEl.classList.toggle('at-limit', helperCount >= helperLimit);
     }
 
     function setupCategoryChangeHandler() {
@@ -996,6 +1145,10 @@
       buttonColor = template.button_color || '#008060';
       document.getElementById('button-color').value = buttonColor;
       document.getElementById('button-color-text').value = buttonColor;
+
+      // Load include_size_helper setting
+      includeSizeHelper = template.include_size_helper !== false;
+      updateTemplateTypeButtons();
 
       measurementFields = template.measurement_fields;
 
@@ -1530,6 +1683,7 @@
         buttonColor,
         measurementFields,
         sizes: validSizes,
+        includeSizeHelper,
       };
 
       try {

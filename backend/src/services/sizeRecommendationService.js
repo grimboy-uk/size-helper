@@ -264,11 +264,12 @@ export async function getSizeChart(shopDomain, productId, displayUnit = null) {
     category: template.category,
     measurementUnit: outputUnit,
     measurementGender: template.measurement_gender,
-    sizeNotation: template.size_notation || 'US',
+    sizeNotation: template.size_notation || 'UK',
     buttonColor: template.button_color || '#008060',
     measurementFields: template.measurement_fields,
     sizes,
     bodyShapes: template.body_shapes,
+    includeSizeHelper: template.include_size_helper !== false,
   };
 }
 

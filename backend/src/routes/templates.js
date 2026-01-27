@@ -79,10 +79,10 @@ router.get(
  */
 router.post(
   '/',
-  subscriptionCheck({ enforceLimit: true }),
+  subscriptionCheck({ enforceLimit: true, enforceSizeHelperLimit: true }),
   asyncHandler(async (req, res) => {
     const shopDomain = res.locals.shopify.shopDomain;
-    const { name, category, measurementUnit, measurementGender, sizeNotation, buttonColor, measurementFields, sizes, bodyShapes } = req.body;
+    const { name, category, measurementUnit, measurementGender, sizeNotation, buttonColor, measurementFields, sizes, bodyShapes, includeSizeHelper } = req.body;
 
     logger.debug('Creating template:', { shopDomain, name });
     // Validation
@@ -133,14 +133,15 @@ router.post(
         category,
         measurementUnit: measurementUnit || 'cm',
         measurementGender: measurementGender || 'unisex',
-        sizeNotation: sizeNotation || 'US',
+        sizeNotation: sizeNotation || 'UK',
         buttonColor: buttonColor || '#008060',
         measurementFields,
         sizes,
         bodyShapes: bodyShapes || DEFAULT_BODY_SHAPES,
+        includeSizeHelper: includeSizeHelper !== false, // Default to true if not specified
       });
 
-      logger.info('Template created:', { shopDomain, templateId: template.id });
+      logger.info('Template created:', { shopDomain, templateId: template.id, includeSizeHelper: template.include_size_helper });
       res.status(201).json({ template });
     } catch (error) {
       if (error.message === 'A template with this name already exists') {
@@ -157,10 +158,11 @@ router.post(
  */
 router.put(
   '/:id',
+  subscriptionCheck({ enforceSizeHelperLimit: true }),
   asyncHandler(async (req, res) => {
     const shopDomain = res.locals.shopify.shopDomain;
     const { id } = req.params;
-    const { name, category, measurementUnit, measurementGender, sizeNotation, buttonColor, measurementFields, sizes, bodyShapes, isActive } = req.body;
+    const { name, category, measurementUnit, measurementGender, sizeNotation, buttonColor, measurementFields, sizes, bodyShapes, includeSizeHelper, isActive } = req.body;
 
     // Validate measurement unit if provided
     if (measurementUnit && !['cm', 'in'].includes(measurementUnit)) {
@@ -193,6 +195,7 @@ router.put(
         measurementFields,
         sizes,
         bodyShapes,
+        includeSizeHelper,
         isActive,
       });
 

@@ -19,22 +19,6 @@
       border-bottom: 1px solid #e1e3e5;
       padding: 0 24px;
     }
-    .app-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #202223;
-      padding: 16px 0;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .app-title-icon {
-      width: 24px;
-      height: 24px;
-      background: #d4534a;
-      border-radius: 4px;
-    }
     .nav-tabs {
       display: flex;
       gap: 32px;
@@ -147,62 +131,69 @@
     }
     .pricing-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 800px) {
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
     }
     .pricing-card {
       border: 2px solid #e1e3e5;
       border-radius: 12px;
       padding: 24px;
-      text-align: center;
-      transition: border-color 0.2s;
+      text-align: left;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      background: white;
     }
     .pricing-card.current {
-      border-color: #2a9d6e;
-      background: #f0fdf4;
+      border: 2px solid #2a9d6e;
+      background-color: #f0fdf7;
     }
     .pricing-tier {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
       color: #202223;
       margin-bottom: 8px;
     }
     .pricing-price {
-      font-size: 36px;
+      font-size: 24px;
       font-weight: 700;
       color: #2a9d6e;
+      margin-bottom: 5px;
     }
     .pricing-price span {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 400;
       color: #6d7175;
     }
     .pricing-features {
-      margin: 20px 0;
-      text-align: left;
+      margin: 0 0 24px 0;
+      flex-grow: 1;
     }
     .pricing-feature {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 0;
+      padding: 2px 0;
       font-size: 14px;
       color: #202223;
+      line-height: 1.4;
     }
-    .pricing-feature::before {
-      content: "✓";
-      color: #2a9d6e;
-      font-weight: bold;
+    .pricing-card .btn {
+      width: 100%;
+      justify-content: center;
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 600;
     }
-    .current-badge {
-      display: inline-block;
-      background: #2a9d6e;
+    .btn-current {
+      background-color: #9ca3af;
       color: white;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      margin-bottom: 12px;
+      cursor: default;
+    }
+    .btn-current:hover {
+      background-color: #9ca3af;
     }
     .info-text {
       font-size: 14px;
@@ -218,10 +209,6 @@
 </head>
 <body>
   <header class="app-header">
-    <h1 class="app-title">
-      <span class="app-title-icon"></span>
-      RMS Size Helper
-    </h1>
     <nav class="nav-tabs">
       <a href="#" class="nav-tab" data-path="/">Dashboard</a>
       <a href="#" class="nav-tab" data-path="/templates">Size Templates</a>
@@ -240,8 +227,7 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Subscription Plans</h2>
-      <p class="info-text" style="margin-bottom: 20px;">Choose the plan that best fits your needs. Upgrade or downgrade at any time.</p>
+      <h2 class="card-title">Available Plans</h2>
 
       <div class="pricing-grid" id="pricing-grid">
         <div class="loading">Loading plans...</div>
@@ -294,24 +280,47 @@
       const container = document.getElementById('usage-section');
       const sub = currentSubscription;
 
-      const percentage = (sub.productTypeCount / sub.productTypeLimit) * 100;
-      let fillClass = '';
-      if (percentage >= 90) fillClass = 'danger';
-      else if (percentage >= 70) fillClass = 'warning';
+      // Size Charts usage
+      const chartPercentage = (sub.sizeChartCount / sub.sizeChartLimit) * 100;
+      let chartFillClass = '';
+      if (chartPercentage >= 90) chartFillClass = 'danger';
+      else if (chartPercentage >= 70) chartFillClass = 'warning';
+
+      // Size Helper usage
+      const helperPercentage = (sub.sizeHelperCount / sub.sizeHelperLimit) * 100;
+      let helperFillClass = '';
+      if (helperPercentage >= 90) helperFillClass = 'danger';
+      else if (helperPercentage >= 70) helperFillClass = 'warning';
 
       container.innerHTML = `
-        <div style="font-weight: 600; margin-bottom: 4px; color: #202223;">
-          ${sub.tierName} Plan - Product Types
+        <div style="font-weight: 600; margin-bottom: 12px; color: #202223;">
+          ${sub.tierName} Plan
         </div>
-        <div class="usage-bar">
-          <div class="usage-fill ${fillClass}" style="width: ${percentage}%;"></div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 14px; color: #202223; margin-bottom: 4px;">Size Charts (Total Templates)</div>
+          <div class="usage-bar">
+            <div class="usage-fill ${chartFillClass}" style="width: ${Math.min(chartPercentage, 100)}%;"></div>
+          </div>
+          <div class="usage-text">
+            <span>${sub.sizeChartCount} of ${sub.sizeChartLimit} used</span>
+            <span>${sub.sizeChartRemaining} remaining</span>
+          </div>
         </div>
-        <div class="usage-text">
-          <span>${sub.productTypeCount} of ${sub.productTypeLimit} used</span>
-          <span>${sub.remainingSlots} remaining</span>
+
+        <div>
+          <div style="font-size: 14px; color: #202223; margin-bottom: 4px;">Size Chart + Size Helper Templates</div>
+          <div class="usage-bar">
+            <div class="usage-fill ${helperFillClass}" style="width: ${Math.min(helperPercentage, 100)}%;"></div>
+          </div>
+          <div class="usage-text">
+            <span>${sub.sizeHelperCount} of ${sub.sizeHelperLimit} used</span>
+            <span>${sub.sizeHelperRemaining} remaining</span>
+          </div>
         </div>
+
         ${sub.billingCycleEnd ? `
-          <div style="font-size: 13px; color: #6d7175; margin-top: 12px;">
+          <div style="font-size: 13px; color: #6d7175; margin-top: 16px;">
             Billing cycle ends: ${new Date(sub.billingCycleEnd).toLocaleDateString()}
           </div>
         ` : ''}
@@ -323,27 +332,24 @@
 
       container.innerHTML = allTiers.map(tier => {
         const isCurrent = tier.key === currentSubscription.tier;
-        const isUpgrade = tier.price > (allTiers.find(t => t.key === currentSubscription.tier)?.price || 0);
 
         return `
           <div class="pricing-card ${isCurrent ? 'current' : ''}">
-            ${isCurrent ? '<div class="current-badge">Current Plan</div>' : ''}
             <div class="pricing-tier">${tier.name}</div>
             <div class="pricing-price">
               ${tier.price === 0 ? 'Free' : `$${tier.price}<span>/month</span>`}
             </div>
             <div class="pricing-features">
-              <div class="pricing-feature">Up to ${tier.productTypeLimit} product types</div>
-              <div class="pricing-feature">Unlimited size recommendations</div>
-              <div class="pricing-feature">Analytics dashboard</div>
+              <div class="pricing-feature">Up to ${tier.sizeChartLimit} size charts</div>
+              <div class="pricing-feature">${tier.sizeHelperLimit} with Size Helper</div>
+              <div class="pricing-feature">Dashboard & analytics</div>
               <div class="pricing-feature">Storefront widget</div>
+              <div class="pricing-feature">Unlimited size recommendations</div>
             </div>
             ${isCurrent ? `
-              <button class="btn btn-secondary" disabled>Current Plan</button>
+              <button class="btn btn-current">Current Plan</button>
             ` : `
-              <button class="btn btn-primary" onclick="selectPlan('${tier.key}')">
-                ${isUpgrade ? 'Upgrade' : 'Downgrade'} to ${tier.name}
-              </button>
+              <button class="btn btn-primary" onclick="selectPlan('${tier.key}')">Select Plan</button>
             `}
           </div>
         `;

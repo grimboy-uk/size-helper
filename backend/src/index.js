@@ -30,6 +30,7 @@ import analyticsRouter from './routes/analytics.js';
 import publicRouter from './routes/public.js';
 import webhooksRouter from './routes/webhooks.js';
 import { setShopifyInstance, registerWebhooks } from './services/webhookService.js';
+import { startCleanupScheduler } from './services/cleanupService.js';
 
 const logger = createLogger('Server');
 
@@ -241,6 +242,9 @@ async function start() {
   try {
     // Initialize database
     await initializeDatabase();
+
+    // Start cleanup scheduler for analytics data retention
+    startCleanupScheduler();
 
     app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);

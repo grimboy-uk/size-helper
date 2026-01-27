@@ -1,8 +1,14 @@
 import pg from 'pg';
 import { createLogger } from '../utils/logger.js';
 
-const { Pool } = pg;
+const { Pool, types } = pg;
 const logger = createLogger('Database');
+
+// Fix for DATE type timezone issue:
+// By default, pg parses DATE as a JS Date at midnight UTC, which can shift dates
+// when interpreted in local timezone. Override to return DATE as string 'YYYY-MM-DD'.
+const DATE_OID = 1082;
+types.setTypeParser(DATE_OID, (val) => val);
 
 // Create connection pool lazily
 let pool = null;
@@ -70,16 +76,30 @@ export async function initializeDatabase() {
         category VARCHAR(100) NOT NULL,
         measurement_unit VARCHAR(10) DEFAULT 'cm',
         measurement_gender VARCHAR(20) DEFAULT 'unisex',
-        size_notation VARCHAR(10) DEFAULT 'US',
+        size_notation VARCHAR(10) DEFAULT 'UK',
         button_color VARCHAR(20) DEFAULT '#008060',
         measurement_fields JSONB NOT NULL DEFAULT '[]',
         sizes JSONB NOT NULL DEFAULT '[]',
         body_shapes JSONB DEFAULT '[]',
+        include_size_helper BOOLEAN DEFAULT true,
         is_active BOOLEAN DEFAULT true,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(shop_domain, name)
       )
+    `);
+
+    // Add include_size_helper column if it doesn't exist (for existing databases)
+    await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'size_templates' AND column_name = 'include_size_helper'
+        ) THEN
+          ALTER TABLE size_templates ADD COLUMN include_size_helper BOOLEAN DEFAULT true;
+        END IF;
+      END $$;
     `);
 
     // Product assignments table - links products to size templates

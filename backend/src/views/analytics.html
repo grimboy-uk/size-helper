@@ -19,22 +19,6 @@
       border-bottom: 1px solid #e1e3e5;
       padding: 0 24px;
     }
-    .app-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #202223;
-      padding: 16px 0;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .app-title-icon {
-      width: 24px;
-      height: 24px;
-      background: #d4534a;
-      border-radius: 4px;
-    }
     .nav-tabs {
       display: flex;
       gap: 32px;
@@ -136,15 +120,15 @@
       gap: 4px;
     }
     .bar {
-      width: 100%;
-      max-width: 40px;
-      background: #2a9d6e;
+      width: 18px;
+      min-width: 18px;
+      background: #3b82f6;
       border-radius: 4px 4px 0 0;
       min-height: 4px;
       transition: height 0.3s;
     }
     .bar.secondary {
-      background: #8fd4b8;
+      background: #22c55e;
     }
     .bar-label {
       font-size: 11px;
@@ -206,10 +190,6 @@
 </head>
 <body>
   <header class="app-header">
-    <h1 class="app-title">
-      <span class="app-title-icon"></span>
-      RMS Size Helper
-    </h1>
     <nav class="nav-tabs">
       <a href="#" class="nav-tab" data-path="/">Dashboard</a>
       <a href="#" class="nav-tab" data-path="/templates">Size Templates</a>
@@ -252,11 +232,11 @@
         </div>
         <div class="chart-legend">
           <div class="legend-item">
-            <div class="legend-color" style="background: #2a9d6e;"></div>
+            <div class="legend-color" style="background: #3b82f6;"></div>
             <span>Size Guide Opens</span>
           </div>
           <div class="legend-item">
-            <div class="legend-color" style="background: #8fd4b8;"></div>
+            <div class="legend-color" style="background: #22c55e;"></div>
             <span>Recommendations</span>
           </div>
         </div>
@@ -343,7 +323,7 @@
       container.innerHTML = displayData.map(day => {
         const opensHeight = ((day.sizeGuideOpened || 0) / maxValue) * 180;
         const recsHeight = ((day.recommendationMade || 0) / maxValue) * 180;
-        const dateLabel = new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const dateLabel = new Date(day.date).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
 
         return `
           <div class="bar-group">

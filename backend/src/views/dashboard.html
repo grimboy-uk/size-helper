@@ -44,7 +44,7 @@
     }
     .page-container {
       max-width: 1000px;
-      margin: 0 auto;
+      margin: 0;
       padding: 24px;
     }
     .card {
@@ -134,7 +134,109 @@
       padding: 40px;
       color: #6d7175;
     }
+    .getting-started {
+      margin-top: 8px;
+    }
+    .steps-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .step-item {
+      display: flex;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid #e1e3e5;
+    }
+    .step-item:last-child {
+      border-bottom: none;
+    }
+    .step-number {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      background: #2a9d6e;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .step-content {
+      flex: 1;
+    }
+    .step-title {
+      font-weight: 600;
+      color: #202223;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-description {
+      color: #6d7175;
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0;
+    }
+    .step-link {
+      color: #2a9d6e;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .step-link:hover {
+      text-decoration: underline;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .feature-item {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .feature-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    .feature-title {
+      font-weight: 600;
+      color: #202223;
+      margin-bottom: 4px;
+    }
+    .feature-desc {
+      color: #6d7175;
+      font-size: 13px;
+      line-height: 1.4;
+      margin: 0;
+    }
+    .tip-box {
+      background: #fff8e6;
+      border-left: 4px solid #f5a623;
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin-top: 16px;
+    }
+    .tip-title {
+      font-weight: 600;
+      color: #202223;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .tip-text {
+      color: #6d7175;
+      font-size: 13px;
+      margin: 0;
+    }
     @media (max-width: 768px) {
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
       .stats-grid {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -183,6 +285,85 @@
           <div class="stat-value" id="stat-conversion">0%</div>
           <div class="stat-label">Conversion Rate</div>
         </div>
+      </div>
+    </div>
+
+    <div class="card getting-started">
+      <h2 class="card-title">Getting Started</h2>
+      <p style="color: #6d7175; margin: 0 0 20px 0;">Follow these steps to set up size charts and size helpers for your products.</p>
+
+      <ol class="steps-list">
+        <li class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Create a Size Template</div>
+            <p class="step-description">
+              Go to <a href="#" class="step-link" data-path="/templates">Size Templates</a> and click "Create Template".
+              Choose your product category (tops, bottoms, shoes), enter your size measurements, and customize the appearance.
+            </p>
+          </div>
+        </li>
+        <li class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Assign Products to Templates</div>
+            <p class="step-description">
+              Visit the <a href="#" class="step-link" data-path="/products">Products</a> page to assign your size template to products.
+              You can assign templates to individual products or use collection-based rules for bulk assignment.
+            </p>
+          </div>
+        </li>
+        <li class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">Add the Widget to Your Theme</div>
+            <p class="step-description">
+              Go to your Shopify theme editor, navigate to a product page, and add the "RMS Size Helper" block.
+              The widget will automatically show the size chart button for products with assigned templates.
+            </p>
+          </div>
+        </li>
+        <li class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <div class="step-title">Track Performance</div>
+            <p class="step-description">
+              Monitor how customers interact with your size guides on the <a href="#" class="step-link" data-path="/analytics">Analytics</a> page.
+              See how many customers open guides and use the size recommendation feature.
+            </p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Features</h2>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <div class="feature-icon">&#128207;</div>
+          <div class="feature-title">Size Charts</div>
+          <p class="feature-desc">Display professional size charts with your exact measurements. Customers can switch between cm/inches and different size notations (US, UK, EU).</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">&#128269;</div>
+          <div class="feature-title">Size Helper</div>
+          <p class="feature-desc">Help customers find their perfect size by answering simple questions about their body shape, usual size, and fit preferences.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">&#128200;</div>
+          <div class="feature-title">Analytics</div>
+          <p class="feature-desc">Track size guide opens, recommendation usage, and conversion rates. Understand which products need better sizing information.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">&#127912;</div>
+          <div class="feature-title">Customization</div>
+          <p class="feature-desc">Match your brand with customizable button colors. Set measurement units, size notations, and body shape options per template.</p>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <div class="tip-title">Pro Tip</div>
+        <p class="tip-text">Templates with "Size Helper" enabled help customers find their size more confidently. Consider enabling it for products with higher return rates due to sizing issues.</p>
       </div>
     </div>
   </div>

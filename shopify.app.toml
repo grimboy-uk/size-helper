@@ -2,7 +2,7 @@
 
 name = "RMS Size Helper"
 client_id = "154f1d77bd75ca9d8a0c638bcc64059c"
-application_url = "https://size-helper-production.up.railway.app"
+application_url = "https://offendedly-drys-lauri.ngrok-free.dev"
 embedded = true
 
 [access_scopes]
@@ -10,7 +10,7 @@ scopes = "read_products,read_inventory,write_customers,read_orders"
 
 [auth]
 redirect_urls = [
-  "https://size-helper-production.up.railway.app/api/auth/callback"
+  "https://offendedly-drys-lauri.ngrok-free.dev/api/auth/callback"
 ]
 
 [webhooks]

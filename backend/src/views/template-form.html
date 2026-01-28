@@ -44,7 +44,7 @@
     }
     .page-container {
       max-width: 900px;
-      margin: 0 auto;
+      margin: 0;
       padding: 24px;
     }
     .back-link {
@@ -1315,9 +1315,11 @@
     function removeField(index) {
       const field = measurementFields[index];
       measurementFields.splice(index, 1);
-      // Remove from all sizes
-      ALL_SIZES.forEach(sizeName => {
-        delete sizeData[sizeName].measurements[field.key];
+      // Remove from all sizes in sizeData
+      Object.keys(sizeData).forEach(sizeName => {
+        if (sizeData[sizeName] && sizeData[sizeName].measurements) {
+          delete sizeData[sizeName].measurements[field.key];
+        }
       });
       renderFields();
       renderSizeTable();

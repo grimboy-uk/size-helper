@@ -1,5 +1,6 @@
 import { query } from '../config/database.js';
 import { createLogger } from '../utils/logger.js';
+import { getShopifyInstance } from './webhookService.js';
 
 const logger = createLogger('Billing');
 
@@ -52,9 +53,13 @@ export async function createSubscription(session, tierKey, returnUrl) {
   }
 
   // Create paid subscription via Shopify GraphQL
-  const client = new (await import('@shopify/shopify-api')).default.clients.Graphql({
-    session,
-  });
+  const shopify = getShopifyInstance();
+  if (!shopify) {
+    logger.error('Shopify instance not initialized');
+    throw new Error('Shopify instance not initialized');
+  }
+  logger.info('Creating subscription for tier:', tierKey, 'shop:', session.shop);
+  const client = new shopify.api.clients.Graphql({ session });
 
   const mutation = `
     mutation AppSubscriptionCreate($name: String!, $returnUrl: URL!, $lineItems: [AppSubscriptionLineItemInput!]!) {
@@ -96,14 +101,9 @@ export async function createSubscription(session, tierKey, returnUrl) {
   };
 
   try {
-    const response = await client.query({
-      data: {
-        query: mutation,
-        variables,
-      },
-    });
+    const response = await client.request(mutation, { variables });
 
-    const { appSubscriptionCreate } = response.body.data;
+    const { appSubscriptionCreate } = response.data;
 
     if (appSubscriptionCreate.userErrors.length > 0) {
       logger.error('Subscription creation errors:', appSubscriptionCreate.userErrors);
@@ -117,7 +117,8 @@ export async function createSubscription(session, tierKey, returnUrl) {
       confirmationUrl: appSubscriptionCreate.confirmationUrl,
     };
   } catch (error) {
-    logger.error('Failed to create subscription:', error);
+    logger.error('Failed to create subscription:', error.message);
+    logger.error('Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     throw error;
   }
 }
@@ -125,11 +126,14 @@ export async function createSubscription(session, tierKey, returnUrl) {
 /**
  * Confirm subscription after merchant approval
  */
-export async function confirmSubscription(shopDomain, tierKey, subscriptionId) {
+export async function confirmSubscription(shopDomain, tierKey, chargeId) {
   try {
     const cycleStart = new Date();
     const cycleEnd = new Date();
     cycleEnd.setDate(cycleEnd.getDate() + 30);
+
+    // Convert charge_id to proper GID format for Shopify GraphQL API
+    const subscriptionGid = chargeId ? `gid://shopify/AppSubscription/${chargeId}` : null;
 
     await query(
       `UPDATE shops
@@ -139,10 +143,10 @@ export async function confirmSubscription(shopDomain, tierKey, subscriptionId) {
            billing_cycle_end = $4,
            updated_at = CURRENT_TIMESTAMP
        WHERE shop_domain = $5`,
-      [tierKey, subscriptionId, cycleStart, cycleEnd, shopDomain]
+      [tierKey, subscriptionGid, cycleStart, cycleEnd, shopDomain]
     );
 
-    logger.info('Subscription confirmed:', { shopDomain, tier: tierKey });
+    logger.info('Subscription confirmed:', { shopDomain, tier: tierKey, subscriptionGid });
     return { success: true };
   } catch (error) {
     logger.error('Failed to confirm subscription:', error);
@@ -166,12 +170,17 @@ export async function cancelSubscription(session) {
     }
 
     const subscriptionId = result.rows[0].subscription_id;
+    logger.info('Cancelling subscription:', { shop: session.shop, subscriptionId });
 
     if (subscriptionId) {
       // Cancel via Shopify GraphQL
-      const client = new (await import('@shopify/shopify-api')).default.clients.Graphql({
-        session,
-      });
+      const shopify = getShopifyInstance();
+      if (!shopify) {
+        logger.error('Shopify instance not initialized');
+        throw new Error('Shopify instance not initialized');
+      }
+
+      const client = new shopify.api.clients.Graphql({ session });
 
       const mutation = `
         mutation AppSubscriptionCancel($id: ID!) {
@@ -188,12 +197,23 @@ export async function cancelSubscription(session) {
         }
       `;
 
-      await client.query({
-        data: {
-          query: mutation,
+      try {
+        const response = await client.request(mutation, {
           variables: { id: subscriptionId },
-        },
-      });
+        });
+
+        const { appSubscriptionCancel } = response.data;
+        if (appSubscriptionCancel?.userErrors?.length > 0) {
+          logger.error('Subscription cancellation errors:', appSubscriptionCancel.userErrors);
+          // Don't throw - still update database to downgrade locally
+        } else {
+          logger.info('Shopify subscription cancelled:', appSubscriptionCancel?.appSubscription);
+        }
+      } catch (shopifyError) {
+        logger.error('Shopify API error during cancellation:', shopifyError.message);
+        // Don't throw - still update database to downgrade locally
+        // The subscription might already be cancelled or invalid
+      }
     }
 
     // Update database to free tier
@@ -206,7 +226,7 @@ export async function cancelSubscription(session) {
       [session.shop]
     );
 
-    logger.info('Subscription cancelled:', session.shop);
+    logger.info('Subscription cancelled successfully:', session.shop);
     return { success: true };
   } catch (error) {
     logger.error('Failed to cancel subscription:', error);

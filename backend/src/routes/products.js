@@ -166,9 +166,6 @@ router.get(
     const session = res.locals.shopify.session;
     const { query: searchQuery, limit = 25 } = req.query;
 
-    // const client = new (await import('@shopify/shopify-api')).api.clients.Graphql({
-    //   session,
-    // });
     const shopify = getShopifyInstance();
     const client = new shopify.api.clients.Graphql({ session });
 

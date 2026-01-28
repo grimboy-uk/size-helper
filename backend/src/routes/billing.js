@@ -55,13 +55,14 @@ router.post(
   '/subscribe',
   asyncHandler(async (req, res) => {
     const session = res.locals.shopify.session;
-    const { tier } = req.body;
+    const { tier, host } = req.body;
 
     if (!tier || !SUBSCRIPTION_TIERS[tier]) {
       return res.status(400).json({ error: 'Invalid subscription tier' });
     }
 
-    const returnUrl = `${process.env.SHOPIFY_APP_URL}/billing/callback?shop=${session.shop}&tier=${tier}`;
+    // Include host parameter for embedded app redirect
+    const returnUrl = `${process.env.SHOPIFY_APP_URL}/billing/callback?shop=${session.shop}&tier=${tier}&host=${encodeURIComponent(host || '')}`;
 
     try {
       const result = await createSubscription(session, tier, returnUrl);
@@ -113,7 +114,7 @@ router.post(
  * (Not under /api - direct page load)
  */
 export function billingCallbackHandler(req, res) {
-  const { shop, tier, charge_id } = req.query;
+  const { shop, tier, charge_id, host } = req.query;
 
   if (!shop || !tier) {
     return res.status(400).send('Missing parameters');
@@ -122,12 +123,14 @@ export function billingCallbackHandler(req, res) {
   // Confirm the subscription
   confirmSubscription(shop, tier, charge_id)
     .then(() => {
-      // Redirect back to app
-      res.redirect(`/?shop=${shop}&billing=success`);
+      // Redirect back to app with host parameter for embedded apps
+      const hostParam = host ? `&host=${encodeURIComponent(host)}` : '';
+      res.redirect(`/?shop=${shop}${hostParam}&billing=success`);
     })
     .catch((error) => {
       logger.error('Billing callback error:', error);
-      res.redirect(`/?shop=${shop}&billing=error`);
+      const hostParam = host ? `&host=${encodeURIComponent(host)}` : '';
+      res.redirect(`/?shop=${shop}${hostParam}&billing=error`);
     });
 }
 

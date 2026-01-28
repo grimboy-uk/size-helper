@@ -368,7 +368,10 @@
       }
 
       try {
-        const result = await apiPost('/api/billing/subscribe', { tier: tierKey });
+        // Get host parameter from URL for embedded app redirect
+        const urlParams = new URLSearchParams(window.location.search);
+        const host = urlParams.get('host');
+        const result = await apiPost('/api/billing/subscribe', { tier: tierKey, host });
 
         if (result.requiresApproval && result.confirmationUrl) {
           // Redirect to Shopify approval page

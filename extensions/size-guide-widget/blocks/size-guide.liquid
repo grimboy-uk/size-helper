@@ -801,6 +801,7 @@
       currentNotation: null, // Will be set from template's size_notation
       originalNotation: null, // The notation the template was created with
       buttonColor: null, // Will be set from template's button_color
+      buttonBorderRadius: 8, // Will be set from template's button_border_radius
       subscriptionTier: null, // Will be set from API response
       sizeChart: null,
       selectedBodyShape: null,
@@ -888,9 +889,10 @@
           this.originalNotation = this.sizeChart.sizeNotation || 'UK';
           this.currentNotation = this.originalNotation;
 
-          // Set button color from template
+          // Set button color and border radius from template
           this.buttonColor = this.sizeChart.buttonColor || '#008060';
-          this.applyButtonColor();
+          this.buttonBorderRadius = this.sizeChart.buttonBorderRadius !== undefined ? this.sizeChart.buttonBorderRadius : 8;
+          this.applyButtonStyles();
 
           // Set subscription tier
           this.subscriptionTier = this.sizeChart.subscriptionTier || 'STARTUP';
@@ -1188,10 +1190,12 @@
         }
       },
 
-      applyButtonColor() {
+      applyButtonStyles() {
         if (!this.buttonColor) return;
 
-        // Create a style element to override button colors
+        const borderRadius = this.buttonBorderRadius || 8;
+
+        // Create a style element to override button colors and border radius
         let styleEl = document.getElementById('size-helper-dynamic-styles');
         if (!styleEl) {
           styleEl = document.createElement('style');
@@ -1202,6 +1206,10 @@
         styleEl.textContent = `
           .size-guide-btn-primary {
             background: ${this.buttonColor} !important;
+            border-radius: ${borderRadius}px !important;
+          }
+          .size-guide-btn-secondary {
+            border-radius: ${borderRadius}px !important;
           }
           .unit-btn.active {
             background: ${this.buttonColor} !important;

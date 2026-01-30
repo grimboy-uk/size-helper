@@ -104,6 +104,25 @@
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    .form-fieldset {
+      border: 1px solid #e1e3e5;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+      background: #fafbfc;
+    }
+    .form-fieldset legend {
+      font-size: 14px;
+      font-weight: 600;
+      color: #202223;
+      padding: 0 8px;
+      background: #fafbfc;
+    }
     .btn {
       display: inline-flex;
       align-items: center;
@@ -433,6 +452,66 @@
       border-color: #2a9d6e;
       box-shadow: 0 0 0 1px #2a9d6e;
     }
+    .slider-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .slider-input {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: #e1e3e5;
+      border-radius: 3px;
+      outline: none;
+    }
+    .slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #2a9d6e;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .slider-input::-webkit-slider-thumb:hover {
+      background: #238c5f;
+    }
+    .slider-input::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: #2a9d6e;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+    }
+    .slider-value {
+      min-width: 48px;
+      padding: 6px 10px;
+      background: #f8f9fa;
+      border: 1px solid #e1e3e5;
+      border-radius: 4px;
+      font-size: 14px;
+      text-align: center;
+      color: #202223;
+    }
+    .slider-preview {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .slider-preview-btn {
+      padding: 8px 16px;
+      background: #008060;
+      color: white;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: default;
+    }
     .guidance-section {
       background: #f0f7ff;
       border: 1px solid #bbd6f7;
@@ -616,120 +695,144 @@
       <h2 class="card-title" id="page-title">Create Size Template</h2>
 
       <form id="template-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Template Name *</label>
-            <input type="text" class="form-input" id="name" placeholder="e.g., Men's T-Shirts" required>
-            <p class="form-hint">A descriptive name for this size template</p>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Category *</label>
-            <select class="form-select" id="category" required>
-              <option value="">Select a category...</option>
-              <option value="TOPS">Tops (T-shirts, shirts, blouses)</option>
-              <option value="BOTTOMS">Bottoms (Trousers, jeans)</option>
-              <!--<option value="DRESSES">Dresses & Jumpsuits</option>
-              <option value="OUTERWEAR">Outerwear (Jackets, coats)</option>
-              <option value="FOOTWEAR">Footwear (Shoes, boots)</option>
-              <option value="ACCESSORIES">Accessories (Hats, belts)</option>-->
-            </select>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Template Type</label>
-          <div class="template-type-toggle">
-            <button type="button" class="template-type-btn active" id="type-with-helper" data-type="with-helper">
-              Size Chart + Size Helper
-              <span class="template-type-badge with-helper">Recommended</span>
-            </button>
-            <button type="button" class="template-type-btn" id="type-chart-only" data-type="chart-only">
-              Size Chart Only
-            </button>
-          </div>
-          <p class="form-hint">Size Chart + Size Helper includes the "Find My Size" questionnaire to help customers find their best fit.</p>
-          <div class="quota-info" id="quota-info">
-            <div class="quota-item">
-              <span>Size Charts:</span>
-              <span class="quota-count" id="quota-charts">-/-</span>
+        <fieldset class="form-fieldset">
+          <legend>Basic Information</legend>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Template Name *</label>
+              <input type="text" class="form-input" id="name" placeholder="e.g., Men's T-Shirts" required>
+              <p class="form-hint">A descriptive name for this size template</p>
             </div>
-            <div class="quota-item">
-              <span>With Size Helper:</span>
-              <span class="quota-count" id="quota-helpers">-/-</span>
-            </div>
-          </div>
-        </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Measurement Unit</label>
-            <div class="unit-toggle">
-              <button type="button" class="unit-btn active" data-unit="cm">Centimeters (cm)</button>
-              <button type="button" class="unit-btn" data-unit="in">Inches (in)</button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Measurement Gender</label>
-            <div class="gender-toggle">
-              <button type="button" class="gender-btn active" data-unit="women">Women</button>
-              <button type="button" class="gender-btn" data-unit="men">Men</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group size-style-group" id="size-style-group">
-          <label class="form-label">Size Notation Type</label>
-          <div class="size-style-toggle">
-            <button type="button" class="size-style-btn active" data-style="letter">Standard (S, M, L, XL)</button>
-            <button type="button" class="size-style-btn" data-style="waist-length">Waist + Length (32S, 32R, 32L)</button>
-            <button type="button" class="size-style-btn" data-style="waist-only">Waist Only (28, 30, 32, 34)</button>
-          </div>
-          <p class="form-hint">Choose the sizing format for this template</p>
-          <div class="length-options" id="length-options" style="display: none;">
-            <label class="length-option">
-              <input type="checkbox" id="length-short" checked>
-              Short (S)
-            </label>
-            <label class="length-option">
-              <input type="checkbox" id="length-regular" checked>
-              Regular (R)
-            </label>
-            <label class="length-option">
-              <input type="checkbox" id="length-long" checked>
-              Long (L)
-            </label>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Size Notation Country</label>
-            <div class="notation-select">
-              <select id="size-notation">
-                <option value="UK">🇬🇧 UK Sizes</option>
-                <option value="US">🇺🇸 US Sizes</option>
-                <option value="AU">🇦🇺 AU Sizes</option>
-                <option value="EU">🇪🇺 EU Sizes</option>
-                <option value="JP">🇯🇵 JP Sizes</option>
-                <option value="CN">🇨🇳 CN Sizes</option>
+            <div class="form-group">
+              <label class="form-label">Category *</label>
+              <select class="form-select" id="category" required>
+                <option value="">Select a category...</option>
+                <option value="TOPS">Tops (T-shirts, shirts, blouses)</option>
+                <option value="BOTTOMS">Bottoms (Trousers, jeans)</option>
+                <!--<option value="DRESSES">Dresses & Jumpsuits</option>
+                <option value="OUTERWEAR">Outerwear (Jackets, coats)</option>
+                <option value="FOOTWEAR">Footwear (Shoes, boots)</option>
+                <option value="ACCESSORIES">Accessories (Hats, belts)</option>-->
               </select>
             </div>
-            <p class="form-hint">The sizing system used for this template's size labels</p>
           </div>
-          <div class="form-group">
-            <label class="form-label">Popup Button Colour</label>
-            <div class="color-picker-wrapper">
-              <input type="color" id="button-color" value="#008060" class="color-picker">
-              <input type="text" id="button-color-text" value="#008060" class="color-text-input" placeholder="#008060">
-            </div>
-            <p class="form-hint">The colour of buttons in the size guide modal on your storefront</p>
-          </div>
-        </div>
 
-        <div class="form-group">
-          <label class="form-label">Measurement Fields</label>
+          <div class="form-group">
+            <label class="form-label">Template Type</label>
+            <div class="template-type-toggle">
+              <button type="button" class="template-type-btn active" id="type-with-helper" data-type="with-helper">
+                Size Chart + Size Helper
+                <span class="template-type-badge with-helper">Recommended</span>
+              </button>
+              <button type="button" class="template-type-btn" id="type-chart-only" data-type="chart-only">
+                Size Chart Only
+              </button>
+            </div>
+            <p class="form-hint">Size Chart + Size Helper includes the "Find My Size" questionnaire to help customers find their best fit.</p>
+            <div class="quota-info" id="quota-info">
+              <div class="quota-item">
+                <span>Size Charts:</span>
+                <span class="quota-count" id="quota-charts">-/-</span>
+              </div>
+              <div class="quota-item">
+                <span>With Size Helper:</span>
+                <span class="quota-count" id="quota-helpers">-/-</span>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-fieldset">
+          <legend>Measurement Settings</legend>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">Measurement Unit</label>
+              <div class="unit-toggle">
+                <button type="button" class="unit-btn active" data-unit="cm">Centimeters (cm)</button>
+                <button type="button" class="unit-btn" data-unit="in">Inches (in)</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Measurement Gender</label>
+              <div class="gender-toggle">
+                <button type="button" class="gender-btn active" data-unit="women">Women</button>
+                <button type="button" class="gender-btn" data-unit="men">Men</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Size Notation Country</label>
+              <div class="notation-select">
+                <select id="size-notation">
+                  <option value="UK">🇬🇧 UK Sizes</option>
+                  <option value="US">🇺🇸 US Sizes</option>
+                  <option value="AU">🇦🇺 AU Sizes</option>
+                  <option value="EU">🇪🇺 EU Sizes</option>
+                  <option value="JP">🇯🇵 JP Sizes</option>
+                  <option value="CN">🇨🇳 CN Sizes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group size-style-group" id="size-style-group">
+            <label class="form-label">Size Notation Type</label>
+            <div class="size-style-toggle">
+              <button type="button" class="size-style-btn active" data-style="letter">Standard (S, M, L, XL)</button>
+              <button type="button" class="size-style-btn" data-style="waist-length">Waist + Length (32S, 32R, 32L)</button>
+              <button type="button" class="size-style-btn" data-style="waist-only">Waist Only (28, 30, 32, 34)</button>
+            </div>
+            <p class="form-hint">Choose the sizing format for this template</p>
+            <div class="length-options" id="length-options" style="display: none;">
+              <label class="length-option">
+                <input type="checkbox" id="length-short" checked>
+                Short (S)
+              </label>
+              <label class="length-option">
+                <input type="checkbox" id="length-regular" checked>
+                Regular (R)
+              </label>
+              <label class="length-option">
+                <input type="checkbox" id="length-long" checked>
+                Long (L)
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-fieldset">
+          <legend>Button Appearance</legend>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Button Colour</label>
+              <div class="color-picker-wrapper">
+                <input type="color" id="button-color" value="#008060" class="color-picker">
+                <input type="text" id="button-color-text" value="#008060" class="color-text-input" placeholder="#008060">
+              </div>
+              <p class="form-hint">The colour of buttons in the size guide modal</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Corner Radius</label>
+              <div class="slider-wrapper">
+                <input type="range" id="button-border-radius" class="slider-input" min="0" max="24" step="1" value="8">
+                <span class="slider-value" id="button-border-radius-value">8px</span>
+              </div>
+              <p class="form-hint">0 = square, 24 = pill</p>
+            </div>
+          </div>
+          <div class="slider-preview">
+            <span style="font-size: 13px; color: #6d7175;">Preview:</span>
+            <button type="button" class="slider-preview-btn" id="radius-preview-btn">Find My Size</button>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-fieldset">
+          <legend>Size Chart Data</legend>
+          <div class="form-group">
+            <label class="form-label">Measurement Fields</label>
           <p class="form-hint">Define which measurements this template uses. Required fields must have values for all sizes.</p>
           <div class="field-list" id="field-list">
             <!-- Fields will be populated dynamically -->
@@ -785,6 +888,7 @@
             </div>
           </div>
         </div>
+        </fieldset>
 
         <div class="guidance-section">
           <h3>
@@ -883,6 +987,7 @@
     let measurementGender = 'women';
     let sizeNotation = 'UK';
     let buttonColor = '#008060';
+    let buttonBorderRadius = 8;
     let measurementFields = [];
     let includeSizeHelper = true;
     let subscriptionInfo = null;
@@ -1146,6 +1251,11 @@
       document.getElementById('button-color').value = buttonColor;
       document.getElementById('button-color-text').value = buttonColor;
 
+      buttonBorderRadius = template.button_border_radius !== undefined ? template.button_border_radius : 8;
+      document.getElementById('button-border-radius').value = buttonBorderRadius;
+      document.getElementById('button-border-radius-value').textContent = buttonBorderRadius + 'px';
+      updateRadiusPreview();
+
       // Load include_size_helper setting
       includeSizeHelper = template.include_size_helper !== false;
       updateTemplateTypeButtons();
@@ -1286,8 +1396,24 @@
       if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
         buttonColor = value;
         document.getElementById('button-color').value = buttonColor;
+        updateRadiusPreview();
       }
     });
+
+    // Button border radius slider
+    document.getElementById('button-border-radius').addEventListener('input', (e) => {
+      buttonBorderRadius = parseInt(e.target.value, 10);
+      document.getElementById('button-border-radius-value').textContent = buttonBorderRadius + 'px';
+      updateRadiusPreview();
+    });
+
+    function updateRadiusPreview() {
+      const previewBtn = document.getElementById('radius-preview-btn');
+      if (previewBtn) {
+        previewBtn.style.borderRadius = buttonBorderRadius + 'px';
+        previewBtn.style.background = buttonColor;
+      }
+    }
 
     function renderFields() {
       const container = document.getElementById('field-list');
@@ -1683,6 +1809,7 @@
         measurementGender,
         sizeNotation,
         buttonColor,
+        buttonBorderRadius,
         measurementFields,
         sizes: validSizes,
         includeSizeHelper,

@@ -104,6 +104,7 @@ export async function createTemplate(shopDomain, templateData) {
     measurementGender = 'unisex',
     sizeNotation = 'UK',
     buttonColor = '#008060',
+    buttonBorderRadius = 8,
     measurementFields,
     sizes,
     bodyShapes = DEFAULT_BODY_SHAPES,
@@ -112,8 +113,8 @@ export async function createTemplate(shopDomain, templateData) {
 
   try {
     const result = await query(
-      `INSERT INTO size_templates (shop_domain, name, category, measurement_unit, measurement_gender, size_notation, button_color, measurement_fields, sizes, body_shapes, include_size_helper)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      `INSERT INTO size_templates (shop_domain, name, category, measurement_unit, measurement_gender, size_notation, button_color, button_border_radius, measurement_fields, sizes, body_shapes, include_size_helper)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        RETURNING *`,
       [
         shopDomain,
@@ -123,6 +124,7 @@ export async function createTemplate(shopDomain, templateData) {
         measurementGender,
         sizeNotation,
         buttonColor,
+        buttonBorderRadius,
         JSON.stringify(measurementFields),
         JSON.stringify(sizes),
         JSON.stringify(bodyShapes),
@@ -152,6 +154,7 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
     measurementGender,
     sizeNotation,
     buttonColor,
+    buttonBorderRadius,
     measurementFields,
     sizes,
     bodyShapes,
@@ -168,13 +171,14 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
            measurement_gender = COALESCE($4, measurement_gender),
            size_notation = COALESCE($5, size_notation),
            button_color = COALESCE($6, button_color),
-           measurement_fields = COALESCE($7, measurement_fields),
-           sizes = COALESCE($8, sizes),
-           body_shapes = COALESCE($9, body_shapes),
-           include_size_helper = COALESCE($10, include_size_helper),
-           is_active = COALESCE($11, is_active),
+           button_border_radius = COALESCE($7, button_border_radius),
+           measurement_fields = COALESCE($8, measurement_fields),
+           sizes = COALESCE($9, sizes),
+           body_shapes = COALESCE($10, body_shapes),
+           include_size_helper = COALESCE($11, include_size_helper),
+           is_active = COALESCE($12, is_active),
            updated_at = CURRENT_TIMESTAMP
-       WHERE id = $12 AND shop_domain = $13
+       WHERE id = $13 AND shop_domain = $14
        RETURNING *`,
       [
         name,
@@ -183,6 +187,7 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
         measurementGender,
         sizeNotation,
         buttonColor,
+        buttonBorderRadius,
         measurementFields ? JSON.stringify(measurementFields) : null,
         sizes ? JSON.stringify(sizes) : null,
         bodyShapes ? JSON.stringify(bodyShapes) : null,

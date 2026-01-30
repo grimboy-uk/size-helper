@@ -345,6 +345,7 @@
               <div class="pricing-feature">Dashboard & analytics</div>
               <div class="pricing-feature">Storefront widget</div>
               <div class="pricing-feature">Unlimited size recommendations</div>
+              ${tier.price === 0 ? '' : '<div class="pricing-feature">No logo on size charts</div>'}
             </div>
             ${isCurrent ? `
               <button class="btn btn-current">Current Plan</button>

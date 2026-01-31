@@ -138,12 +138,14 @@
           </div>
         </div>
 
-        <button type="submit" class="size-guide-btn-primary">
-          Get My Recommendation
-        </button>
-        <button type="button" class="size-guide-btn-secondary" onclick="sizeHelper.goToStep(1)">
-          Back to Size Chart
-        </button>
+        <div class="step-buttons">
+          <button type="button" class="size-guide-btn-secondary" onclick="sizeHelper.goToStep(1)">
+            Back to Size Chart
+          </button>
+          <button type="submit" class="size-guide-btn-primary">
+            Get My Recommendation
+          </button>
+        </div>
       </form>
     </div>
 
@@ -159,12 +161,12 @@
       <div class="recommendation-reasoning" id="recommendation-reasoning">
         <!-- Reasoning will be populated dynamically -->
       </div>
-      <div class="recommendation-actions">
-        <button type="button" class="size-guide-btn-primary" onclick="sizeHelper.closeModal()">
-          Continue Shopping
-        </button>
+      <div class="step-buttons">
         <button type="button" class="size-guide-btn-secondary" onclick="sizeHelper.goToStep(2)">
           Try Again
+        </button>
+        <button type="button" class="size-guide-btn-primary" onclick="sizeHelper.closeModal()">
+          Continue Shopping
         </button>
       </div>
     </div>
@@ -327,10 +329,17 @@
     border-color: {{ block.settings.accent_color }};
   }
 
+  .size-chart-table-wrapper {
+    max-height: 330px; /* Approximately 7 rows + header */
+    overflow-y: auto;
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+  }
+
   .size-chart-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
     font-size: 14px;
   }
 
@@ -344,9 +353,16 @@
   .size-chart-table th {
     background: #f9f9f9;
     font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
 
-  .size-chart-table tr:hover {
+  .size-chart-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .size-chart-table tbody tr:hover {
     background: #f5f5f5;
   }
 
@@ -512,8 +528,15 @@
     font-size: 14px;
   }
 
+  .step-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    justify-content: space-between;
+  }
+
   .size-guide-btn-primary {
-    width: 100%;
+    flex: 1;
     padding: 14px 24px;
     background: {{ block.settings.accent_color }};
     color: white;
@@ -523,7 +546,6 @@
     font-weight: 500;
     cursor: pointer;
     transition: opacity 0.2s;
-    margin-top: 12px;
   }
 
   .size-guide-btn-primary:hover {
@@ -531,8 +553,8 @@
   }
 
   .size-guide-btn-secondary {
-    width: 100%;
-    padding: 12px 24px;
+    flex: 1;
+    padding: 14px 24px;
     background: transparent;
     color: #666;
     border: 1px solid #ddd;
@@ -540,11 +562,16 @@
     font-size: 14px;
     cursor: pointer;
     transition: background 0.2s;
-    margin-top: 8px;
   }
 
   .size-guide-btn-secondary:hover {
     background: #f5f5f5;
+  }
+
+  /* Single button (Step 1) should still be full width */
+  .size-guide-step[data-step="1"] .size-guide-btn-primary {
+    width: 100%;
+    margin-top: 12px;
   }
 
   .recommendation-result {
@@ -1030,22 +1057,24 @@
         };
 
         let html = `
-          <table class="size-chart-table">
-            <thead>
-              <tr>
-                <th>Size (${this.currentNotation})</th>
-                ${fields.map(f => `<th>${f.label} (${unit})</th>`).join('')}
-              </tr>
-            </thead>
-            <tbody>
-              ${sizes.map(size => `
+          <div class="size-chart-table-wrapper">
+            <table class="size-chart-table">
+              <thead>
                 <tr>
-                  <td><strong>${convertSizeName(size.name)}</strong></td>
-                  ${fields.map(f => `<td>${convertValue(size.measurements[f.key])}</td>`).join('')}
+                  <th>Size (${this.currentNotation})</th>
+                  ${fields.map(f => `<th>${f.label} (${unit})</th>`).join('')}
                 </tr>
-              `).join('')}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                ${sizes.map(size => `
+                  <tr>
+                    <td><strong>${convertSizeName(size.name)}</strong></td>
+                    ${fields.map(f => `<td>${convertValue(size.measurements[f.key])}</td>`).join('')}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
         `;
 
         container.innerHTML = html;

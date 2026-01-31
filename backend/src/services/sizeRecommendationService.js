@@ -151,13 +151,13 @@ export async function calculateRecommendation(shopDomain, productId, userInputs)
       let adjustedIndex = sizes.findIndex((s) => s.name === bestMatch.size);
       const totalAdjustment = bodyShapeAdjustment + fitAdjustment;
 
-      // Special handling for waist-length sizes (trousers) when user wants a relaxed fit
-      // For relaxed fit on waist-length sizes, only adjust waist, keep length the same when sizing up
-      if (usesWaistLengthFormat && preferredFit === 'loose' && totalAdjustment > 0.5) {
+      // Special handling for waist-length sizes (trousers)
+      // Always adjust only the waist while keeping the length the same
+      if (usesWaistLengthFormat && totalAdjustment > 0.5) {
         const waistAdjustedSize = findWaistAdjustedSize(sizes, bestMatch.size, 1);
         if (waistAdjustedSize) {
           recommendation = waistAdjustedSize;
-          reasoning.push('Sized up in waist only (keeping length the same) for a more relaxed fit');
+          reasoning.push('Sized up in waist (keeping your preferred length) based on body shape');
         } else {
           // Fallback to regular adjustment if waist-adjusted size not found
           if (adjustedIndex < sizes.length - 1) {
@@ -171,7 +171,7 @@ export async function calculateRecommendation(shopDomain, productId, userInputs)
         const waistAdjustedSize = findWaistAdjustedSize(sizes, bestMatch.size, -1);
         if (waistAdjustedSize) {
           recommendation = waistAdjustedSize;
-          reasoning.push('Sized down in waist only (keeping length the same) based on body shape');
+          reasoning.push('Sized down in waist (keeping your preferred length) based on body shape');
         } else {
           // Fallback to regular adjustment
           if (adjustedIndex > 0) {
@@ -180,8 +180,11 @@ export async function calculateRecommendation(shopDomain, productId, userInputs)
           }
           recommendation = sizes[adjustedIndex].name;
         }
+      } else if (usesWaistLengthFormat) {
+        // No adjustment needed for waist-length - use best match
+        recommendation = bestMatch.size;
       } else {
-        // Regular adjustment logic for non-waist-length sizes or when no waist adjustment needed
+        // Regular adjustment logic for non-waist-length sizes
         if (totalAdjustment > 0.5 && adjustedIndex < sizes.length - 1) {
           adjustedIndex++;
           reasoning.push('Sized up based on body shape and fit preference');
@@ -219,15 +222,15 @@ export async function calculateRecommendation(shopDomain, productId, userInputs)
       let adjustedIndex = sizes.findIndex((s) => s.name === exactMatch.name);
       const totalAdjustment = bodyShapeAdjustment + fitAdjustment;
 
-      // Special handling for waist-length sizes (trousers) when user wants a relaxed fit
-      // For relaxed fit on waist-length sizes, only adjust waist, keep length the same when sizing up
-      if (usesWaistLengthFormat && preferredFit === 'loose' && totalAdjustment > 0.5) {
+      // Special handling for waist-length sizes (trousers)
+      // Always adjust only the waist while keeping the length the same
+      if (usesWaistLengthFormat && totalAdjustment > 0.5) {
         const waistAdjustedSize = findWaistAdjustedSize(sizes, exactMatch.name, 1);
         if (waistAdjustedSize) {
           recommendation = waistAdjustedSize;
-          reasoning.push('Sized up in waist only (keeping length the same) from your usual size for a more relaxed fit');
+          reasoning.push('Sized up in waist (keeping your preferred length) based on body shape');
         } else {
-          // Fallback to regular adjustment
+          // Fallback to regular adjustment if waist-adjusted size not found
           if (adjustedIndex < sizes.length - 1) {
             adjustedIndex++;
             reasoning.push('Sized up from your usual size based on body shape');
@@ -239,7 +242,7 @@ export async function calculateRecommendation(shopDomain, productId, userInputs)
         const waistAdjustedSize = findWaistAdjustedSize(sizes, exactMatch.name, -1);
         if (waistAdjustedSize) {
           recommendation = waistAdjustedSize;
-          reasoning.push('Sized down in waist only (keeping length the same) from your usual size based on body shape');
+          reasoning.push('Sized down in waist (keeping your preferred length) based on body shape');
         } else {
           // Fallback to regular adjustment
           if (adjustedIndex > 0) {
@@ -248,8 +251,12 @@ export async function calculateRecommendation(shopDomain, productId, userInputs)
           }
           recommendation = sizes[adjustedIndex].name;
         }
+      } else if (usesWaistLengthFormat) {
+        // No adjustment needed for waist-length - use exact match
+        recommendation = exactMatch.name;
+        reasoning.push('Based on your usual size and preferred length');
       } else {
-        // Regular adjustment logic
+        // Regular adjustment logic for non-waist-length sizes
         if (totalAdjustment > 0.5 && adjustedIndex < sizes.length - 1) {
           adjustedIndex++;
           reasoning.push('Sized up from your usual size based on body shape');

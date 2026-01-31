@@ -2,6 +2,7 @@ import express from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { query } from '../config/database.js';
 import { calculateRecommendation, getSizeChart } from '../services/sizeRecommendationService.js';
+import { canMakeRecommendation } from '../services/billingService.js';
 import { createLogger } from '../utils/logger.js';
 
 const router = express.Router();
@@ -73,6 +74,17 @@ router.post(
       });
     }
 
+    // Check recommendation limit for this shop
+    const limitCheck = await canMakeRecommendation(shop);
+    if (!limitCheck.allowed) {
+      return res.status(429).json({
+        error: 'Monthly recommendation limit reached',
+        message: 'This store has reached its monthly size recommendation limit. Please try again next month or ask the store to upgrade their plan.',
+        limit: limitCheck.limit,
+        count: limitCheck.count,
+      });
+    }
+
     try {
       const recommendation = await calculateRecommendation(shop, productId, {
         measurements,
@@ -81,6 +93,11 @@ router.post(
         preferredFit,
         measurementUnit,
       });
+
+      // Include remaining recommendations in response for free tier
+      if (limitCheck.remaining !== undefined) {
+        recommendation.recommendationsRemaining = limitCheck.remaining - 1; // -1 because we just used one
+      }
 
       res.json(recommendation);
     } catch (error) {

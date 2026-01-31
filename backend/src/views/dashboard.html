@@ -233,6 +233,34 @@
       font-size: 13px;
       margin: 0;
     }
+    .upgrade-banner {
+      background: linear-gradient(135deg, #f0f7ff 0%, #e8f4f8 100%);
+      border: 1px solid #bbd6f7;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .upgrade-banner-text {
+      flex: 1;
+    }
+    .upgrade-banner-title {
+      font-weight: 600;
+      color: #202223;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .upgrade-banner-desc {
+      color: #6d7175;
+      font-size: 13px;
+      margin: 0;
+    }
+    .upgrade-banner .btn-primary {
+      flex-shrink: 0;
+    }
     @media (max-width: 768px) {
       .feature-grid {
         grid-template-columns: 1fr;
@@ -365,6 +393,14 @@
         <div class="tip-title">Pro Tip</div>
         <p class="tip-text">Templates with "Size Helper" enabled help customers find their size more confidently. Consider enabling it for products with higher return rates due to sizing issues.</p>
       </div>
+
+      <div class="upgrade-banner" id="upgrade-banner" style="display: none;">
+        <div class="upgrade-banner-text">
+          <div class="upgrade-banner-title" id="upgrade-banner-title">Unlock More Features</div>
+          <p class="upgrade-banner-desc" id="upgrade-banner-desc">Upgrade for unlimited recommendations, per-product analytics, custom button colours, and no branding.</p>
+        </div>
+        <a href="#" class="btn btn-primary" data-path="/settings">View Plans</a>
+      </div>
     </div>
   </div>
 
@@ -389,6 +425,24 @@
         document.getElementById('stat-products').textContent = analyticsData.assignedProducts || 0;
         document.getElementById('stat-opens').textContent = analyticsData.totals?.sizeGuideOpened || 0;
         document.getElementById('stat-conversion').textContent = (analyticsData.conversionRate || 0) + '%';
+
+        // Show upgrade banner for free tier
+        if (sub.tier === 'STARTUP') {
+          const upgradeBanner = document.getElementById('upgrade-banner');
+          upgradeBanner.style.display = 'flex';
+
+          // Show contextual message based on usage
+          const usagePercent = (sub.productTypeCount / sub.productTypeLimit) * 100;
+          const recUsagePercent = sub.recommendationLimit ? (sub.recommendationCount / sub.recommendationLimit) * 100 : 0;
+
+          if (usagePercent >= 80) {
+            document.getElementById('upgrade-banner-title').textContent = 'Running Low on Templates';
+            document.getElementById('upgrade-banner-desc').textContent = `You've used ${sub.productTypeCount} of ${sub.productTypeLimit} templates. Upgrade for more templates and premium features.`;
+          } else if (recUsagePercent >= 80) {
+            document.getElementById('upgrade-banner-title').textContent = 'Recommendation Limit Approaching';
+            document.getElementById('upgrade-banner-desc').textContent = `You've used ${sub.recommendationCount} of ${sub.recommendationLimit} recommendations this month. Upgrade for unlimited recommendations.`;
+          }
+        }
 
       } catch (error) {
         console.error('Error loading dashboard:', error);

@@ -1,6 +1,7 @@
 import express from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { query } from '../config/database.js';
+import { SUBSCRIPTION_TIERS } from '../services/billingService.js';
 
 const router = express.Router();
 
@@ -10,6 +11,18 @@ function formatDateLocal(date) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+/**
+ * Helper function to get shop's tier features
+ */
+async function getShopTierFeatures(shopDomain) {
+  const result = await query(
+    `SELECT subscription_tier FROM shops WHERE shop_domain = $1`,
+    [shopDomain]
+  );
+  const tierKey = result.rows[0]?.subscription_tier || 'STARTUP';
+  return SUBSCRIPTION_TIERS[tierKey] || SUBSCRIPTION_TIERS.STARTUP;
 }
 
 /**
@@ -153,12 +166,23 @@ router.get(
 /**
  * GET /api/analytics/top-products
  * Get top products by size guide usage
+ * Note: Requires detailedAnalytics feature (paid tiers only)
  */
 router.get(
   '/top-products',
   asyncHandler(async (req, res) => {
     const shopDomain = res.locals.shopify.shopDomain;
     const { limit = 10, days = 30 } = req.query;
+
+    // Check if shop has detailed analytics access
+    const tierFeatures = await getShopTierFeatures(shopDomain);
+    if (!tierFeatures.detailedAnalytics) {
+      return res.json({
+        products: [],
+        restricted: true,
+        message: 'Per-product analytics requires a paid plan. Upgrade to see which products get the most size guide usage.',
+      });
+    }
 
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - Number.parseInt(days, 10));
@@ -195,12 +219,23 @@ router.get(
 /**
  * GET /api/analytics/recommendations
  * Get recent recommendations log
+ * Note: Requires detailedAnalytics feature (paid tiers only)
  */
 router.get(
   '/recommendations',
   asyncHandler(async (req, res) => {
     const shopDomain = res.locals.shopify.shopDomain;
     const { limit = 50, offset = 0 } = req.query;
+
+    // Check if shop has detailed analytics access
+    const tierFeatures = await getShopTierFeatures(shopDomain);
+    if (!tierFeatures.detailedAnalytics) {
+      return res.json({
+        recommendations: [],
+        restricted: true,
+        message: 'Detailed recommendation history requires a paid plan. Upgrade to see individual size recommendations.',
+      });
+    }
 
     const result = await query(
       `SELECT

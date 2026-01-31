@@ -83,6 +83,11 @@ export function subscriptionCheck(options = {}) {
         sizeHelperCount,
         canCreateSizeHelper: sizeHelperCount < tier.sizeHelperLimit,
         sizeHelperRemaining: tier.sizeHelperLimit - sizeHelperCount,
+        // Feature flags
+        showBranding: tier.showBranding,
+        detailedAnalytics: tier.detailedAnalytics,
+        customButtonColor: tier.customButtonColor,
+        recommendationLimit: tier.recommendationLimit,
         // Legacy fields for backwards compatibility
         productTypeLimit: tier.sizeChartLimit,
         productTypeCount: sizeChartCount,

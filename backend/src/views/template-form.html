@@ -512,6 +512,32 @@
       font-weight: 500;
       cursor: default;
     }
+    .upgrade-hint {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #fff8e6;
+      border: 1px solid #f5c76b;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #7a5a00;
+    }
+    .upgrade-hint-icon {
+      font-size: 14px;
+    }
+    .upgrade-hint a {
+      color: #2a9d6e;
+      font-weight: 500;
+    }
+    .form-group.disabled .color-picker-wrapper {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .form-group.disabled .form-hint {
+      display: none;
+    }
     .guidance-section {
       background: #f0f7ff;
       border: 1px solid #bbd6f7;
@@ -805,13 +831,17 @@
         <fieldset class="form-fieldset">
           <legend>Button Appearance</legend>
           <div class="form-row">
-            <div class="form-group">
+            <div class="form-group" id="button-color-group">
               <label class="form-label">Button Colour</label>
               <div class="color-picker-wrapper">
                 <input type="color" id="button-color" value="#008060" class="color-picker">
                 <input type="text" id="button-color-text" value="#008060" class="color-text-input" placeholder="#008060">
               </div>
               <p class="form-hint">The colour of buttons in the size guide modal</p>
+              <div class="upgrade-hint" id="button-color-upgrade" style="display: none;">
+                <span class="upgrade-hint-icon">&#128274;</span>
+                <span>Custom button colours require a paid plan. <a href="#" data-path="/settings">Upgrade</a></span>
+              </div>
             </div>
 
             <div class="form-group">
@@ -1031,7 +1061,12 @@
           if (templatesData && templatesData.subscription) {
             subscriptionInfo = templatesData.subscription;
             updateQuotaDisplay();
+            // For new templates, default to "Size Chart Only" if size helper quota is reached
+            if (MODE === 'create' && !subscriptionInfo.canCreateSizeHelper) {
+              includeSizeHelper = false;
+            }
             updateTemplateTypeButtons();
+            updateButtonColorAccess();
           }
         } catch (subError) {
           console.warn('Could not load subscription info:', subError);
@@ -1120,6 +1155,34 @@
       // Highlight if at limit
       chartsEl.classList.toggle('at-limit', chartCount >= chartLimit);
       helpersEl.classList.toggle('at-limit', helperCount >= helperLimit);
+    }
+
+    function updateButtonColorAccess() {
+      if (!subscriptionInfo) return;
+
+      const canCustomize = subscriptionInfo.customButtonColor === true;
+      const colorGroup = document.getElementById('button-color-group');
+      const upgradeHint = document.getElementById('button-color-upgrade');
+      const colorPicker = document.getElementById('button-color');
+      const colorText = document.getElementById('button-color-text');
+
+      if (canCustomize) {
+        colorGroup.classList.remove('disabled');
+        upgradeHint.style.display = 'none';
+        colorPicker.disabled = false;
+        colorText.disabled = false;
+      } else {
+        // Disable button colour customization for free tier
+        colorGroup.classList.add('disabled');
+        upgradeHint.style.display = 'flex';
+        colorPicker.disabled = true;
+        colorText.disabled = true;
+        // Reset to default colour for free tier
+        buttonColor = '#008060';
+        colorPicker.value = buttonColor;
+        colorText.value = buttonColor;
+        updateRadiusPreview();
+      }
     }
 
     function setupCategoryChangeHandler() {

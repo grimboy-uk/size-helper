@@ -1375,7 +1375,13 @@
           const result = await response.json();
 
           if (result.error) {
-            alert(result.error);
+            // Handle specific error cases
+            if (response.status === 429) {
+              // Monthly limit reached
+              alert('This store has reached its monthly size recommendation limit. You can still use the size chart to find your size manually.');
+            } else {
+              alert(result.error);
+            }
             return;
           }
 

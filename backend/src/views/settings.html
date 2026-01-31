@@ -292,6 +292,28 @@
       if (helperPercentage >= 90) helperFillClass = 'danger';
       else if (helperPercentage >= 70) helperFillClass = 'warning';
 
+      // Recommendation usage (only for free tier with limits)
+      let recommendationHtml = '';
+      if (sub.recommendationLimit && sub.recommendationLimit > 0) {
+        const recPercentage = (sub.recommendationCount / sub.recommendationLimit) * 100;
+        let recFillClass = '';
+        if (recPercentage >= 90) recFillClass = 'danger';
+        else if (recPercentage >= 70) recFillClass = 'warning';
+
+        recommendationHtml = `
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 14px; color: #202223; margin-bottom: 4px;">Monthly Recommendations</div>
+            <div class="usage-bar">
+              <div class="usage-fill ${recFillClass}" style="width: ${Math.min(recPercentage, 100)}%;"></div>
+            </div>
+            <div class="usage-text">
+              <span>${sub.recommendationCount} of ${sub.recommendationLimit} used this month</span>
+              <span>${sub.recommendationRemaining} remaining</span>
+            </div>
+          </div>
+        `;
+      }
+
       container.innerHTML = `
         <div style="font-weight: 600; margin-bottom: 12px; color: #202223;">
           ${sub.tierName} Plan
@@ -308,7 +330,7 @@
           </div>
         </div>
 
-        <div>
+        <div style="margin-bottom: 16px;">
           <div style="font-size: 14px; color: #202223; margin-bottom: 4px;">Size Chart + Size Helper Templates</div>
           <div class="usage-bar">
             <div class="usage-fill ${helperFillClass}" style="width: ${Math.min(helperPercentage, 100)}%;"></div>
@@ -318,6 +340,8 @@
             <span>${sub.sizeHelperRemaining} remaining</span>
           </div>
         </div>
+
+        ${recommendationHtml}
 
         ${sub.billingCycleEnd ? `
           <div style="font-size: 13px; color: #6d7175; margin-top: 16px;">
@@ -329,9 +353,29 @@
 
     function renderPricing() {
       const container = document.getElementById('pricing-grid');
+      const currentTier = allTiers.find(t => t.key === currentSubscription.tier);
+      const currentPrice = currentTier?.price || 0;
 
       container.innerHTML = allTiers.map(tier => {
         const isCurrent = tier.key === currentSubscription.tier;
+        const isUpgrade = tier.price > currentPrice;
+
+        // Use features array from tier if available, otherwise fallback
+        const features = tier.features || [
+          `Up to ${tier.sizeChartLimit} size charts`,
+          `${tier.sizeHelperLimit} with Size Helper`,
+          'Dashboard & analytics',
+          'Storefront widget',
+        ];
+
+        let buttonHtml;
+        if (isCurrent) {
+          buttonHtml = '<button class="btn btn-current">Current Plan</button>';
+        } else if (isUpgrade) {
+          buttonHtml = `<button class="btn btn-primary" onclick="selectPlan('${tier.key}')">Upgrade</button>`;
+        } else {
+          buttonHtml = `<button class="btn btn-primary" onclick="selectPlan('${tier.key}')">Select Plan</button>`;
+        }
 
         return `
           <div class="pricing-card ${isCurrent ? 'current' : ''}">
@@ -340,18 +384,9 @@
               ${tier.price === 0 ? 'Free' : `$${tier.price}<span>/month</span>`}
             </div>
             <div class="pricing-features">
-              <div class="pricing-feature">Up to ${tier.sizeChartLimit} size charts</div>
-              <div class="pricing-feature">${tier.sizeHelperLimit} with Size Helper</div>
-              <div class="pricing-feature">Dashboard & analytics</div>
-              <div class="pricing-feature">Storefront widget</div>
-              <div class="pricing-feature">Unlimited size recommendations</div>
-              ${tier.price === 0 ? '' : '<div class="pricing-feature">No logo on size charts</div>'}
+              ${features.map(feature => `<div class="pricing-feature">${feature}</div>`).join('')}
             </div>
-            ${isCurrent ? `
-              <button class="btn btn-current">Current Plan</button>
-            ` : `
-              <button class="btn btn-primary" onclick="selectPlan('${tier.key}')">Select Plan</button>
-            `}
+            ${buttonHtml}
           </div>
         `;
       }).join('');

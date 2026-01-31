@@ -8,6 +8,10 @@ const logger = createLogger('Billing');
  * Subscription tier definitions
  * - sizeChartLimit: Number of "Size Chart Only" templates allowed
  * - sizeHelperLimit: Number of "Size Chart + Size Helper" templates allowed
+ * - recommendationLimit: Monthly size recommendation limit (0 = unlimited)
+ * - showBranding: Whether "Powered by RMS" branding is shown
+ * - detailedAnalytics: Whether per-product analytics breakdown is available
+ * - customButtonColor: Whether button colour customization is available
  */
 export const SUBSCRIPTION_TIERS = {
   STARTUP: {
@@ -15,21 +19,57 @@ export const SUBSCRIPTION_TIERS = {
     price: 0,
     sizeChartLimit: 5,
     sizeHelperLimit: 2,
-    description: 'Free tier - 5 size charts, 2 with size helper',
+    recommendationLimit: 100,
+    showBranding: true,
+    detailedAnalytics: false,
+    customButtonColor: false,
+    description: 'Free tier - Perfect for getting started',
+    features: [
+      'Up to 5 size charts',
+      '2 with Size Helper',
+      '100 recommendations/month',
+      'Basic analytics (totals only)',
+      'Default button styling',
+      'RMS branding shown',
+    ],
   },
   MICRO_ENTERPRISE: {
     name: 'Micro Enterprise',
     price: 10,
     sizeChartLimit: 10,
     sizeHelperLimit: 7,
-    description: '$10/month - 10 size charts, 7 with size helper',
+    recommendationLimit: 0,
+    showBranding: false,
+    detailedAnalytics: true,
+    customButtonColor: true,
+    description: 'For growing stores with more products',
+    features: [
+      'Up to 10 size charts',
+      '7 with Size Helper',
+      'Unlimited recommendations',
+      'Per-product analytics',
+      'Custom button colours',
+      'No RMS branding',
+    ],
   },
   SMALL_BUSINESS: {
     name: 'Small Business',
     price: 20,
     sizeChartLimit: 30,
     sizeHelperLimit: 20,
-    description: '$20/month - 30 size charts, 20 with size helper',
+    recommendationLimit: 0,
+    showBranding: false,
+    detailedAnalytics: true,
+    customButtonColor: true,
+    description: 'For established stores with large catalogs',
+    features: [
+      'Up to 30 size charts',
+      '20 with Size Helper',
+      'Unlimited recommendations',
+      'Per-product analytics',
+      'Custom button colours',
+      'No RMS branding',
+    ],
   },
 };
 
@@ -235,6 +275,75 @@ export async function cancelSubscription(session) {
 }
 
 /**
+ * Get monthly recommendation count for a shop
+ */
+export async function getMonthlyRecommendationCount(shopDomain) {
+  try {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    const startDateStr = startOfMonth.toISOString().split('T')[0];
+
+    const result = await query(
+      `SELECT COALESCE(SUM(count), 0) as total
+       FROM analytics
+       WHERE shop_domain = $1 AND event_type = 'recommendation_made' AND event_date >= $2`,
+      [shopDomain, startDateStr]
+    );
+
+    return Number.parseInt(result.rows[0].total, 10);
+  } catch (error) {
+    logger.error('Failed to get monthly recommendation count:', error);
+    return 0;
+  }
+}
+
+/**
+ * Check if shop can make more recommendations this month
+ */
+export async function canMakeRecommendation(shopDomain) {
+  try {
+    const result = await query(
+      `SELECT subscription_tier FROM shops WHERE shop_domain = $1`,
+      [shopDomain]
+    );
+
+    if (result.rows.length === 0) {
+      return { allowed: false, reason: 'Shop not found' };
+    }
+
+    const tier = SUBSCRIPTION_TIERS[result.rows[0].subscription_tier] || SUBSCRIPTION_TIERS.STARTUP;
+
+    // Unlimited recommendations for paid tiers (limit = 0)
+    if (tier.recommendationLimit === 0) {
+      return { allowed: true };
+    }
+
+    const count = await getMonthlyRecommendationCount(shopDomain);
+
+    if (count >= tier.recommendationLimit) {
+      return {
+        allowed: false,
+        reason: 'Monthly recommendation limit reached',
+        count,
+        limit: tier.recommendationLimit,
+      };
+    }
+
+    return {
+      allowed: true,
+      count,
+      limit: tier.recommendationLimit,
+      remaining: tier.recommendationLimit - count,
+    };
+  } catch (error) {
+    logger.error('Failed to check recommendation limit:', error);
+    // Allow on error to not break the user experience
+    return { allowed: true };
+  }
+}
+
+/**
  * Get current subscription status for a shop
  */
 export async function getSubscriptionStatus(shopDomain) {
@@ -266,6 +375,9 @@ export async function getSubscriptionStatus(shopDomain) {
     const sizeChartCount = Number.parseInt(counts.total_count, 10);
     const sizeHelperCount = Number.parseInt(counts.size_helper_count, 10);
 
+    // Get monthly recommendation count
+    const recommendationCount = await getMonthlyRecommendationCount(shopDomain);
+
     return {
       tier: shop.subscription_tier,
       tierName: tier.name,
@@ -278,6 +390,14 @@ export async function getSubscriptionStatus(shopDomain) {
       sizeHelperLimit: tier.sizeHelperLimit,
       sizeHelperCount,
       sizeHelperRemaining: tier.sizeHelperLimit - sizeHelperCount,
+      // Recommendation limits
+      recommendationLimit: tier.recommendationLimit,
+      recommendationCount,
+      recommendationRemaining: tier.recommendationLimit === 0 ? null : tier.recommendationLimit - recommendationCount,
+      // Feature flags
+      showBranding: tier.showBranding,
+      detailedAnalytics: tier.detailedAnalytics,
+      customButtonColor: tier.customButtonColor,
       // Legacy field for backwards compatibility
       productTypeLimit: tier.sizeChartLimit,
       productTypeCount: sizeChartCount,
@@ -297,4 +417,6 @@ export default {
   confirmSubscription,
   cancelSubscription,
   getSubscriptionStatus,
+  getMonthlyRecommendationCount,
+  canMakeRecommendation,
 };

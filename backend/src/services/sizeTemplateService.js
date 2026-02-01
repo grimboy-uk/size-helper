@@ -109,12 +109,13 @@ export async function createTemplate(shopDomain, templateData) {
     sizes,
     bodyShapes = DEFAULT_BODY_SHAPES,
     includeSizeHelper = true,
+    illustrationType = null,
   } = templateData;
 
   try {
     const result = await query(
-      `INSERT INTO size_templates (shop_domain, name, category, measurement_unit, measurement_gender, size_notation, button_color, button_border_radius, measurement_fields, sizes, body_shapes, include_size_helper)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      `INSERT INTO size_templates (shop_domain, name, category, measurement_unit, measurement_gender, size_notation, button_color, button_border_radius, measurement_fields, sizes, body_shapes, include_size_helper, illustration_type)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
        RETURNING *`,
       [
         shopDomain,
@@ -129,6 +130,7 @@ export async function createTemplate(shopDomain, templateData) {
         JSON.stringify(sizes),
         JSON.stringify(bodyShapes),
         includeSizeHelper,
+        illustrationType,
       ]
     );
 
@@ -160,6 +162,7 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
     bodyShapes,
     includeSizeHelper,
     isActive,
+    illustrationType,
   } = templateData;
 
   try {
@@ -177,8 +180,9 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
            body_shapes = COALESCE($10, body_shapes),
            include_size_helper = COALESCE($11, include_size_helper),
            is_active = COALESCE($12, is_active),
+           illustration_type = COALESCE($13, illustration_type),
            updated_at = CURRENT_TIMESTAMP
-       WHERE id = $13 AND shop_domain = $14
+       WHERE id = $14 AND shop_domain = $15
        RETURNING *`,
       [
         name,
@@ -193,6 +197,7 @@ export async function updateTemplate(shopDomain, templateId, templateData) {
         bodyShapes ? JSON.stringify(bodyShapes) : null,
         includeSizeHelper,
         isActive,
+        illustrationType,
         templateId,
         shopDomain,
       ]

@@ -102,6 +102,19 @@ export async function initializeDatabase() {
       END $$;
     `);
 
+    // Add illustration_type column if it doesn't exist (for existing databases)
+    await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'size_templates' AND column_name = 'illustration_type'
+        ) THEN
+          ALTER TABLE size_templates ADD COLUMN illustration_type VARCHAR(50);
+        END IF;
+      END $$;
+    `);
+
     // Product assignments table - links products to size templates
     await client.query(`
       CREATE TABLE IF NOT EXISTS product_assignments (

@@ -744,6 +744,18 @@
             </div>
           </div>
 
+          <div class="form-group" id="illustration-type-group" style="display: none;">
+            <label class="form-label">Clothing Illustration</label>
+            <select class="form-select" id="illustration-type">
+              <!-- Options populated dynamically based on category -->
+            </select>
+            <p class="form-hint">The illustration shown in the size guide modal</p>
+            <div class="upgrade-hint" id="illustration-upgrade" style="display: none;">
+              <span class="upgrade-hint-icon">&#128274;</span>
+              <span>Additional illustrations require a paid plan. <a href="#" data-path="/settings">Upgrade</a></span>
+            </div>
+          </div>
+
           <div class="form-group">
             <label class="form-label">Template Type</label>
             <div class="template-type-toggle">
@@ -1021,6 +1033,31 @@
     let measurementFields = [];
     let includeSizeHelper = true;
     let subscriptionInfo = null;
+    let illustrationType = null;
+
+    // Illustration options per category
+    // Free tier only gets the first option (jumper for tops, trousers for bottoms)
+    const ILLUSTRATION_OPTIONS = {
+      TOPS: [
+        { value: 'top-jumper', label: 'Jumper / Sweater', free: true },
+        { value: 'top-polo-tee', label: 'Polo / T-Shirt', free: false },
+        { value: 'top-shirt-long-sleeve', label: 'Long Sleeve Shirt', free: false },
+        { value: 'top-blouse', label: 'Blouse', free: false },
+      ],
+      BOTTOMS: [
+        { value: 'bottom-trousers', label: 'Trousers / Jeans', free: true },
+        { value: 'bottom-shorts', label: 'Shorts (Coming Soon)', free: false, disabled: true },
+      ],
+      DRESSES: [
+        { value: 'top-blouse', label: 'Dress / Jumpsuit', free: true },
+      ],
+      OUTERWEAR: [
+        { value: 'top-jumper', label: 'Jacket / Coat', free: true },
+      ],
+      FOOTWEAR: [
+        { value: 'shoe', label: 'Shoes / Boots', free: true },
+      ],
+    };
 
     // All predefined sizes from smallest to largest
     const ALL_SIZES = ['3XS', '2XS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
@@ -1083,6 +1120,7 @@
         } else {
           // Default fields for new template
           setDefaultFields('TOPS');
+          updateIllustrationOptions('TOPS');
           initializeSizeData();
         }
 
@@ -1185,6 +1223,56 @@
       }
     }
 
+    function updateIllustrationOptions(category) {
+      const group = document.getElementById('illustration-type-group');
+      const select = document.getElementById('illustration-type');
+      const upgradeHint = document.getElementById('illustration-upgrade');
+      const options = ILLUSTRATION_OPTIONS[category];
+
+      if (!options || options.length === 0) {
+        group.style.display = 'none';
+        return;
+      }
+
+      // Show the group
+      group.style.display = 'block';
+
+      // Check if user has paid plan (can use all illustrations)
+      const isPaidPlan = subscriptionInfo && subscriptionInfo.customButtonColor === true;
+
+      // Build options HTML
+      let hasDisabledOptions = false;
+      select.innerHTML = options.map(opt => {
+        const disabled = opt.disabled || (!isPaidPlan && !opt.free);
+        if (disabled && !opt.disabled) hasDisabledOptions = true;
+        let suffix = '';
+        if (disabled && !opt.disabled) {
+          suffix = ' (Paid)';
+        }
+        return `<option value="${opt.value}" ${disabled ? 'disabled' : ''}>${opt.label}${suffix}</option>`;
+      }).join('');
+
+      // Show/hide upgrade hint
+      upgradeHint.style.display = hasDisabledOptions ? 'flex' : 'none';
+
+      // Set default or restore previous value
+      if (illustrationType && options.some(o => o.value === illustrationType && !o.disabled)) {
+        select.value = illustrationType;
+      } else {
+        // Default to first enabled option
+        const firstEnabled = options.find(o => !o.disabled && (isPaidPlan || o.free));
+        if (firstEnabled) {
+          select.value = firstEnabled.value;
+          illustrationType = firstEnabled.value;
+        }
+      }
+
+      // Add change handler
+      select.onchange = function() {
+        illustrationType = this.value;
+      };
+    }
+
     function setupCategoryChangeHandler() {
       const select = document.getElementById('category');
       select.addEventListener('change', (e) => {
@@ -1192,6 +1280,8 @@
           setDefaultFields(e.target.value);
           // Show/hide size style selector for Bottoms
           updateSizeStyleVisibility(e.target.value);
+          // Update illustration options based on category
+          updateIllustrationOptions(e.target.value);
           // Reset to letter style when changing category
           sizeStyle = 'letter';
           updateSizeStyleButtons();
@@ -1322,6 +1412,10 @@
       // Load include_size_helper setting
       includeSizeHelper = template.include_size_helper !== false;
       updateTemplateTypeButtons();
+
+      // Load illustration type
+      illustrationType = template.illustration_type || null;
+      updateIllustrationOptions(template.category);
 
       measurementFields = template.measurement_fields;
 
@@ -1876,6 +1970,7 @@
         measurementFields,
         sizes: validSizes,
         includeSizeHelper,
+        illustrationType,
       };
 
       try {

@@ -82,7 +82,7 @@ router.post(
   subscriptionCheck({ enforceLimit: true, enforceSizeHelperLimit: true }),
   asyncHandler(async (req, res) => {
     const shopDomain = res.locals.shopify.shopDomain;
-    const { name, category, measurementUnit, measurementGender, sizeNotation, buttonColor, measurementFields, sizes, bodyShapes, includeSizeHelper } = req.body;
+    const { name, category, measurementUnit, measurementGender, sizeNotation, buttonColor, measurementFields, sizes, bodyShapes, includeSizeHelper, illustrationType } = req.body;
 
     logger.debug('Creating template:', { shopDomain, name });
     // Validation
@@ -139,6 +139,7 @@ router.post(
         sizes,
         bodyShapes: bodyShapes || DEFAULT_BODY_SHAPES,
         includeSizeHelper: includeSizeHelper !== false, // Default to true if not specified
+        illustrationType: illustrationType || null,
       });
 
       logger.info('Template created:', { shopDomain, templateId: template.id, includeSizeHelper: template.include_size_helper });
@@ -162,7 +163,7 @@ router.put(
   asyncHandler(async (req, res) => {
     const shopDomain = res.locals.shopify.shopDomain;
     const { id } = req.params;
-    const { name, category, measurementUnit, measurementGender, sizeNotation, buttonColor, measurementFields, sizes, bodyShapes, includeSizeHelper, isActive } = req.body;
+    const { name, category, measurementUnit, measurementGender, sizeNotation, buttonColor, measurementFields, sizes, bodyShapes, includeSizeHelper, isActive, illustrationType } = req.body;
 
     // Validate measurement unit if provided
     if (measurementUnit && !['cm', 'in'].includes(measurementUnit)) {
@@ -197,6 +198,7 @@ router.put(
         bodyShapes,
         includeSizeHelper,
         isActive,
+        illustrationType,
       });
 
       logger.info('Template updated:', { shopDomain, templateId: id });

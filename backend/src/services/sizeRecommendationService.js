@@ -408,6 +408,7 @@ export async function getSizeChart(shopDomain, productId, displayUnit = null) {
     sizes,
     bodyShapes: template.body_shapes,
     includeSizeHelper: template.include_size_helper !== false,
+    illustrationType: template.illustration_type || null,
     subscriptionTier,
   };
 }

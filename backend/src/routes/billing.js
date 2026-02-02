@@ -128,14 +128,27 @@ export function billingCallbackHandler(req, res) {
   // Confirm the subscription
   confirmSubscription(shop, tier, charge_id)
     .then(() => {
-      // Redirect back to app with host parameter for embedded apps
-      const hostParam = host ? `&host=${encodeURIComponent(host)}` : '';
-      res.redirect(`/?shop=${shop}${hostParam}&billing=success`);
+      // Redirect back to app
+      // If host is provided, use it; otherwise redirect to Shopify admin embedded app URL
+      if (host) {
+        res.redirect(`/?shop=${shop}&host=${encodeURIComponent(host)}&billing=success`);
+      } else {
+        // Construct Shopify admin URL for embedded app
+        // Shop format: mystore.myshopify.com -> admin URL: admin.shopify.com/store/mystore
+        const storeName = shop.replace('.myshopify.com', '');
+        const embeddedUrl = `https://admin.shopify.com/store/${storeName}/apps/${process.env.SHOPIFY_API_KEY}/settings?billing=success`;
+        res.redirect(embeddedUrl);
+      }
     })
     .catch((error) => {
       logger.error('Billing callback error:', error);
-      const hostParam = host ? `&host=${encodeURIComponent(host)}` : '';
-      res.redirect(`/?shop=${shop}${hostParam}&billing=error`);
+      if (host) {
+        res.redirect(`/?shop=${shop}&host=${encodeURIComponent(host)}&billing=error`);
+      } else {
+        const storeName = shop.replace('.myshopify.com', '');
+        const embeddedUrl = `https://admin.shopify.com/store/${storeName}/apps/${process.env.SHOPIFY_API_KEY}/settings?billing=error`;
+        res.redirect(embeddedUrl);
+      }
     });
 }
 

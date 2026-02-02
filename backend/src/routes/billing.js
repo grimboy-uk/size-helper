@@ -62,7 +62,12 @@ router.post(
     }
 
     // Include host parameter for embedded app redirect
-    const returnUrl = `${process.env.SHOPIFY_APP_URL}/billing/callback?shop=${session.shop}&tier=${tier}&host=${encodeURIComponent(host || '')}`;
+    // Ensure URL has protocol prefix
+    let appUrl = process.env.SHOPIFY_APP_URL || '';
+    if (appUrl && !appUrl.startsWith('http://') && !appUrl.startsWith('https://')) {
+      appUrl = `https://${appUrl}`;
+    }
+    const returnUrl = `${appUrl}/billing/callback?shop=${session.shop}&tier=${tier}&host=${encodeURIComponent(host || '')}`;
 
     try {
       const result = await createSubscription(session, tier, returnUrl);

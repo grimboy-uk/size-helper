@@ -20,6 +20,12 @@ api_version = "2024-01"
   topics = ["app/uninstalled"]
   uri = "/api/webhooks/app/uninstalled"
 
+# Mandatory GDPR compliance webhooks
+[webhooks.privacy_compliance]
+customer_deletion_url = "/api/webhooks/customers/redact"
+customer_data_request_url = "/api/webhooks/customers/data_request"
+shop_deletion_url = "/api/webhooks/shop/redact"
+
 [app_proxy]
 url = "/api/public"
 subpath = "size-helper"

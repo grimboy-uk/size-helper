@@ -193,7 +193,7 @@
     background: {{ block.settings.button_background }};
     color: {{ block.settings.button_text_color }};
     border: 1px solid {{ block.settings.button_border_color }};
-    border-radius: {{ block.settings.button_border_radius }}px;
+    border-radius: 6px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -302,8 +302,8 @@
 
   .size-notation-select select:focus {
     outline: none;
-    border-color: {{ block.settings.accent_color }};
-    box-shadow: 0 0 0 1px {{ block.settings.accent_color }};
+    border-color: #008060;
+    box-shadow: 0 0 0 1px #008060;
   }
 
   .unit-btn {
@@ -324,9 +324,9 @@
   }
 
   .unit-btn.active {
-    background: {{ block.settings.accent_color }};
+    background: #008060;
     color: white;
-    border-color: {{ block.settings.accent_color }};
+    border-color: #008060;
   }
 
   .size-chart-table-wrapper {
@@ -428,8 +428,8 @@
   }
 
   .body-shape-option.selected {
-    border-color: {{ block.settings.accent_color }};
-    background: {{ block.settings.accent_color }}10;
+    border-color: #008060;
+    background: #00806010;
   }
 
   .body-shape-icon {
@@ -474,8 +474,8 @@
   }
 
   .fit-option:has(input:checked) {
-    border-color: {{ block.settings.accent_color }};
-    background: {{ block.settings.accent_color }}10;
+    border-color: #008060;
+    background: #00806010;
   }
 
   .fit-option input {
@@ -491,7 +491,7 @@
     border: none;
     background: none;
     font-size: 14px;
-    color: {{ block.settings.accent_color }};
+    color: #008060;
     cursor: pointer;
   }
 
@@ -538,7 +538,7 @@
   .size-guide-btn-primary {
     flex: 1;
     padding: 14px 24px;
-    background: {{ block.settings.accent_color }};
+    background: #008060;
     color: white;
     border: none;
     border-radius: 8px;
@@ -582,7 +582,7 @@
   .recommended-size {
     font-size: 72px;
     font-weight: 700;
-    color: {{ block.settings.accent_color }};
+    color: #008060;
     line-height: 1;
   }
 
@@ -1481,12 +1481,6 @@
     },
     {
       "type": "color",
-      "id": "accent_color",
-      "label": "Accent Color",
-      "default": "#008060"
-    },
-    {
-      "type": "color",
       "id": "button_background",
       "label": "Button Background",
       "default": "#ffffff"
@@ -1514,16 +1508,6 @@
       "id": "button_hover_text_color",
       "label": "Button Hover Text Color",
       "default": "#000000"
-    },
-    {
-      "type": "range",
-      "id": "button_border_radius",
-      "label": "Button Border Radius",
-      "min": 0,
-      "max": 20,
-      "step": 1,
-      "default": 6,
-      "unit": "px"
     }
   ]
 }

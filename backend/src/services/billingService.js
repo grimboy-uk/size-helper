@@ -207,7 +207,7 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
         returnUrl: $returnUrl
         lineItems: $lineItems
         ${trialDays > 0 ? 'trialDays: $trialDays' : ''}
-        test: ${process.env.SHOPIFY_BILLING_TEST === 'true' || process.env.NODE_ENV !== 'production'}
+        test: ${process.env.SHOPIFY_BILLING_TEST !== 'false' && process.env.NODE_ENV !== 'production'}
       ) {
         appSubscription {
           id

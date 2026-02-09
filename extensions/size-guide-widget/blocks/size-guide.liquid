@@ -138,6 +138,8 @@
           </div>
         </div>
 
+        <div id="form-error-message" class="form-error-message" style="display: none;"></div>
+
         <div class="step-buttons">
           <button type="button" class="size-guide-btn-secondary" onclick="sizeHelper.goToStep(1)">
             Back to Size Chart
@@ -386,6 +388,17 @@
 
   .form-section {
     margin-bottom: 20px;
+  }
+
+  .form-error-message {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    text-align: center;
   }
 
   .form-label {
@@ -1348,6 +1361,8 @@
       },
 
       goToStep(step) {
+        // Hide any errors when navigating
+        this.hideError();
         document.querySelectorAll('.size-guide-step').forEach(el => {
           el.style.display = el.dataset.step == step ? 'block' : 'none';
         });
@@ -1385,6 +1400,9 @@
         };
 
         try {
+          // Hide any previous error
+          this.hideError();
+
           const response = await fetch(`${this.apiBase}/recommend`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1397,9 +1415,9 @@
             // Handle specific error cases
             if (response.status === 429) {
               // Monthly limit reached
-              alert('This store has reached its monthly size recommendation limit. You can still use the size chart to find your size manually.');
+              this.showError('This store has reached its monthly size recommendation limit. You can still use the size chart to find your size manually.');
             } else {
-              alert(result.error);
+              this.showError(result.error);
             }
             return;
           }
@@ -1409,7 +1427,25 @@
 
         } catch (error) {
           console.error('Size Helper: Error getting recommendation', error);
-          alert('Sorry, we couldn\'t get your size recommendation. Please try again.');
+          this.showError('Sorry, we couldn\'t get your size recommendation. Please try again.');
+        }
+      },
+
+      showError(message) {
+        const errorEl = document.getElementById('form-error-message');
+        if (errorEl) {
+          errorEl.textContent = message;
+          errorEl.style.display = 'block';
+          // Scroll error into view
+          errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      },
+
+      hideError() {
+        const errorEl = document.getElementById('form-error-message');
+        if (errorEl) {
+          errorEl.style.display = 'none';
+          errorEl.textContent = '';
         }
       },
 

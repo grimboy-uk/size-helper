@@ -561,7 +561,15 @@
     }
 
     async function unassignProduct(productId) {
-      if (!confirm('Remove this product from its size template?')) {
+      const confirmed = await showConfirm({
+        title: 'Remove Assignment',
+        message: 'Remove this product from its size template?',
+        confirmText: 'Remove',
+        cancelText: 'Cancel',
+        destructive: true
+      });
+
+      if (!confirmed) {
         return;
       }
 

@@ -587,7 +587,14 @@
 
       // Confirm downgrade
       if (tier.price < currentTier.price) {
-        if (!confirm(`Downgrade to ${tier.name}? This will reduce your size chart limit to ${tier.sizeChartLimit}.`)) {
+        const confirmed = await showConfirm({
+          title: 'Downgrade Plan',
+          message: `Downgrade to ${tier.name}? This will reduce your size chart limit to ${tier.sizeChartLimit}.`,
+          confirmText: 'Downgrade',
+          cancelText: 'Cancel',
+          destructive: true
+        });
+        if (!confirmed) {
           console.log('User cancelled downgrade');
           return;
         }
@@ -600,7 +607,13 @@
         const billingType = isAnnualBilling ? 'annual' : 'monthly';
         const price = isAnnualBilling ? tier.annualPrice : tier.price;
         const period = isAnnualBilling ? 'year' : 'month';
-        if (!confirm(`Start your ${tier.trialDays}-day free trial of ${tier.name}?\n\nAfter the trial, you'll be charged $${price}/${period} (${billingType} billing).`)) {
+        const confirmed = await showConfirm({
+          title: 'Start Free Trial',
+          message: `Start your ${tier.trialDays}-day free trial of ${tier.name}?\n\nAfter the trial, you'll be charged $${price}/${period} (${billingType} billing).`,
+          confirmText: 'Start Trial',
+          cancelText: 'Cancel'
+        });
+        if (!confirmed) {
           console.log('User cancelled trial upgrade');
           return;
         }
@@ -647,7 +660,15 @@
     }
 
     async function cancelSubscription() {
-      if (!confirm('Cancel your subscription and downgrade to the Free plan? This will reduce your size chart limit to 3.')) {
+      const confirmed = await showConfirm({
+        title: 'Cancel Subscription',
+        message: 'Cancel your subscription and downgrade to the Free plan? This will reduce your size chart limit to 3.',
+        confirmText: 'Cancel Subscription',
+        cancelText: 'Keep Plan',
+        destructive: true
+      });
+
+      if (!confirmed) {
         return;
       }
 

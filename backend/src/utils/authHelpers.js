@@ -127,6 +127,36 @@ export const authHelpersScript = `
     }
   }
 
+  // Show confirmation modal using App Bridge
+  // Returns a Promise that resolves to true if confirmed, false if cancelled
+  async function showConfirm(options) {
+    const { title, message, confirmText = 'Confirm', cancelText = 'Cancel', destructive = false } = options;
+
+    if (typeof window.shopify !== 'undefined' && window.shopify.modal) {
+      try {
+        const result = await window.shopify.modal.confirm({
+          title: title || 'Confirm',
+          message: message,
+          primaryAction: {
+            content: confirmText,
+            destructive: destructive
+          },
+          secondaryAction: {
+            content: cancelText
+          }
+        });
+        return result;
+      } catch (error) {
+        console.error('Modal confirm error:', error);
+        // Fallback to native confirm if App Bridge modal fails
+        return confirm(message);
+      }
+    } else {
+      // Fallback to native confirm if App Bridge not available
+      return confirm(message);
+    }
+  }
+
   // Navigate using App Bridge v4
   // For embedded apps, simply change the iframe location
   function navigateTo(path) {
@@ -166,6 +196,7 @@ export const authHelpersScript = `
   window.apiPut = apiPut;
   window.apiDelete = apiDelete;
   window.showToast = showToast;
+  window.showConfirm = showConfirm;
   window.navigateTo = navigateTo;
 </script>
 `;

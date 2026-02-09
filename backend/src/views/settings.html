@@ -151,8 +151,8 @@
     }
     .toggle-switch {
       position: relative;
-      width: 48px;
-      height: 24px;
+      width: 49px;
+      height: 27px;
       background: #e1e3e5;
       border-radius: 12px;
       cursor: pointer;
@@ -578,23 +578,30 @@
     }
 
     async function selectPlan(tierKey) {
+      console.log('selectPlan called with tierKey:', tierKey);
       const tier = allTiers.find(t => t.key === tierKey);
       const currentTier = allTiers.find(t => t.key === currentSubscription.tier);
+      console.log('Selected tier:', tier);
+      console.log('Current tier:', currentTier);
+      console.log('isAnnualBilling:', isAnnualBilling);
 
       // Confirm downgrade
       if (tier.price < currentTier.price) {
         if (!confirm(`Downgrade to ${tier.name}? This will reduce your size chart limit to ${tier.sizeChartLimit}.`)) {
+          console.log('User cancelled downgrade');
           return;
         }
       }
 
       // Confirm upgrade with trial info (only show trial message if trial hasn't been used)
       const trialAvailable = tier.trialDays > 0 && !currentSubscription.trialUsed;
+      console.log('trialAvailable:', trialAvailable, '(trialDays:', tier.trialDays, ', trialUsed:', currentSubscription.trialUsed, ')');
       if (tier.price > 0 && trialAvailable && currentSubscription.tier === 'FREE') {
         const billingType = isAnnualBilling ? 'annual' : 'monthly';
         const price = isAnnualBilling ? tier.annualPrice : tier.price;
         const period = isAnnualBilling ? 'year' : 'month';
         if (!confirm(`Start your ${tier.trialDays}-day free trial of ${tier.name}?\n\nAfter the trial, you'll be charged $${price}/${period} (${billingType} billing).`)) {
+          console.log('User cancelled trial upgrade');
           return;
         }
       }
@@ -603,17 +610,23 @@
         // Get host parameter from URL for embedded app redirect
         const urlParams = new URLSearchParams(window.location.search);
         const host = urlParams.get('host');
+        console.log('Host parameter:', host);
+        console.log('Making API call to /api/billing/subscribe...');
+
         const result = await apiPost('/api/billing/subscribe', {
           tier: tierKey,
           host,
           isAnnual: isAnnualBilling
         });
+        console.log('API response:', result);
 
         if (result.requiresApproval && result.confirmationUrl) {
           // Redirect to Shopify approval page
+          console.log('Redirecting to confirmation URL:', result.confirmationUrl);
           window.top.location.href = result.confirmationUrl;
         } else {
           // Free tier - immediate success
+          console.log('Free tier selected, reloading...');
           showToast('Plan updated successfully');
           setTimeout(() => {
             window.location.reload();

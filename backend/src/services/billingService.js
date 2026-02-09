@@ -180,24 +180,46 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
   }
 
   logger.info('Creating subscription for tier:', tierKey, 'shop:', session.shop, 'annual:', isAnnual);
+  logger.info('Creating GraphQL client with session:', { shop: session.shop, hasAccessToken: !!session.accessToken });
   const client = new shopify.api.clients.Graphql({ session });
+  logger.info('GraphQL client created successfully');
 
   // Calculate price and interval
   const price = isAnnual ? tier.annualPrice : tier.price;
   const interval = isAnnual ? 'ANNUAL' : 'EVERY_30_DAYS';
+  logger.info('Price and interval calculated:', { price, interval });
 
   // Check if shop has already used a trial (prevent trial abuse on reinstall)
   let trialDays = tier.trialDays || 0;
+  logger.info('Initial trial days:', trialDays);
   if (trialDays > 0) {
-    const trialCheck = await query(
-      `SELECT trial_used_at FROM shops WHERE shop_domain = $1`,
-      [session.shop]
-    );
-    if (trialCheck.rows.length > 0 && trialCheck.rows[0].trial_used_at) {
-      logger.info('Shop has already used trial, skipping trial days:', session.shop);
-      trialDays = 0;
+    try {
+      logger.info('Checking if shop has already used trial...');
+      const trialCheck = await query(
+        `SELECT trial_used_at FROM shops WHERE shop_domain = $1`,
+        [session.shop]
+      );
+      logger.info('Trial check result:', trialCheck.rows);
+      if (trialCheck.rows.length > 0 && trialCheck.rows[0].trial_used_at) {
+        logger.info('Shop has already used trial, skipping trial days:', session.shop);
+        trialDays = 0;
+      }
+    } catch (trialError) {
+      // Column might not exist in older databases - continue without trial check
+      logger.warn('Trial check failed (column may not exist):', trialError.message);
     }
   }
+
+  // Test charges only work on development stores
+  // In production (NODE_ENV=production), always create real charges
+  const isTestCharge = process.env.NODE_ENV !== 'production';
+  logger.info('Billing config:', {
+    isTestCharge,
+    NODE_ENV: process.env.NODE_ENV,
+    price,
+    interval,
+    trialDays,
+  });
 
   // Build the mutation with optional trial days
   const mutation = `
@@ -207,7 +229,7 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
         returnUrl: $returnUrl
         lineItems: $lineItems
         ${trialDays > 0 ? 'trialDays: $trialDays' : ''}
-        test: ${process.env.SHOPIFY_BILLING_TEST !== 'false' && process.env.NODE_ENV !== 'production'}
+        test: ${isTestCharge}
       ) {
         appSubscription {
           id
@@ -245,8 +267,14 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
     variables.trialDays = trialDays;
   }
 
+  logger.info('Subscription mutation variables:', JSON.stringify(variables, null, 2));
+  logger.info('Subscription mutation:', mutation);
+  logger.info('About to call Shopify GraphQL API...');
+
   try {
     const response = await client.request(mutation, { variables });
+    logger.info('Shopify GraphQL API call completed');
+    logger.info('Subscription API response:', JSON.stringify(response, null, 2));
 
     const { appSubscriptionCreate } = response.data;
 

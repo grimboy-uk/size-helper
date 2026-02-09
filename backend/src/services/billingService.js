@@ -303,6 +303,7 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
  * Also marks trial as used if this is the first paid subscription (prevents trial abuse on reinstall)
  */
 export async function confirmSubscription(shopDomain, tierKey, chargeId, isAnnual = false) {
+  logger.info('confirmSubscription called:', { shopDomain, tierKey, chargeId, isAnnual });
   try {
     const cycleStart = new Date();
     const cycleEnd = new Date();
@@ -315,10 +316,11 @@ export async function confirmSubscription(shopDomain, tierKey, chargeId, isAnnua
 
     // Convert charge_id to proper GID format for Shopify GraphQL API
     const subscriptionGid = chargeId ? `gid://shopify/AppSubscription/${chargeId}` : null;
+    logger.info('Updating database with:', { tierKey, subscriptionGid, cycleStart, cycleEnd, isAnnual, shopDomain });
 
     // Mark trial as used if this is a paid tier (prevents trial abuse on reinstall)
     // Only set trial_used_at if it's not already set
-    await query(
+    const result = await query(
       `UPDATE shops
        SET subscription_tier = $1,
            subscription_id = $2,
@@ -327,10 +329,12 @@ export async function confirmSubscription(shopDomain, tierKey, chargeId, isAnnua
            billing_interval = $5,
            trial_used_at = COALESCE(trial_used_at, CURRENT_TIMESTAMP),
            updated_at = CURRENT_TIMESTAMP
-       WHERE shop_domain = $6`,
+       WHERE shop_domain = $6
+       RETURNING *`,
       [tierKey, subscriptionGid, cycleStart, cycleEnd, isAnnual ? 'ANNUAL' : 'MONTHLY', shopDomain]
     );
 
+    logger.info('Database update result:', { rowCount: result.rowCount, rows: result.rows });
     logger.info('Subscription confirmed:', { shopDomain, tier: tierKey, subscriptionGid, isAnnual });
     return { success: true };
   } catch (error) {

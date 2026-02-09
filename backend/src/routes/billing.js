@@ -118,17 +118,21 @@ router.post(
  * (Not under /api - direct page load)
  */
 export function billingCallbackHandler(req, res) {
+  logger.info('Billing callback received:', req.query);
   const { shop, tier, charge_id, host, annual } = req.query;
 
   if (!shop || !tier) {
+    logger.error('Billing callback missing parameters:', { shop, tier });
     return res.status(400).send('Missing parameters');
   }
 
   const isAnnual = annual === 'true';
+  logger.info('Processing billing callback:', { shop, tier, charge_id, isAnnual });
 
   // Confirm the subscription
   confirmSubscription(shop, tier, charge_id, isAnnual)
     .then(() => {
+      logger.info('Subscription confirmed successfully:', { shop, tier });
       // Redirect back to app
       // If host is provided, use it; otherwise redirect to Shopify admin embedded app URL
       if (host) {

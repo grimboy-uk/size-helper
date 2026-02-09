@@ -283,10 +283,30 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
       throw new Error(appSubscriptionCreate.userErrors[0].message);
     }
 
+    const subscriptionId = appSubscriptionCreate.appSubscription.id;
+    // Extract the numeric charge ID from the GID for the callback URL
+    const chargeId = subscriptionId.split('/').pop();
+
+    // For test charges on dev stores, the approve button is greyed out and no redirect happens
+    // Auto-confirm the subscription immediately after successful API response
+    if (isTestCharge) {
+      logger.info('Test charge detected - auto-confirming subscription');
+      await confirmSubscription(session.shop, tierKey, chargeId, isAnnual);
+      return {
+        success: true,
+        tier: tierKey,
+        subscriptionId,
+        confirmationUrl: null, // No redirect needed for test charges
+        trialDays: appSubscriptionCreate.appSubscription.trialDays,
+        isAnnual,
+        autoConfirmed: true,
+      };
+    }
+
     return {
       success: true,
       tier: tierKey,
-      subscriptionId: appSubscriptionCreate.appSubscription.id,
+      subscriptionId,
       confirmationUrl: appSubscriptionCreate.confirmationUrl,
       trialDays: appSubscriptionCreate.appSubscription.trialDays,
       isAnnual,

@@ -624,6 +624,13 @@
           // Redirect to Shopify approval page
           console.log('Redirecting to confirmation URL:', result.confirmationUrl);
           window.top.location.href = result.confirmationUrl;
+        } else if (result.autoConfirmed) {
+          // Test charge on dev store - auto-confirmed, no redirect needed
+          console.log('Test charge auto-confirmed, reloading...');
+          showToast('Plan updated successfully (test mode)');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
         } else {
           // Free tier - immediate success
           console.log('Free tier selected, reloading...');

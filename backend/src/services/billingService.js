@@ -211,12 +211,11 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
   }
 
   // Test charges only work on development stores
-  // Use SHOPIFY_DEV_STORE=true to enable test charges when testing on dev stores
-  // In production with real stores, set SHOPIFY_DEV_STORE=false or leave unset
-  const isTestCharge = process.env.SHOPIFY_DEV_STORE === 'true' || process.env.NODE_ENV !== 'production';
+  // Development/staging (NODE_ENV !== 'production'): test: true - creates test subscriptions
+  // Production (NODE_ENV === 'production'): test: false - creates real subscriptions
+  const isTestCharge = process.env.NODE_ENV !== 'production';
   logger.info('Billing config:', {
     isTestCharge,
-    SHOPIFY_DEV_STORE: process.env.SHOPIFY_DEV_STORE,
     NODE_ENV: process.env.NODE_ENV,
     price,
     interval,

@@ -6,6 +6,7 @@ import {
   confirmSubscription,
   cancelSubscription,
   getSubscriptionStatus,
+  getAvailableTiers,
 } from '../services/billingService.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -14,17 +15,12 @@ const logger = createLogger('BillingRoute');
 
 /**
  * GET /api/billing/tiers
- * Get available subscription tiers
+ * Get available subscription tiers with annual pricing info
  */
 router.get(
   '/tiers',
   asyncHandler(async (req, res) => {
-    const tiers = Object.entries(SUBSCRIPTION_TIERS).map(([key, tier]) => ({
-      key,
-      ...tier,
-      // Include both limit types for display
-      productTypeLimit: tier.sizeChartLimit, // Legacy compatibility
-    }));
+    const tiers = getAvailableTiers();
     res.json({ tiers });
   })
 );
@@ -55,7 +51,7 @@ router.post(
   '/subscribe',
   asyncHandler(async (req, res) => {
     const session = res.locals.shopify.session;
-    const { tier, host } = req.body;
+    const { tier, host, isAnnual } = req.body;
 
     if (!tier || !SUBSCRIPTION_TIERS[tier]) {
       return res.status(400).json({ error: 'Invalid subscription tier' });
@@ -67,10 +63,11 @@ router.post(
     if (appUrl && !appUrl.startsWith('http://') && !appUrl.startsWith('https://')) {
       appUrl = `https://${appUrl}`;
     }
-    const returnUrl = `${appUrl}/billing/callback?shop=${session.shop}&tier=${tier}&host=${encodeURIComponent(host || '')}`;
+    const annual = isAnnual === true || isAnnual === 'true';
+    const returnUrl = `${appUrl}/billing/callback?shop=${session.shop}&tier=${tier}&host=${encodeURIComponent(host || '')}&annual=${annual}`;
 
     try {
-      const result = await createSubscription(session, tier, returnUrl);
+      const result = await createSubscription(session, tier, returnUrl, annual);
 
       if (result.confirmationUrl) {
         // Paid tier - redirect to Shopify approval
@@ -78,6 +75,8 @@ router.post(
           success: true,
           requiresApproval: true,
           confirmationUrl: result.confirmationUrl,
+          trialDays: result.trialDays,
+          isAnnual: annual,
         });
       } else {
         // Free tier - immediate success
@@ -105,7 +104,7 @@ router.post(
 
     try {
       await cancelSubscription(session);
-      res.json({ success: true, message: 'Subscription cancelled, downgraded to Startup tier' });
+      res.json({ success: true, message: 'Subscription cancelled, downgraded to Free tier' });
     } catch (error) {
       logger.error('Subscription cancellation failed:', error);
       res.status(500).json({ error: 'Failed to cancel subscription' });
@@ -119,14 +118,16 @@ router.post(
  * (Not under /api - direct page load)
  */
 export function billingCallbackHandler(req, res) {
-  const { shop, tier, charge_id, host } = req.query;
+  const { shop, tier, charge_id, host, annual } = req.query;
 
   if (!shop || !tier) {
     return res.status(400).send('Missing parameters');
   }
 
+  const isAnnual = annual === 'true';
+
   // Confirm the subscription
-  confirmSubscription(shop, tier, charge_id)
+  confirmSubscription(shop, tier, charge_id, isAnnual)
     .then(() => {
       // Redirect back to app
       // If host is provided, use it; otherwise redirect to Shopify admin embedded app URL

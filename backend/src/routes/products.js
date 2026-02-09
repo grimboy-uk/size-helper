@@ -194,17 +194,14 @@ router.get(
       }
     `;
 
-    const response = await client.query({
-      data: {
-        query: gqlQuery,
-        variables: {
-          query: searchQuery || '',
-          first: parseInt(limit, 10),
-        },
+    const response = await client.request(gqlQuery, {
+      variables: {
+        query: searchQuery || '',
+        first: parseInt(limit, 10),
       },
     });
 
-    const products = response.body.data.products.edges.map((edge) => ({
+    const products = response.data.products.edges.map((edge) => ({
       id: edge.node.id.replace('gid://shopify/Product/', ''),
       title: edge.node.title,
       handle: edge.node.handle,

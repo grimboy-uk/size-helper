@@ -57,10 +57,12 @@ export async function initializeDatabase() {
         shop_domain VARCHAR(255) UNIQUE NOT NULL,
         access_token TEXT,
         scope TEXT,
-        subscription_tier VARCHAR(50) DEFAULT 'STARTUP',
+        subscription_tier VARCHAR(50) DEFAULT 'FREE',
         subscription_id VARCHAR(255),
         billing_cycle_start DATE,
         billing_cycle_end DATE,
+        billing_interval VARCHAR(20) DEFAULT 'MONTHLY',
+        trial_used_at TIMESTAMP DEFAULT NULL,
         product_type_count INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

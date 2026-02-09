@@ -1,0 +1,5 @@
+# Nixpacks configuration for Railway deployment
+# Specifies Node.js 22.13.1 using a pinned nixpkgs commit
+
+[phases.setup]
+nixpkgsArchive = '51ad838b03a05b1de6f9f2a0fffecee64a9788ee'

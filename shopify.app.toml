@@ -6,7 +6,7 @@ application_url = "https://size-helper.reedmace.net"
 embedded = true
 
 [access_scopes]
-scopes = "read_products,read_inventory,write_customers,read_orders"
+scopes = "read_products"
 
 [auth]
 redirect_urls = [
@@ -14,7 +14,7 @@ redirect_urls = [
 ]
 
 [webhooks]
-api_version = "2024-01"
+api_version = "2025-01"
 
   [[webhooks.subscriptions]]
   topics = ["app/uninstalled"]
@@ -36,4 +36,4 @@ embedded = false
 
 [build]
 automatically_update_urls_on_dev = true
-dev_store_url = "reedmace.myshopify.com"
+dev_store_url = "reedmace-3.myshopify.com"

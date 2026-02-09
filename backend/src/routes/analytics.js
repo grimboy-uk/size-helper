@@ -21,8 +21,8 @@ async function getShopTierFeatures(shopDomain) {
     `SELECT subscription_tier FROM shops WHERE shop_domain = $1`,
     [shopDomain]
   );
-  const tierKey = result.rows[0]?.subscription_tier || 'STARTUP';
-  return SUBSCRIPTION_TIERS[tierKey] || SUBSCRIPTION_TIERS.STARTUP;
+  const tierKey = result.rows[0]?.subscription_tier || 'FREE';
+  return SUBSCRIPTION_TIERS[tierKey] || SUBSCRIPTION_TIERS.FREE;
 }
 
 /**

@@ -438,7 +438,7 @@
         document.getElementById('stat-conversion').textContent = (analyticsData.conversionRate || 0) + '%';
 
         // Show upgrade banner for free tier
-        if (sub.tier === 'STARTUP') {
+        if (sub.tier === 'FREE') {
           const upgradeBanner = document.getElementById('upgrade-banner');
           upgradeBanner.style.display = 'flex';
 

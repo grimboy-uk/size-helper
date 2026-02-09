@@ -129,12 +129,72 @@
       font-size: 14px;
       color: #6d7175;
     }
+    .billing-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    .billing-toggle-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #6d7175;
+      cursor: pointer;
+    }
+    .billing-toggle-label.active {
+      color: #202223;
+      font-weight: 600;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 48px;
+      height: 24px;
+      background: #e1e3e5;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-switch.active {
+      background: #2a9d6e;
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle-switch.active::after {
+      transform: translateX(24px);
+    }
+    .savings-badge {
+      background: #ffc453;
+      color: #202223;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
     .pricing-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
     }
-    @media (max-width: 800px) {
+    @media (max-width: 900px) {
+      .pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
       .pricing-grid {
         grid-template-columns: 1fr;
       }
@@ -142,49 +202,79 @@
     .pricing-card {
       border: 2px solid #e1e3e5;
       border-radius: 12px;
-      padding: 24px;
+      padding: 20px;
       text-align: left;
       transition: all 0.2s;
       display: flex;
       flex-direction: column;
       background: white;
+      position: relative;
     }
     .pricing-card.current {
       border: 2px solid #2a9d6e;
       background-color: #f0fdf7;
     }
+    .pricing-card.recommended {
+      border: 2px solid #2a9d6e;
+    }
     .pricing-tier {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       color: #202223;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+    }
+    .tier-description {
+      font-size: 13px;
+      color: #6d7175;
+      margin-bottom: 12px;
     }
     .pricing-price {
-      font-size: 24px;
+      font-size: 28px;
       font-weight: 700;
       color: #2a9d6e;
-      margin-bottom: 5px;
+      margin-bottom: 2px;
     }
     .pricing-price span {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 400;
       color: #6d7175;
     }
+    .pricing-original {
+      font-size: 14px;
+      color: #9ca3af;
+      text-decoration: line-through;
+      margin-bottom: 4px;
+    }
+    .pricing-equivalent {
+      font-size: 12px;
+      color: #6d7175;
+      margin-bottom: 8px;
+    }
+    .trial-badge {
+      display: inline-block;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
     .pricing-features {
-      margin: 0 0 24px 0;
+      margin: 0 0 16px 0;
       flex-grow: 1;
     }
     .pricing-feature {
       padding: 2px 0;
-      font-size: 14px;
+      font-size: 13px;
       color: #202223;
       line-height: 1.4;
     }
     .pricing-card .btn {
       width: 100%;
       justify-content: center;
-      padding: 12px 16px;
-      font-size: 15px;
+      padding: 10px 14px;
+      font-size: 14px;
       font-weight: 600;
     }
     .btn-current {
@@ -229,6 +319,13 @@
     <div class="card">
       <h2 class="card-title">Available Plans</h2>
 
+      <div class="billing-toggle">
+        <span class="billing-toggle-label active" id="monthly-label">Monthly</span>
+        <button type="button" class="toggle-switch" id="billing-toggle" onclick="toggleBilling()" aria-label="Toggle annual billing"></button>
+        <span class="billing-toggle-label" id="annual-label">Annual</span>
+        <span class="savings-badge">Save 20%</span>
+      </div>
+
       <div class="pricing-grid" id="pricing-grid">
         <div class="loading">Loading plans...</div>
       </div>
@@ -248,6 +345,7 @@
   <script>
     let currentSubscription = null;
     let allTiers = [];
+    let isAnnualBilling = false;
 
     async function init() {
       try {
@@ -262,11 +360,15 @@
         allTiers = tiersData.tiers;
         currentSubscription = subscriptionData.subscription;
 
+        // Set billing toggle based on current subscription
+        isAnnualBilling = currentSubscription.billingInterval === 'ANNUAL';
+        updateBillingToggle();
+
         renderUsage();
         renderPricing();
 
         // Show cancel button if on paid plan
-        if (currentSubscription.tier !== 'STARTUP') {
+        if (currentSubscription.tier !== 'FREE') {
           document.getElementById('cancel-btn').style.display = 'inline-flex';
         }
 
@@ -276,25 +378,52 @@
       }
     }
 
+    function toggleBilling() {
+      isAnnualBilling = !isAnnualBilling;
+      updateBillingToggle();
+      renderPricing();
+    }
+
+    function updateBillingToggle() {
+      const toggle = document.getElementById('billing-toggle');
+      const monthlyLabel = document.getElementById('monthly-label');
+      const annualLabel = document.getElementById('annual-label');
+
+      if (isAnnualBilling) {
+        toggle.classList.add('active');
+        monthlyLabel.classList.remove('active');
+        annualLabel.classList.add('active');
+      } else {
+        toggle.classList.remove('active');
+        monthlyLabel.classList.add('active');
+        annualLabel.classList.remove('active');
+      }
+    }
+
     function renderUsage() {
       const container = document.getElementById('usage-section');
       const sub = currentSubscription;
 
+      // Check if limits are unlimited (0 means unlimited)
+      const hasChartLimit = sub.sizeChartLimit > 0;
+      const hasHelperLimit = sub.sizeHelperLimit > 0;
+      const hasRecLimit = sub.recommendationLimit > 0;
+
       // Size Charts usage
-      const chartPercentage = (sub.sizeChartCount / sub.sizeChartLimit) * 100;
+      const chartPercentage = hasChartLimit ? (sub.sizeChartCount / sub.sizeChartLimit) * 100 : 0;
       let chartFillClass = '';
-      if (chartPercentage >= 90) chartFillClass = 'danger';
-      else if (chartPercentage >= 70) chartFillClass = 'warning';
+      if (hasChartLimit && chartPercentage >= 90) chartFillClass = 'danger';
+      else if (hasChartLimit && chartPercentage >= 70) chartFillClass = 'warning';
 
       // Size Helper usage
-      const helperPercentage = (sub.sizeHelperCount / sub.sizeHelperLimit) * 100;
+      const helperPercentage = hasHelperLimit ? (sub.sizeHelperCount / sub.sizeHelperLimit) * 100 : 0;
       let helperFillClass = '';
-      if (helperPercentage >= 90) helperFillClass = 'danger';
-      else if (helperPercentage >= 70) helperFillClass = 'warning';
+      if (hasHelperLimit && helperPercentage >= 90) helperFillClass = 'danger';
+      else if (hasHelperLimit && helperPercentage >= 70) helperFillClass = 'warning';
 
-      // Recommendation usage (only for free tier with limits)
+      // Recommendation usage
       let recommendationHtml = '';
-      if (sub.recommendationLimit && sub.recommendationLimit > 0) {
+      if (hasRecLimit) {
         const recPercentage = (sub.recommendationCount / sub.recommendationLimit) * 100;
         let recFillClass = '';
         if (recPercentage >= 90) recFillClass = 'danger';
@@ -312,40 +441,61 @@
             </div>
           </div>
         `;
+      } else if (sub.tier !== 'FREE') {
+        recommendationHtml = `
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 14px; color: #202223; margin-bottom: 4px;">Monthly Recommendations</div>
+            <div style="font-size: 14px; color: #2a9d6e; font-weight: 500;">Unlimited</div>
+          </div>
+        `;
       }
 
+      // Billing interval display
+      const billingInfo = sub.billingInterval === 'ANNUAL' ? 'Annual billing' : 'Monthly billing';
+
       container.innerHTML = `
-        <div style="font-weight: 600; margin-bottom: 12px; color: #202223;">
+        <div style="font-weight: 600; margin-bottom: 4px; color: #202223;">
           ${sub.tierName} Plan
+        </div>
+        <div style="font-size: 13px; color: #6d7175; margin-bottom: 16px;">
+          ${sub.tier !== 'FREE' ? billingInfo : 'Free forever'}
         </div>
 
         <div style="margin-bottom: 16px;">
           <div style="font-size: 14px; color: #202223; margin-bottom: 4px;">Size Charts (Total Templates)</div>
-          <div class="usage-bar">
-            <div class="usage-fill ${chartFillClass}" style="width: ${Math.min(chartPercentage, 100)}%;"></div>
-          </div>
-          <div class="usage-text">
-            <span>${sub.sizeChartCount} of ${sub.sizeChartLimit} used</span>
-            <span>${sub.sizeChartRemaining} remaining</span>
-          </div>
+          ${hasChartLimit ? `
+            <div class="usage-bar">
+              <div class="usage-fill ${chartFillClass}" style="width: ${Math.min(chartPercentage, 100)}%;"></div>
+            </div>
+            <div class="usage-text">
+              <span>${sub.sizeChartCount} of ${sub.sizeChartLimit} used</span>
+              <span>${sub.sizeChartRemaining} remaining</span>
+            </div>
+          ` : `
+            <div style="font-size: 14px; color: #2a9d6e; font-weight: 500;">${sub.sizeChartCount} created (Unlimited)</div>
+          `}
         </div>
 
         <div style="margin-bottom: 16px;">
           <div style="font-size: 14px; color: #202223; margin-bottom: 4px;">Size Chart + Size Helper Templates</div>
-          <div class="usage-bar">
-            <div class="usage-fill ${helperFillClass}" style="width: ${Math.min(helperPercentage, 100)}%;"></div>
-          </div>
-          <div class="usage-text">
-            <span>${sub.sizeHelperCount} of ${sub.sizeHelperLimit} used</span>
-            <span>${sub.sizeHelperRemaining} remaining</span>
-          </div>
+          ${hasHelperLimit ? `
+            <div class="usage-bar">
+              <div class="usage-fill ${helperFillClass}" style="width: ${Math.min(helperPercentage, 100)}%;"></div>
+            </div>
+            <div class="usage-text">
+              <span>${sub.sizeHelperCount} of ${sub.sizeHelperLimit} used</span>
+              <span>${sub.sizeHelperRemaining} remaining</span>
+            </div>
+          ` : `
+            <div style="font-size: 14px; color: #2a9d6e; font-weight: 500;">${sub.sizeHelperCount} created (Unlimited)</div>
+          `}
         </div>
 
         ${recommendationHtml}
 
         ${sub.billingCycleEnd ? `
           <div style="font-size: 13px; color: #6d7175; margin-top: 16px;">
-            Billing cycle ends: ${new Date(sub.billingCycleEnd).toLocaleDateString()}
+            ${sub.tier !== 'FREE' ? `Billing cycle ends: ${new Date(sub.billingCycleEnd).toLocaleDateString()}` : ''}
           </div>
         ` : ''}
       `;
@@ -360,7 +510,7 @@
         const isCurrent = tier.key === currentSubscription.tier;
         const isUpgrade = tier.price > currentPrice;
 
-        // Use features array from tier if available, otherwise fallback
+        // Use features array from tier if available
         const features = tier.features || [
           `Up to ${tier.sizeChartLimit} size charts`,
           `${tier.sizeHelperLimit} with Size Helper`,
@@ -368,21 +518,56 @@
           'Storefront widget',
         ];
 
+        // Calculate display price based on billing toggle
+        const displayPrice = isAnnualBilling ? tier.annualPrice : tier.price;
+        const monthlyEquivalent = isAnnualBilling && tier.annualPrice > 0
+          ? (tier.annualPrice / 12).toFixed(2)
+          : null;
+        const originalMonthlyTotal = tier.price * 12;
+
+        // Check if trial is available (not used before)
+        const trialAvailable = tier.trialDays > 0 && !currentSubscription.trialUsed;
+
+        // Button logic
         let buttonHtml;
-        if (isCurrent) {
+        if (isCurrent && currentSubscription.billingInterval === (isAnnualBilling ? 'ANNUAL' : 'MONTHLY')) {
           buttonHtml = '<button class="btn btn-current">Current Plan</button>';
+        } else if (isCurrent) {
+          // Same tier, different billing interval
+          buttonHtml = `<button class="btn btn-secondary" onclick="selectPlan('${tier.key}')">Switch to ${isAnnualBilling ? 'Annual' : 'Monthly'}</button>`;
+        } else if (tier.price === 0) {
+          buttonHtml = `<button class="btn btn-secondary" onclick="selectPlan('${tier.key}')">Select Plan</button>`;
         } else if (isUpgrade) {
-          buttonHtml = `<button class="btn btn-primary" onclick="selectPlan('${tier.key}')">Upgrade</button>`;
+          buttonHtml = `<button class="btn btn-primary" onclick="selectPlan('${tier.key}')">${trialAvailable ? 'Start Free Trial' : 'Upgrade'}</button>`;
         } else {
-          buttonHtml = `<button class="btn btn-primary" onclick="selectPlan('${tier.key}')">Select Plan</button>`;
+          buttonHtml = `<button class="btn btn-secondary" onclick="selectPlan('${tier.key}')">Select Plan</button>`;
         }
 
+        // Price display
+        let priceHtml;
+        if (tier.price === 0) {
+          priceHtml = '<div class="pricing-price">Free</div>';
+        } else if (isAnnualBilling) {
+          priceHtml = `
+            <div class="pricing-original">$${originalMonthlyTotal}/year</div>
+            <div class="pricing-price">$${displayPrice}<span>/year</span></div>
+            <div class="pricing-equivalent">$${monthlyEquivalent}/month</div>
+          `;
+        } else {
+          priceHtml = `<div class="pricing-price">$${displayPrice}<span>/month</span></div>`;
+        }
+
+        // Trial badge - only show if trial is available and not current tier
+        const trialBadge = trialAvailable && !isCurrent
+          ? `<span class="trial-badge">${tier.trialDays}-day free trial</span>`
+          : '';
+
         return `
-          <div class="pricing-card ${isCurrent ? 'current' : ''}">
+          <div class="pricing-card ${isCurrent ? 'current' : ''} ${tier.key === 'PROFESSIONAL' ? 'recommended' : ''}">
             <div class="pricing-tier">${tier.name}</div>
-            <div class="pricing-price">
-              ${tier.price === 0 ? 'Free' : `$${tier.price}<span>/month</span>`}
-            </div>
+            <div class="tier-description">${tier.description || ''}</div>
+            ${priceHtml}
+            ${trialBadge}
             <div class="pricing-features">
               ${features.map(feature => `<div class="pricing-feature">${feature}</div>`).join('')}
             </div>
@@ -398,7 +583,18 @@
 
       // Confirm downgrade
       if (tier.price < currentTier.price) {
-        if (!confirm(`Downgrade to ${tier.name}? This will reduce your product type limit to ${tier.productTypeLimit}.`)) {
+        if (!confirm(`Downgrade to ${tier.name}? This will reduce your size chart limit to ${tier.sizeChartLimit}.`)) {
+          return;
+        }
+      }
+
+      // Confirm upgrade with trial info (only show trial message if trial hasn't been used)
+      const trialAvailable = tier.trialDays > 0 && !currentSubscription.trialUsed;
+      if (tier.price > 0 && trialAvailable && currentSubscription.tier === 'FREE') {
+        const billingType = isAnnualBilling ? 'annual' : 'monthly';
+        const price = isAnnualBilling ? tier.annualPrice : tier.price;
+        const period = isAnnualBilling ? 'year' : 'month';
+        if (!confirm(`Start your ${tier.trialDays}-day free trial of ${tier.name}?\n\nAfter the trial, you'll be charged $${price}/${period} (${billingType} billing).`)) {
           return;
         }
       }
@@ -407,7 +603,11 @@
         // Get host parameter from URL for embedded app redirect
         const urlParams = new URLSearchParams(window.location.search);
         const host = urlParams.get('host');
-        const result = await apiPost('/api/billing/subscribe', { tier: tierKey, host });
+        const result = await apiPost('/api/billing/subscribe', {
+          tier: tierKey,
+          host,
+          isAnnual: isAnnualBilling
+        });
 
         if (result.requiresApproval && result.confirmationUrl) {
           // Redirect to Shopify approval page
@@ -427,13 +627,13 @@
     }
 
     async function cancelSubscription() {
-      if (!confirm('Cancel your subscription and downgrade to the free Startup plan? This will reduce your product type limit to 2.')) {
+      if (!confirm('Cancel your subscription and downgrade to the Free plan? This will reduce your size chart limit to 3.')) {
         return;
       }
 
       try {
         await apiPost('/api/billing/cancel', {});
-        showToast('Subscription cancelled. You are now on the Startup plan.');
+        showToast('Subscription cancelled. You are now on the Free plan.');
         setTimeout(() => {
           window.location.reload();
         }, 1000);

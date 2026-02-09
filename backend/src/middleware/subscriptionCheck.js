@@ -36,7 +36,7 @@ export function subscriptionCheck(options = {}) {
       }
 
       const shop = result.rows[0];
-      const tier = SUBSCRIPTION_TIERS[shop.subscription_tier] || SUBSCRIPTION_TIERS.STARTUP;
+      const tier = SUBSCRIPTION_TIERS[shop.subscription_tier] || SUBSCRIPTION_TIERS.FREE;
 
       // Check if billing cycle needs reset
       const now = new Date();

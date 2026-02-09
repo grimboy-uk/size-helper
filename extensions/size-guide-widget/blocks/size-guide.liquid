@@ -171,7 +171,7 @@
       </div>
     </div>
 
-    <!-- Powered by RMS - shown only for Startup tier -->
+    <!-- Powered by RMS - shown only for Free tier -->
     <div class="powered-by-rms" id="powered-by-rms" style="display: none;">
       <a href="https://reedmace.net" target="_blank" alt="Reedmace by Wrenby's">
         <img src="{{ 'powered-by-rms.png' | asset_url }}" alt="Powered by RMS Size Helper" loading="lazy" width="120" height="24">
@@ -933,7 +933,7 @@
           this.applyButtonStyles();
 
           // Set subscription tier
-          this.subscriptionTier = this.sizeChart.subscriptionTier || 'STARTUP';
+          this.subscriptionTier = this.sizeChart.subscriptionTier || 'FREE';
 
           // Update dropdown to show template's notation
           const dropdown = document.getElementById('size-notation-dropdown');
@@ -955,10 +955,10 @@
           }
 
           // Show/hide powered-by logo based on subscription tier
-          // Only visible for STARTUP (free) tier
+          // Only visible for FREE tier
           const poweredByEl = document.getElementById('powered-by-rms');
           if (poweredByEl) {
-            poweredByEl.style.display = this.subscriptionTier === 'STARTUP' ? 'block' : 'none';
+            poweredByEl.style.display = this.subscriptionTier === 'FREE' ? 'block' : 'none';
           }
         } catch (error) {
           console.error('Size Helper: Error loading size chart', error);

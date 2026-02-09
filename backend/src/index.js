@@ -17,7 +17,7 @@ import { ApiVersion } from '@shopify/shopify-api';
 
 import { createLogger } from './utils/logger.js';
 import { initializeDatabase, query } from './config/database.js';
-import { verifyShop } from './middleware/verifyShop.js';
+import { verifyShop, verifyShopDocument } from './middleware/verifyShop.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { authHelpersScript } from './utils/authHelpers.js';
 import { loadTemplate } from './utils/templateLoader.js';
@@ -48,7 +48,7 @@ const shopify = shopifyApp({
     apiSecretKey: process.env.SHOPIFY_API_SECRET,
     scopes: process.env.SHOPIFY_SCOPES?.split(',') || ['read_products'],
     hostName: process.env.SHOPIFY_APP_URL?.replace(/^https?:\/\//, '') || 'localhost',
-    apiVersion: ApiVersion.January24,
+    apiVersion: ApiVersion.January25,
     isEmbeddedApp: true,
   },
   auth: {
@@ -176,6 +176,47 @@ setShopifyInstance(shopify);
 // Billing callback (not under /api - direct page load)
 app.get('/billing/callback', billingCallbackHandler);
 
+/**
+ * Session Bounce Flow Endpoints
+ * Used when token exchange fails and we need to redirect through OAuth
+ */
+
+// Exit iframe endpoint - breaks out of Shopify Admin iframe to start OAuth
+app.get('/auth/exit-iframe', (req, res) => {
+  const { shop, host } = req.query;
+
+  if (!shop) {
+    return res.status(400).send('Missing shop parameter');
+  }
+
+  // Build the OAuth start URL
+  const authUrl = `${shopify.config.auth.path}?shop=${encodeURIComponent(shop)}`;
+
+  try {
+    const html = loadTemplate('exit-iframe', {
+      redirectUrl: authUrl,
+    });
+    res.send(html);
+  } catch (error) {
+    logger.error('Error loading exit-iframe page:', error);
+    // Fallback: redirect directly
+    res.redirect(authUrl);
+  }
+});
+
+// Session token endpoint - receives bounce from App Bridge and initiates OAuth
+app.get('/auth/session-token', (req, res) => {
+  const { shop, host, redirectUri } = req.query;
+
+  if (!shop) {
+    return res.status(400).send('Missing shop parameter');
+  }
+
+  // Redirect to exit-iframe which will break out and start OAuth
+  const exitIframeUrl = `/auth/exit-iframe?shop=${encodeURIComponent(shop)}&host=${encodeURIComponent(host || '')}`;
+  res.redirect(exitIframeUrl);
+});
+
 // Webhook routes (before auth middleware)
 app.use('/api/webhooks', webhooksRouter);
 
@@ -184,6 +225,7 @@ app.use('/api/public', publicRouter);
 
 // Protected API routes
 const verifyShopMiddleware = verifyShop(sessionStorage);
+const verifyShopDocumentMiddleware = verifyShopDocument(sessionStorage);
 
 app.use('/api/templates', verifyShopMiddleware, templatesRouter);
 app.use('/api/products', verifyShopMiddleware, productsRouter);
@@ -223,15 +265,15 @@ app.get('/', (req, res, next) => {
   next();
 }, serveAdminPage('dashboard'));
 
-// Other admin pages - serve directly (App Bridge maintains session)
-app.get('/templates', serveAdminPage('templates'));
-app.get('/templates/new', serveAdminPage('template-form', { mode: 'create', templateId: '' }));
-app.get('/templates/:id/edit', (req, res) => {
+// Other admin pages - verify session when shop param is present, redirect to bounce flow if needed
+app.get('/templates', verifyShopDocumentMiddleware, serveAdminPage('templates'));
+app.get('/templates/new', verifyShopDocumentMiddleware, serveAdminPage('template-form', { mode: 'create', templateId: '' }));
+app.get('/templates/:id/edit', verifyShopDocumentMiddleware, (req, res) => {
   serveAdminPage('template-form', { mode: 'edit', templateId: req.params.id })(req, res);
 });
-app.get('/products', serveAdminPage('products'));
-app.get('/analytics', serveAdminPage('analytics'));
-app.get('/settings', serveAdminPage('settings'));
+app.get('/products', verifyShopDocumentMiddleware, serveAdminPage('products'));
+app.get('/analytics', verifyShopDocumentMiddleware, serveAdminPage('analytics'));
+app.get('/settings', verifyShopDocumentMiddleware, serveAdminPage('settings'));
 
 // Public pages (no auth required)
 app.get('/privacy', (req, res) => {

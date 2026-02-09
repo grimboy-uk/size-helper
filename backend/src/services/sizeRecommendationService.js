@@ -364,14 +364,14 @@ export async function getSizeChart(shopDomain, productId, displayUnit = null) {
   }
 
   // Fetch shop's subscription tier
-  let subscriptionTier = 'STARTUP';
+  let subscriptionTier = 'FREE';
   try {
     const shopResult = await query(
       `SELECT subscription_tier FROM shops WHERE shop_domain = $1`,
       [shopDomain]
     );
     if (shopResult.rows.length > 0) {
-      subscriptionTier = shopResult.rows[0].subscription_tier || 'STARTUP';
+      subscriptionTier = shopResult.rows[0].subscription_tier || 'FREE';
     }
   } catch (error) {
     logger.error('Failed to fetch subscription tier:', error);

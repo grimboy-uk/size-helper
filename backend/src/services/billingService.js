@@ -4,79 +4,159 @@ import { getShopifyInstance } from './webhookService.js';
 
 const logger = createLogger('Billing');
 
+// Configurable trial period (days) - can be overridden via environment variable
+const TRIAL_DAYS = parseInt(process.env.TRIAL_DAYS || '7', 10);
+
+// Annual discount percentage
+const ANNUAL_DISCOUNT_PERCENT = 20;
+
 /**
  * Subscription tier definitions
- * - sizeChartLimit: Number of "Size Chart Only" templates allowed
- * - sizeHelperLimit: Number of "Size Chart + Size Helper" templates allowed
+ * - sizeChartLimit: Number of size chart templates allowed (0 = unlimited)
+ * - sizeHelperLimit: Number of templates with Size Helper enabled (0 = unlimited)
  * - recommendationLimit: Monthly size recommendation limit (0 = unlimited)
+ * - analyticsRetentionDays: How long analytics data is retained (0 = unlimited)
  * - showBranding: Whether "Powered by RMS" branding is shown
  * - detailedAnalytics: Whether per-product analytics breakdown is available
  * - customButtonColor: Whether button colour customization is available
+ * - prioritySupport: Whether priority support is included
+ * - apiAccess: Whether API access is available
  */
 export const SUBSCRIPTION_TIERS = {
-  STARTUP: {
-    name: 'Startup',
+  FREE: {
+    name: 'Free',
     price: 0,
-    sizeChartLimit: 5,
-    sizeHelperLimit: 2,
-    recommendationLimit: 100,
+    annualPrice: 0,
+    sizeChartLimit: 3,
+    sizeHelperLimit: 1,
+    recommendationLimit: 50,
+    analyticsRetentionDays: 30,
     showBranding: true,
     detailedAnalytics: false,
     customButtonColor: false,
-    description: 'Free tier - Perfect for getting started',
+    prioritySupport: false,
+    apiAccess: false,
+    trialDays: 0,
+    description: 'Perfect for getting started',
     features: [
-      'Up to 5 size charts',
-      '2 with Size Helper',
-      '100 recommendations/month',
-      'Basic analytics (totals only)',
+      'Up to 3 size charts',
+      '1 with Size Helper',
+      '50 recommendations/month',
+      '30-day analytics',
       'Default button styling',
       'RMS branding shown',
     ],
   },
-  MICRO_ENTERPRISE: {
-    name: 'Micro Enterprise',
-    price: 10,
-    sizeChartLimit: 10,
-    sizeHelperLimit: 7,
-    recommendationLimit: 0,
+  GROWTH: {
+    name: 'Growth',
+    price: 9,
+    annualPrice: 86, // ~20% off ($108 -> $86)
+    sizeChartLimit: 15,
+    sizeHelperLimit: 10,
+    recommendationLimit: 500,
+    analyticsRetentionDays: 90,
     showBranding: false,
     detailedAnalytics: true,
     customButtonColor: true,
-    description: 'For growing stores with more products',
+    prioritySupport: false,
+    apiAccess: false,
+    trialDays: TRIAL_DAYS,
+    description: 'For growing stores',
     features: [
-      'Up to 10 size charts',
-      '7 with Size Helper',
-      'Unlimited recommendations',
+      'Up to 15 size charts',
+      '10 with Size Helper',
+      '500 recommendations/month',
+      '90-day analytics',
       'Per-product analytics',
       'Custom button colours',
       'No RMS branding',
     ],
   },
-  SMALL_BUSINESS: {
-    name: 'Small Business',
-    price: 20,
-    sizeChartLimit: 30,
-    sizeHelperLimit: 20,
-    recommendationLimit: 0,
+  PROFESSIONAL: {
+    name: 'Professional',
+    price: 19,
+    annualPrice: 182, // ~20% off ($228 -> $182)
+    sizeChartLimit: 50,
+    sizeHelperLimit: 35,
+    recommendationLimit: 0, // Unlimited
+    analyticsRetentionDays: 365,
     showBranding: false,
     detailedAnalytics: true,
     customButtonColor: true,
-    description: 'For established stores with large catalogs',
+    prioritySupport: true,
+    apiAccess: false,
+    trialDays: TRIAL_DAYS,
+    description: 'For established stores',
     features: [
-      'Up to 30 size charts',
-      '20 with Size Helper',
+      'Up to 50 size charts',
+      '35 with Size Helper',
       'Unlimited recommendations',
+      '1-year analytics',
       'Per-product analytics',
       'Custom button colours',
+      'Priority support',
+      'No RMS branding',
+    ],
+  },
+  ENTERPRISE: {
+    name: 'Enterprise',
+    price: 49,
+    annualPrice: 470, // ~20% off ($588 -> $470)
+    sizeChartLimit: 0, // Unlimited
+    sizeHelperLimit: 0, // Unlimited
+    recommendationLimit: 0, // Unlimited
+    analyticsRetentionDays: 0, // Unlimited
+    showBranding: false,
+    detailedAnalytics: true,
+    customButtonColor: true,
+    prioritySupport: true,
+    apiAccess: true,
+    trialDays: TRIAL_DAYS,
+    description: 'For high-volume stores',
+    features: [
+      'Unlimited size charts',
+      'Unlimited Size Helpers',
+      'Unlimited recommendations',
+      'Unlimited analytics retention',
+      'Per-product analytics',
+      'Custom button colours',
+      'Priority support',
+      'API access',
       'No RMS branding',
     ],
   },
 };
 
+// Legacy tier mappings for backwards compatibility
+const LEGACY_TIER_MAP = {
+  STARTUP: 'FREE',
+  MICRO_ENTERPRISE: 'GROWTH',
+  SMALL_BUSINESS: 'PROFESSIONAL',
+};
+
+/**
+ * Get the actual tier key, handling legacy tier names
+ */
+function normalizeTierKey(tierKey) {
+  return LEGACY_TIER_MAP[tierKey] || tierKey;
+}
+
+/**
+ * Get tier configuration, handling legacy tier names
+ */
+function getTierConfig(tierKey) {
+  const normalizedKey = normalizeTierKey(tierKey);
+  return SUBSCRIPTION_TIERS[normalizedKey] || SUBSCRIPTION_TIERS.FREE;
+}
+
 /**
  * Create a subscription using Shopify Billing API
+ * @param {Object} session - Shopify session
+ * @param {string} tierKey - Tier key (FREE, GROWTH, PROFESSIONAL, ENTERPRISE)
+ * @param {string} returnUrl - URL to return to after approval
+ * @param {boolean} isAnnual - Whether to create an annual subscription
  */
-export async function createSubscription(session, tierKey, returnUrl) {
+export async function createSubscription(session, tierKey, returnUrl, isAnnual = false) {
   const tier = SUBSCRIPTION_TIERS[tierKey];
 
   if (!tier) {
@@ -86,7 +166,7 @@ export async function createSubscription(session, tierKey, returnUrl) {
   if (tier.price === 0) {
     // Free tier - just update the database
     await query(
-      `UPDATE shops SET subscription_tier = $1, subscription_id = NULL WHERE shop_domain = $2`,
+      `UPDATE shops SET subscription_tier = $1, subscription_id = NULL, billing_interval = 'MONTHLY' WHERE shop_domain = $2`,
       [tierKey, session.shop]
     );
     return { success: true, tier: tierKey, confirmationUrl: null };
@@ -98,20 +178,41 @@ export async function createSubscription(session, tierKey, returnUrl) {
     logger.error('Shopify instance not initialized');
     throw new Error('Shopify instance not initialized');
   }
-  logger.info('Creating subscription for tier:', tierKey, 'shop:', session.shop);
+
+  logger.info('Creating subscription for tier:', tierKey, 'shop:', session.shop, 'annual:', isAnnual);
   const client = new shopify.api.clients.Graphql({ session });
 
+  // Calculate price and interval
+  const price = isAnnual ? tier.annualPrice : tier.price;
+  const interval = isAnnual ? 'ANNUAL' : 'EVERY_30_DAYS';
+
+  // Check if shop has already used a trial (prevent trial abuse on reinstall)
+  let trialDays = tier.trialDays || 0;
+  if (trialDays > 0) {
+    const trialCheck = await query(
+      `SELECT trial_used_at FROM shops WHERE shop_domain = $1`,
+      [session.shop]
+    );
+    if (trialCheck.rows.length > 0 && trialCheck.rows[0].trial_used_at) {
+      logger.info('Shop has already used trial, skipping trial days:', session.shop);
+      trialDays = 0;
+    }
+  }
+
+  // Build the mutation with optional trial days
   const mutation = `
-    mutation AppSubscriptionCreate($name: String!, $returnUrl: URL!, $lineItems: [AppSubscriptionLineItemInput!]!) {
+    mutation AppSubscriptionCreate($name: String!, $returnUrl: URL!, $lineItems: [AppSubscriptionLineItemInput!]!${trialDays > 0 ? ', $trialDays: Int!' : ''}) {
       appSubscriptionCreate(
         name: $name
         returnUrl: $returnUrl
         lineItems: $lineItems
-        test: ${process.env.NODE_ENV !== 'production'}
+        ${trialDays > 0 ? 'trialDays: $trialDays' : ''}
+        test: ${process.env.SHOPIFY_BILLING_TEST === 'true' || process.env.NODE_ENV !== 'production'}
       ) {
         appSubscription {
           id
           status
+          trialDays
         }
         confirmationUrl
         userErrors {
@@ -123,22 +224,26 @@ export async function createSubscription(session, tierKey, returnUrl) {
   `;
 
   const variables = {
-    name: `Size Helper - ${tier.name}`,
+    name: `Size Helper - ${tier.name}${isAnnual ? ' (Annual)' : ''}`,
     returnUrl,
     lineItems: [
       {
         plan: {
           appRecurringPricingDetails: {
             price: {
-              amount: tier.price,
+              amount: price,
               currencyCode: 'USD',
             },
-            interval: 'EVERY_30_DAYS',
+            interval,
           },
         },
       },
     ],
   };
+
+  if (trialDays > 0) {
+    variables.trialDays = trialDays;
+  }
 
   try {
     const response = await client.request(mutation, { variables });
@@ -155,6 +260,8 @@ export async function createSubscription(session, tierKey, returnUrl) {
       tier: tierKey,
       subscriptionId: appSubscriptionCreate.appSubscription.id,
       confirmationUrl: appSubscriptionCreate.confirmationUrl,
+      trialDays: appSubscriptionCreate.appSubscription.trialDays,
+      isAnnual,
     };
   } catch (error) {
     logger.error('Failed to create subscription:', error.message);
@@ -165,28 +272,38 @@ export async function createSubscription(session, tierKey, returnUrl) {
 
 /**
  * Confirm subscription after merchant approval
+ * Also marks trial as used if this is the first paid subscription (prevents trial abuse on reinstall)
  */
-export async function confirmSubscription(shopDomain, tierKey, chargeId) {
+export async function confirmSubscription(shopDomain, tierKey, chargeId, isAnnual = false) {
   try {
     const cycleStart = new Date();
     const cycleEnd = new Date();
-    cycleEnd.setDate(cycleEnd.getDate() + 30);
+    // Set cycle end based on billing interval
+    if (isAnnual) {
+      cycleEnd.setFullYear(cycleEnd.getFullYear() + 1);
+    } else {
+      cycleEnd.setDate(cycleEnd.getDate() + 30);
+    }
 
     // Convert charge_id to proper GID format for Shopify GraphQL API
     const subscriptionGid = chargeId ? `gid://shopify/AppSubscription/${chargeId}` : null;
 
+    // Mark trial as used if this is a paid tier (prevents trial abuse on reinstall)
+    // Only set trial_used_at if it's not already set
     await query(
       `UPDATE shops
        SET subscription_tier = $1,
            subscription_id = $2,
            billing_cycle_start = $3,
            billing_cycle_end = $4,
+           billing_interval = $5,
+           trial_used_at = COALESCE(trial_used_at, CURRENT_TIMESTAMP),
            updated_at = CURRENT_TIMESTAMP
-       WHERE shop_domain = $5`,
-      [tierKey, subscriptionGid, cycleStart, cycleEnd, shopDomain]
+       WHERE shop_domain = $6`,
+      [tierKey, subscriptionGid, cycleStart, cycleEnd, isAnnual ? 'ANNUAL' : 'MONTHLY', shopDomain]
     );
 
-    logger.info('Subscription confirmed:', { shopDomain, tier: tierKey, subscriptionGid });
+    logger.info('Subscription confirmed:', { shopDomain, tier: tierKey, subscriptionGid, isAnnual });
     return { success: true };
   } catch (error) {
     logger.error('Failed to confirm subscription:', error);
@@ -259,8 +376,9 @@ export async function cancelSubscription(session) {
     // Update database to free tier
     await query(
       `UPDATE shops
-       SET subscription_tier = 'STARTUP',
+       SET subscription_tier = 'FREE',
            subscription_id = NULL,
+           billing_interval = 'MONTHLY',
            updated_at = CURRENT_TIMESTAMP
        WHERE shop_domain = $1`,
       [session.shop]
@@ -312,9 +430,9 @@ export async function canMakeRecommendation(shopDomain) {
       return { allowed: false, reason: 'Shop not found' };
     }
 
-    const tier = SUBSCRIPTION_TIERS[result.rows[0].subscription_tier] || SUBSCRIPTION_TIERS.STARTUP;
+    const tier = getTierConfig(result.rows[0].subscription_tier);
 
-    // Unlimited recommendations for paid tiers (limit = 0)
+    // Unlimited recommendations (limit = 0)
     if (tier.recommendationLimit === 0) {
       return { allowed: true };
     }
@@ -349,7 +467,7 @@ export async function canMakeRecommendation(shopDomain) {
 export async function getSubscriptionStatus(shopDomain) {
   try {
     const result = await query(
-      `SELECT subscription_tier, subscription_id, billing_cycle_start, billing_cycle_end
+      `SELECT subscription_tier, subscription_id, billing_cycle_start, billing_cycle_end, billing_interval, trial_used_at
        FROM shops WHERE shop_domain = $1`,
       [shopDomain]
     );
@@ -359,7 +477,8 @@ export async function getSubscriptionStatus(shopDomain) {
     }
 
     const shop = result.rows[0];
-    const tier = SUBSCRIPTION_TIERS[shop.subscription_tier] || SUBSCRIPTION_TIERS.STARTUP;
+    const normalizedTierKey = normalizeTierKey(shop.subscription_tier);
+    const tier = getTierConfig(shop.subscription_tier);
 
     // Get counts for both template types
     const countResult = await query(
@@ -378,18 +497,26 @@ export async function getSubscriptionStatus(shopDomain) {
     // Get monthly recommendation count
     const recommendationCount = await getMonthlyRecommendationCount(shopDomain);
 
+    // Calculate limits (0 means unlimited)
+    const sizeChartLimit = tier.sizeChartLimit || Infinity;
+    const sizeHelperLimit = tier.sizeHelperLimit || Infinity;
+
     return {
-      tier: shop.subscription_tier,
+      tier: normalizedTierKey,
       tierName: tier.name,
       price: tier.price,
+      annualPrice: tier.annualPrice,
+      billingInterval: shop.billing_interval || 'MONTHLY',
       // Size chart limits (total templates)
       sizeChartLimit: tier.sizeChartLimit,
       sizeChartCount,
-      sizeChartRemaining: tier.sizeChartLimit - sizeChartCount,
+      sizeChartRemaining: tier.sizeChartLimit === 0 ? null : Math.max(0, sizeChartLimit - sizeChartCount),
+      canCreateSizeChart: tier.sizeChartLimit === 0 || sizeChartCount < sizeChartLimit,
       // Size helper limits (templates with size helper enabled)
       sizeHelperLimit: tier.sizeHelperLimit,
       sizeHelperCount,
-      sizeHelperRemaining: tier.sizeHelperLimit - sizeHelperCount,
+      sizeHelperRemaining: tier.sizeHelperLimit === 0 ? null : Math.max(0, sizeHelperLimit - sizeHelperCount),
+      canCreateSizeHelper: tier.sizeHelperLimit === 0 || sizeHelperCount < sizeHelperLimit,
       // Recommendation limits
       recommendationLimit: tier.recommendationLimit,
       recommendationCount,
@@ -398,10 +525,18 @@ export async function getSubscriptionStatus(shopDomain) {
       showBranding: tier.showBranding,
       detailedAnalytics: tier.detailedAnalytics,
       customButtonColor: tier.customButtonColor,
-      // Legacy field for backwards compatibility
+      prioritySupport: tier.prioritySupport,
+      apiAccess: tier.apiAccess,
+      analyticsRetentionDays: tier.analyticsRetentionDays,
+      trialDays: tier.trialDays,
+      // Trial status (for UI display)
+      trialUsed: !!shop.trial_used_at,
+      trialUsedAt: shop.trial_used_at,
+      // Legacy fields for backwards compatibility
       productTypeLimit: tier.sizeChartLimit,
       productTypeCount: sizeChartCount,
-      remainingSlots: tier.sizeChartLimit - sizeChartCount,
+      remainingSlots: tier.sizeChartLimit === 0 ? null : Math.max(0, sizeChartLimit - sizeChartCount),
+      canCreateMore: tier.sizeChartLimit === 0 || sizeChartCount < sizeChartLimit,
       billingCycleStart: shop.billing_cycle_start,
       billingCycleEnd: shop.billing_cycle_end,
     };
@@ -411,12 +546,27 @@ export async function getSubscriptionStatus(shopDomain) {
   }
 }
 
+/**
+ * Get all available tiers for display
+ */
+export function getAvailableTiers() {
+  return Object.entries(SUBSCRIPTION_TIERS).map(([key, tier]) => ({
+    key,
+    ...tier,
+    annualSavings: tier.price > 0 ? Math.round((tier.price * 12 - tier.annualPrice) / (tier.price * 12) * 100) : 0,
+    monthlyEquivalent: tier.annualPrice > 0 ? (tier.annualPrice / 12).toFixed(2) : 0,
+  }));
+}
+
 export default {
   SUBSCRIPTION_TIERS,
+  TRIAL_DAYS,
+  ANNUAL_DISCOUNT_PERCENT,
   createSubscription,
   confirmSubscription,
   cancelSubscription,
   getSubscriptionStatus,
   getMonthlyRecommendationCount,
   canMakeRecommendation,
+  getAvailableTiers,
 };

@@ -39,6 +39,7 @@ backend/
       cleanupService.js      # Scheduled analytics data retention cleanup (daily 3am UTC)
     utils/
       authHelpers.js         # Client-side JS injected into all admin pages (App Bridge init, authenticated fetch, toast, confirm modal, navigation)
+      shopifyGraphql.js      # Shopify GraphQL wrapper with 401 retry via token exchange
       logger.js              # Structured logger with emoji prefixes
       templateLoader.js      # HTML template loader with {{variable}} replacement
       asyncHandler.js        # Express async error wrapper
@@ -131,6 +132,7 @@ The recommendation algorithm considers: usual size, body shape (+/- size adjustm
 - **Date parsing:** PostgreSQL DATE type parser is overridden to return strings (`YYYY-MM-DD`) to avoid timezone shift issues.
 - **Client-side 401 retry:** `authenticatedFetch` in authHelpers.js retries once with a fresh session token when the server returns 401 with `X-Shopify-Retry-Invalid-Session-Request` header. This handles expired/invalid JWT tokens that App Bridge's built-in fetch would normally auto-retry.
 - **Stale access tokens:** If Shopify revokes an access token (e.g., after uninstall/reinstall or scope change), the JWT still validates locally but Shopify API calls return 401. All Shopify GraphQL API calls go through `shopifyGraphqlRequest()` in `utils/shopifyGraphql.js`, which catches 401 errors, performs a token exchange to get a fresh access token, and retries the request once. The auth context (`sessionToken`, `sessionStorage`) is attached to `res.locals.shopify` by the `verifyShop` middleware and must be passed through to service functions that make Shopify API calls.
+- **Session objects must be `Session` class instances:** `PostgreSQLSessionStorage.storeSession()` calls `session.toPropertyArray()` internally, which only exists on `@shopify/shopify-api`'s `Session` class. When creating sessions manually (e.g., in token exchange or database recovery), always use `new Session({...})` from `@shopify/shopify-api`, never plain objects. Plain objects will cause `session.toPropertyArray is not a function` errors.
 
 ## Environment Variables
 

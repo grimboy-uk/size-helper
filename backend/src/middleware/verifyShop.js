@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { Session } from '@shopify/shopify-api';
 import { createLogger } from '../utils/logger.js';
 import { query } from '../config/database.js';
 
@@ -44,15 +45,15 @@ export async function performTokenExchange(shopDomain, sessionToken, sessionStor
 
     logger.info('Token exchange successful for shop:', shopDomain);
 
-    // Create session object
-    const session = {
+    // Create proper Session instance (required by session storage's storeSession)
+    const session = new Session({
       id: `offline_${shopDomain}`,
       shop: shopDomain,
       state: '',
       isOnline: false,
       accessToken: data.access_token,
       scope: data.scope || process.env.SHOPIFY_SCOPES,
-    };
+    });
 
     // Store in session storage
     await sessionStorage.storeSession(session);
@@ -259,15 +260,15 @@ async function recoverSessionFromDatabase(shopDomain, sessionStorage) {
 
     const shopData = result.rows[0];
 
-    // Reconstruct session object
-    const session = {
+    // Reconstruct proper Session instance (required by session storage's storeSession)
+    const session = new Session({
       id: `offline_${shopDomain}`,
       shop: shopDomain,
       state: '',
       isOnline: false,
       accessToken: shopData.access_token,
       scope: shopData.scope || process.env.SHOPIFY_SCOPES,
-    };
+    });
 
     // Store the recovered session back to session storage
     await sessionStorage.storeSession(session);

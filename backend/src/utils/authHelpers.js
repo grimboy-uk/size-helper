@@ -53,7 +53,8 @@ export const authHelpersScript = `
   }
 
   // Authenticated fetch wrapper - automatically adds Bearer token
-  async function authenticatedFetch(url, options = {}) {
+  // Retries once with a fresh token if the server returns 401 with retry header
+  async function authenticatedFetch(url, options = {}, _isRetry = false) {
     try {
       const token = await getSessionToken();
       console.log('Session token obtained:', token ? 'Yes (length: ' + token.length + ')' : 'No');
@@ -65,12 +66,21 @@ export const authHelpersScript = `
         'Authorization': 'Bearer ' + token,
       };
 
-      console.log('Request headers:', headers);
       const response = await fetch(url, {
         ...options,
         headers,
       });
       console.log('Response status:', response.status);
+
+      // If 401 with retry header and this is the first attempt,
+      // get a fresh session token and retry once
+      if (response.status === 401 && !_isRetry) {
+        const shouldRetry = response.headers.get('X-Shopify-Retry-Invalid-Session-Request');
+        if (shouldRetry) {
+          console.log('Server requested session retry, fetching fresh token...');
+          return authenticatedFetch(url, options, true);
+        }
+      }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

@@ -122,12 +122,15 @@ The recommendation algorithm considers: usual size, body shape (+/- size adjustm
 
 ## Common Gotchas
 
-- **Two auth flows coexist:** The Shopify library's `ensureInstalledOnShop` (root route only) and the custom `verifyShopDocument` middleware (all other pages). They redirect to different exit-iframe paths.
+- **Two auth flows coexist:** The Shopify library's `ensureInstalledOnShop` (root route only) and the custom `verifyShopDocument` middleware (all other pages). They redirect to different exit-iframe paths (`/exitiframe` vs `/auth/exit-iframe`). Both must have route handlers.
 - **Session storage vs database:** Sessions can be lost from PostgreSQL session storage but recovered from the `shops` table's `access_token` column, or via token exchange.
+- **Uninstall/reinstall shop record gap:** On uninstall, the `APP_UNINSTALLED` webhook deletes the `shops` row, but session storage may retain the old session. On reinstall, `ensureInstalledOnShop` finds the stale session and skips OAuth, so no new `shops` row is created. The `verifyShop` middleware now checks for and auto-creates missing shop records to handle this. Any new route that queries the `shops` table should be aware of this edge case.
 - **Billing callback:** The billing callback route is at `/billing/callback` (not under `/api`), registered before the auth middleware.
 - **Template loader:** Uses simple `{{variable}}` replacement — no escaping. Variables in HTML templates must not conflict with JS template literals.
 - **Content Security Policy:** Helmet CSP is configured to allow Shopify CDN scripts and inline scripts/styles (required for embedded app).
 - **Date parsing:** PostgreSQL DATE type parser is overridden to return strings (`YYYY-MM-DD`) to avoid timezone shift issues.
+- **Client-side 401 retry:** `authenticatedFetch` in authHelpers.js retries once with a fresh session token when the server returns 401 with `X-Shopify-Retry-Invalid-Session-Request` header. This handles expired/invalid JWT tokens that App Bridge's built-in fetch would normally auto-retry.
+- **Stale access tokens:** If Shopify revokes an access token (e.g., scope change), the app still uses it because the JWT validates locally. Shopify API calls will fail silently. No proactive token validation is implemented — this is a known limitation.
 
 ## Environment Variables
 

@@ -304,8 +304,29 @@ export function verifyShopDocument(sessionStorage) {
         session = await recoverSessionFromDatabase(shop, sessionStorage);
       }
 
-      // If we have a valid session, continue
+      // If we have a valid session, ensure shop record exists and continue
       if (session?.accessToken) {
+        try {
+          const shopCheck = await query(
+            `SELECT id FROM shops WHERE shop_domain = $1`,
+            [shop]
+          );
+          if (shopCheck.rows.length === 0) {
+            logger.info('Shop record missing in document request, creating:', shop);
+            const cycleStart = new Date();
+            const cycleEnd = new Date();
+            cycleEnd.setDate(cycleEnd.getDate() + 30);
+            await query(
+              `INSERT INTO shops (shop_domain, access_token, scope, billing_cycle_start, billing_cycle_end)
+               VALUES ($1, $2, $3, $4, $5)
+               ON CONFLICT (shop_domain) DO NOTHING`,
+              [shop, session.accessToken, session.scope || process.env.SHOPIFY_SCOPES, cycleStart, cycleEnd]
+            );
+          }
+        } catch (shopCheckError) {
+          logger.warn('Failed to verify/create shop record in document request:', shopCheckError.message);
+        }
+
         res.locals.shopify = {
           session,
           shopDomain: shop,

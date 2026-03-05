@@ -196,6 +196,31 @@ export function verifyShop(sessionStorage) {
         });
       }
 
+      // Ensure the shop record exists in the database.
+      // After an uninstall+reinstall, the session may survive in storage
+      // but the shops row was deleted by the uninstall webhook.
+      try {
+        const shopCheck = await query(
+          `SELECT id FROM shops WHERE shop_domain = $1`,
+          [shopDomain]
+        );
+        if (shopCheck.rows.length === 0) {
+          logger.info('Shop record missing after auth, creating:', shopDomain);
+          const cycleStart = new Date();
+          const cycleEnd = new Date();
+          cycleEnd.setDate(cycleEnd.getDate() + 30);
+          await query(
+            `INSERT INTO shops (shop_domain, access_token, scope, billing_cycle_start, billing_cycle_end)
+             VALUES ($1, $2, $3, $4, $5)
+             ON CONFLICT (shop_domain) DO NOTHING`,
+            [shopDomain, session.accessToken, session.scope || process.env.SHOPIFY_SCOPES, cycleStart, cycleEnd]
+          );
+        }
+      } catch (shopCheckError) {
+        logger.warn('Failed to verify/create shop record:', shopCheckError.message);
+        // Non-fatal: continue anyway, individual routes can handle missing shop
+      }
+
       // Attach session and shop info to response locals
       res.locals.shopify = {
         session,

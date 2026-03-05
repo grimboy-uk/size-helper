@@ -426,8 +426,9 @@
         const subscriptionData = await apiGet('/api/billing/current');
         const sub = subscriptionData.subscription;
 
-        document.getElementById('status-message').textContent =
-          `${sub.tierName} Plan - Using ${sub.productTypeCount} of ${sub.productTypeLimit} size templates`;
+        document.getElementById('status-message').textContent = sub.productTypeLimit
+          ? `${sub.tierName} Plan - Using ${sub.productTypeCount} of ${sub.productTypeLimit} size templates`
+          : `${sub.tierName} Plan - Using ${sub.productTypeCount} size templates (unlimited)`;
 
         // Load analytics
         const analyticsData = await apiGet('/api/analytics/dashboard');

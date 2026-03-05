@@ -262,22 +262,29 @@
       const fill = document.getElementById('usage-fill');
       const text = document.getElementById('usage-text');
 
-      const percentage = (subscription.productTypeCount / subscription.productTypeLimit) * 100;
+      // A limit of 0 or null means unlimited
+      const isUnlimited = !subscription.productTypeLimit;
 
-      fill.style.width = percentage + '%';
-      fill.className = 'usage-fill';
-      if (percentage >= 90) {
-        fill.classList.add('danger');
-      } else if (percentage >= 70) {
-        fill.classList.add('warning');
+      if (isUnlimited) {
+        fill.style.width = '0%';
+        fill.className = 'usage-fill';
+        text.textContent = `${subscription.productTypeCount} templates used (${subscription.tierName} plan — unlimited)`;
+      } else {
+        const percentage = (subscription.productTypeCount / subscription.productTypeLimit) * 100;
+        fill.style.width = percentage + '%';
+        fill.className = 'usage-fill';
+        if (percentage >= 90) {
+          fill.classList.add('danger');
+        } else if (percentage >= 70) {
+          fill.classList.add('warning');
+        }
+        text.textContent = `${subscription.productTypeCount} of ${subscription.productTypeLimit} templates used (${subscription.tierName} plan)`;
       }
-
-      text.textContent = `${subscription.productTypeCount} of ${subscription.productTypeLimit} templates used (${subscription.tierName} plan)`;
       container.style.display = 'block';
 
-      // Disable create button if at limit
+      // Disable create button if at limit (unlimited tiers never hit limit)
       const createBtn = document.getElementById('create-btn');
-      if (!subscription.canCreateMore) {
+      if (!isUnlimited && !subscription.canCreateMore) {
         createBtn.classList.remove('btn-primary');
         createBtn.classList.add('btn-secondary');
         createBtn.onclick = (e) => {

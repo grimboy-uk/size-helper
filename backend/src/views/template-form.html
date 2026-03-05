@@ -1188,12 +1188,12 @@
       const helperCount = subscriptionInfo.sizeHelperCount || 0;
       const helperLimit = subscriptionInfo.sizeHelperLimit || 0;
 
-      chartsEl.textContent = `${chartCount}/${chartLimit}`;
-      helpersEl.textContent = `${helperCount}/${helperLimit}`;
+      chartsEl.textContent = chartLimit ? `${chartCount}/${chartLimit}` : `${chartCount}/∞`;
+      helpersEl.textContent = helperLimit ? `${helperCount}/${helperLimit}` : `${helperCount}/∞`;
 
-      // Highlight if at limit
-      chartsEl.classList.toggle('at-limit', chartCount >= chartLimit);
-      helpersEl.classList.toggle('at-limit', helperCount >= helperLimit);
+      // Highlight if at limit (unlimited tiers never hit limit)
+      chartsEl.classList.toggle('at-limit', chartLimit > 0 && chartCount >= chartLimit);
+      helpersEl.classList.toggle('at-limit', helperLimit > 0 && helperCount >= helperLimit);
     }
 
     function updateButtonColorAccess() {

@@ -70,19 +70,20 @@ export function subscriptionCheck(options = {}) {
       const sizeHelperCount = Number.parseInt(counts.size_helper_count, 10);
 
       // Attach subscription info
+      // A limit of 0 means unlimited
       req.subscriptionInfo = {
         tier: shop.subscription_tier,
         tierName: tier.name,
         // Size chart limits (total templates)
         sizeChartLimit: tier.sizeChartLimit,
         sizeChartCount,
-        canCreateSizeChart: sizeChartCount < tier.sizeChartLimit,
-        sizeChartRemaining: tier.sizeChartLimit - sizeChartCount,
+        canCreateSizeChart: tier.sizeChartLimit === 0 || sizeChartCount < tier.sizeChartLimit,
+        sizeChartRemaining: tier.sizeChartLimit === 0 ? null : tier.sizeChartLimit - sizeChartCount,
         // Size helper limits (templates with size helper enabled)
         sizeHelperLimit: tier.sizeHelperLimit,
         sizeHelperCount,
-        canCreateSizeHelper: sizeHelperCount < tier.sizeHelperLimit,
-        sizeHelperRemaining: tier.sizeHelperLimit - sizeHelperCount,
+        canCreateSizeHelper: tier.sizeHelperLimit === 0 || sizeHelperCount < tier.sizeHelperLimit,
+        sizeHelperRemaining: tier.sizeHelperLimit === 0 ? null : tier.sizeHelperLimit - sizeHelperCount,
         // Feature flags
         showBranding: tier.showBranding,
         detailedAnalytics: tier.detailedAnalytics,
@@ -91,8 +92,8 @@ export function subscriptionCheck(options = {}) {
         // Legacy fields for backwards compatibility
         productTypeLimit: tier.sizeChartLimit,
         productTypeCount: sizeChartCount,
-        canCreateMore: sizeChartCount < tier.sizeChartLimit,
-        remainingSlots: tier.sizeChartLimit - sizeChartCount,
+        canCreateMore: tier.sizeChartLimit === 0 || sizeChartCount < tier.sizeChartLimit,
+        remainingSlots: tier.sizeChartLimit === 0 ? null : tier.sizeChartLimit - sizeChartCount,
       };
 
       // Optionally enforce size chart limit

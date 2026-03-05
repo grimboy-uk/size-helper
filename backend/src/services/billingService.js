@@ -1,6 +1,6 @@
 import { query } from '../config/database.js';
 import { createLogger } from '../utils/logger.js';
-import { getShopifyInstance } from './webhookService.js';
+import { shopifyGraphqlRequest } from '../utils/shopifyGraphql.js';
 
 const logger = createLogger('Billing');
 
@@ -156,7 +156,7 @@ function getTierConfig(tierKey) {
  * @param {string} returnUrl - URL to return to after approval
  * @param {boolean} isAnnual - Whether to create an annual subscription
  */
-export async function createSubscription(session, tierKey, returnUrl, isAnnual = false) {
+export async function createSubscription(session, tierKey, returnUrl, isAnnual = false, authContext = null) {
   const tier = SUBSCRIPTION_TIERS[tierKey];
 
   if (!tier) {
@@ -173,16 +173,7 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
   }
 
   // Create paid subscription via Shopify GraphQL
-  const shopify = getShopifyInstance();
-  if (!shopify) {
-    logger.error('Shopify instance not initialized');
-    throw new Error('Shopify instance not initialized');
-  }
-
   logger.info('Creating subscription for tier:', tierKey, 'shop:', session.shop, 'annual:', isAnnual);
-  logger.info('Creating GraphQL client with session:', { shop: session.shop, hasAccessToken: !!session.accessToken });
-  const client = new shopify.api.clients.Graphql({ session });
-  logger.info('GraphQL client created successfully');
 
   // Calculate price and interval
   const price = isAnnual ? tier.annualPrice : tier.price;
@@ -269,11 +260,15 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
   }
 
   logger.info('Subscription mutation variables:', JSON.stringify(variables, null, 2));
-  logger.info('Subscription mutation:', mutation);
   logger.info('About to call Shopify GraphQL API...');
 
   try {
-    const response = await client.request(mutation, { variables });
+    const response = await shopifyGraphqlRequest({
+      session,
+      query: mutation,
+      variables,
+      authContext,
+    });
     logger.info('Shopify GraphQL API call completed');
     logger.info('Subscription API response:', JSON.stringify(response, null, 2));
 
@@ -367,7 +362,7 @@ export async function confirmSubscription(shopDomain, tierKey, chargeId, isAnnua
 /**
  * Cancel subscription (downgrade to free tier)
  */
-export async function cancelSubscription(session) {
+export async function cancelSubscription(session, authContext = null) {
   try {
     // Get current subscription ID
     const result = await query(
@@ -384,14 +379,6 @@ export async function cancelSubscription(session) {
 
     if (subscriptionId) {
       // Cancel via Shopify GraphQL
-      const shopify = getShopifyInstance();
-      if (!shopify) {
-        logger.error('Shopify instance not initialized');
-        throw new Error('Shopify instance not initialized');
-      }
-
-      const client = new shopify.api.clients.Graphql({ session });
-
       const mutation = `
         mutation AppSubscriptionCancel($id: ID!) {
           appSubscriptionCancel(id: $id) {
@@ -408,8 +395,11 @@ export async function cancelSubscription(session) {
       `;
 
       try {
-        const response = await client.request(mutation, {
+        const response = await shopifyGraphqlRequest({
+          session,
+          query: mutation,
           variables: { id: subscriptionId },
+          authContext,
         });
 
         const { appSubscriptionCancel } = response.data;

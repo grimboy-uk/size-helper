@@ -130,7 +130,7 @@ The recommendation algorithm considers: usual size, body shape (+/- size adjustm
 - **Content Security Policy:** Helmet CSP is configured to allow Shopify CDN scripts and inline scripts/styles (required for embedded app).
 - **Date parsing:** PostgreSQL DATE type parser is overridden to return strings (`YYYY-MM-DD`) to avoid timezone shift issues.
 - **Client-side 401 retry:** `authenticatedFetch` in authHelpers.js retries once with a fresh session token when the server returns 401 with `X-Shopify-Retry-Invalid-Session-Request` header. This handles expired/invalid JWT tokens that App Bridge's built-in fetch would normally auto-retry.
-- **Stale access tokens:** If Shopify revokes an access token (e.g., scope change), the app still uses it because the JWT validates locally. Shopify API calls will fail silently. No proactive token validation is implemented — this is a known limitation.
+- **Stale access tokens:** If Shopify revokes an access token (e.g., after uninstall/reinstall or scope change), the JWT still validates locally but Shopify API calls return 401. All Shopify GraphQL API calls go through `shopifyGraphqlRequest()` in `utils/shopifyGraphql.js`, which catches 401 errors, performs a token exchange to get a fresh access token, and retries the request once. The auth context (`sessionToken`, `sessionStorage`) is attached to `res.locals.shopify` by the `verifyShop` middleware and must be passed through to service functions that make Shopify API calls.
 
 ## Environment Variables
 

@@ -67,7 +67,11 @@ router.post(
     const returnUrl = `${appUrl}/billing/callback?shop=${session.shop}&tier=${tier}&host=${encodeURIComponent(host || '')}&annual=${annual}`;
 
     try {
-      const result = await createSubscription(session, tier, returnUrl, annual);
+      const authContext = {
+          sessionToken: res.locals.shopify.sessionToken,
+          sessionStorage: res.locals.shopify.sessionStorage,
+        };
+      const result = await createSubscription(session, tier, returnUrl, annual, authContext);
 
       if (result.confirmationUrl) {
         // Paid tier - redirect to Shopify approval
@@ -103,7 +107,11 @@ router.post(
     const session = res.locals.shopify.session;
 
     try {
-      await cancelSubscription(session);
+      const authContext = {
+          sessionToken: res.locals.shopify.sessionToken,
+          sessionStorage: res.locals.shopify.sessionStorage,
+        };
+      await cancelSubscription(session, authContext);
       res.json({ success: true, message: 'Subscription cancelled, downgraded to Free tier' });
     } catch (error) {
       logger.error('Subscription cancellation failed:', error);

@@ -2,7 +2,7 @@ import express from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { query } from '../config/database.js';
 import { createLogger } from '../utils/logger.js';
-import { getShopifyInstance } from '../services/webhookService.js';
+import { shopifyGraphqlRequest } from '../utils/shopifyGraphql.js';
 
 const router = express.Router();
 const logger = createLogger('ProductsRoute');
@@ -166,9 +166,6 @@ router.get(
     const session = res.locals.shopify.session;
     const { query: searchQuery, limit = 25 } = req.query;
 
-    const shopify = getShopifyInstance();
-    const client = new shopify.api.clients.Graphql({ session });
-
     const gqlQuery = `
       query SearchProducts($query: String, $first: Int!) {
         products(first: $first, query: $query) {
@@ -194,10 +191,16 @@ router.get(
       }
     `;
 
-    const response = await client.request(gqlQuery, {
+    const response = await shopifyGraphqlRequest({
+      session,
+      query: gqlQuery,
       variables: {
         query: searchQuery || '',
         first: parseInt(limit, 10),
+      },
+      authContext: {
+        sessionToken: res.locals.shopify.sessionToken,
+        sessionStorage: res.locals.shopify.sessionStorage,
       },
     });
 

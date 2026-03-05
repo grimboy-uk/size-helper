@@ -9,7 +9,7 @@ const logger = createLogger('Auth');
  * Exchanges a session token (JWT) for an offline access token
  * https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/token-exchange
  */
-async function performTokenExchange(shopDomain, sessionToken, sessionStorage) {
+export async function performTokenExchange(shopDomain, sessionToken, sessionStorage) {
   try {
     logger.info('Attempting token exchange for shop:', shopDomain);
 
@@ -221,10 +221,14 @@ export function verifyShop(sessionStorage) {
         // Non-fatal: continue anyway, individual routes can handle missing shop
       }
 
-      // Attach session and shop info to response locals
+      // Attach session, shop info, and auth context to response locals
+      // sessionToken and sessionStorage are needed for token exchange retry
+      // when Shopify API calls fail with 401 due to stale access tokens
       res.locals.shopify = {
         session,
         shopDomain,
+        sessionToken: token,
+        sessionStorage,
       };
 
       logger.debug('Shop verified successfully:', shopDomain);

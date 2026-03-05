@@ -217,6 +217,28 @@ app.get('/auth/session-token', (req, res) => {
   res.redirect(exitIframeUrl);
 });
 
+// Exit iframe endpoint used by shopify.ensureInstalledOnShop() (default library path)
+// This is separate from /auth/exit-iframe used by the custom bounce flow
+app.get('/exitiframe', (req, res) => {
+  const { shop, host } = req.query;
+
+  if (!shop) {
+    return res.status(400).send('Missing shop parameter');
+  }
+
+  const authUrl = `${shopify.config.auth.path}?shop=${encodeURIComponent(shop)}`;
+
+  try {
+    const html = loadTemplate('exit-iframe', {
+      redirectUrl: authUrl,
+    });
+    res.send(html);
+  } catch (error) {
+    logger.error('Error loading exit-iframe page:', error);
+    res.redirect(authUrl);
+  }
+});
+
 // Webhook routes (before auth middleware)
 app.use('/api/webhooks', webhooksRouter);
 

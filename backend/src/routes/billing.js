@@ -1,13 +1,15 @@
 import express from 'express';
+import { Session } from '@shopify/shopify-api';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import {
   SUBSCRIPTION_TIERS,
   createSubscription,
-  confirmSubscription,
   cancelSubscription,
+  syncSubscriptionStatus,
   getSubscriptionStatus,
   getAvailableTiers,
 } from '../services/billingService.js';
+import { query } from '../config/database.js';
 import { createLogger } from '../utils/logger.js';
 
 const router = express.Router();
@@ -64,7 +66,7 @@ router.post(
       appUrl = `https://${appUrl}`;
     }
     const annual = isAnnual === true || isAnnual === 'true';
-    const returnUrl = `${appUrl}/billing/callback?shop=${session.shop}&tier=${tier}&host=${encodeURIComponent(host || '')}&annual=${annual}`;
+    const returnUrl = `${appUrl}/billing/callback?shop=${session.shop}&host=${encodeURIComponent(host || '')}`;
 
     try {
       const authContext = {
@@ -122,47 +124,70 @@ router.post(
 
 /**
  * GET /billing/callback
- * Callback from Shopify after subscription approval
- * (Not under /api - direct page load)
+ * Callback from Shopify after subscription approval (or decline)
+ * (Not under /api - direct page load, unauthenticated)
+ *
+ * Instead of blindly trusting the charge_id URL param, we recover the shop's
+ * session from the DB and call syncSubscriptionStatus to read Shopify's
+ * activeSubscriptions — the ground truth for what was actually approved.
  */
-export function billingCallbackHandler(req, res) {
+export async function billingCallbackHandler(req, res) {
   logger.info('Billing callback received:', req.query);
-  const { shop, tier, charge_id, host, annual } = req.query;
+  const { shop, host } = req.query;
 
-  if (!shop || !tier) {
-    logger.error('Billing callback missing parameters:', { shop, tier });
-    return res.status(400).send('Missing parameters');
+  if (!shop || !/^[a-zA-Z0-9][a-zA-Z0-9-]*\.myshopify\.com$/.test(shop)) {
+    logger.error('Billing callback missing or invalid shop parameter:', shop);
+    return res.status(400).send('Missing or invalid parameters');
   }
 
-  const isAnnual = annual === 'true';
-  logger.info('Processing billing callback:', { shop, tier, charge_id, isAnnual });
+  const redirectSuccess = () => {
+    if (host) {
+      res.redirect(`/?shop=${shop}&host=${encodeURIComponent(host)}&billing=success`);
+    } else {
+      const storeName = shop.replace('.myshopify.com', '');
+      res.redirect(`https://admin.shopify.com/store/${storeName}/apps/${process.env.SHOPIFY_API_KEY}/settings?billing=success`);
+    }
+  };
 
-  // Confirm the subscription
-  confirmSubscription(shop, tier, charge_id, isAnnual)
-    .then(() => {
-      logger.info('Subscription confirmed successfully:', { shop, tier });
-      // Redirect back to app
-      // If host is provided, use it; otherwise redirect to Shopify admin embedded app URL
-      if (host) {
-        res.redirect(`/?shop=${shop}&host=${encodeURIComponent(host)}&billing=success`);
-      } else {
-        // Construct Shopify admin URL for embedded app
-        // Shop format: mystore.myshopify.com -> admin URL: admin.shopify.com/store/mystore
-        const storeName = shop.replace('.myshopify.com', '');
-        const embeddedUrl = `https://admin.shopify.com/store/${storeName}/apps/${process.env.SHOPIFY_API_KEY}/settings?billing=success`;
-        res.redirect(embeddedUrl);
-      }
-    })
-    .catch((error) => {
-      logger.error('Billing callback error:', error);
-      if (host) {
-        res.redirect(`/?shop=${shop}&host=${encodeURIComponent(host)}&billing=error`);
-      } else {
-        const storeName = shop.replace('.myshopify.com', '');
-        const embeddedUrl = `https://admin.shopify.com/store/${storeName}/apps/${process.env.SHOPIFY_API_KEY}/settings?billing=error`;
-        res.redirect(embeddedUrl);
-      }
+  const redirectError = () => {
+    if (host) {
+      res.redirect(`/?shop=${shop}&host=${encodeURIComponent(host)}&billing=error`);
+    } else {
+      const storeName = shop.replace('.myshopify.com', '');
+      res.redirect(`https://admin.shopify.com/store/${storeName}/apps/${process.env.SHOPIFY_API_KEY}/settings?billing=error`);
+    }
+  };
+
+  try {
+    // Recover session from DB (same pattern as verifyShop middleware)
+    const result = await query(
+      `SELECT access_token, scope FROM shops WHERE shop_domain = $1`,
+      [shop]
+    );
+
+    if (result.rows.length === 0 || !result.rows[0].access_token) {
+      logger.error('No shop record with access token for billing callback:', shop);
+      return redirectError();
+    }
+
+    const shopData = result.rows[0];
+    const session = new Session({
+      id: `offline_${shop}`,
+      shop,
+      state: '',
+      isOnline: false,
+      accessToken: shopData.access_token,
+      scope: shopData.scope || process.env.SHOPIFY_SCOPES,
     });
+
+    // Sync subscription state from Shopify's ground truth
+    await syncSubscriptionStatus(session);
+    logger.info('Subscription synced from Shopify after billing callback:', shop);
+    redirectSuccess();
+  } catch (error) {
+    logger.error('Billing callback error:', error);
+    redirectError();
+  }
 }
 
 export default router;

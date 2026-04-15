@@ -164,9 +164,45 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
   }
 
   if (tier.price === 0) {
-    // Free tier - just update the database
+    // Free tier - cancel existing Shopify subscription (if any) then update the database
+    try {
+      const existing = await query(
+        `SELECT subscription_id FROM shops WHERE shop_domain = $1`,
+        [session.shop]
+      );
+      const subscriptionId = existing.rows[0]?.subscription_id;
+      if (subscriptionId) {
+        logger.info('Cancelling existing Shopify subscription before downgrade to FREE:', { shop: session.shop, subscriptionId });
+        try {
+          const cancelResponse = await shopifyGraphqlRequest({
+            session,
+            query: `
+              mutation AppSubscriptionCancel($id: ID!) {
+                appSubscriptionCancel(id: $id) {
+                  appSubscription { id status }
+                  userErrors { field message }
+                }
+              }
+            `,
+            variables: { id: subscriptionId },
+            authContext,
+          });
+          const cancelErrors = cancelResponse.data?.appSubscriptionCancel?.userErrors;
+          if (cancelErrors?.length > 0) {
+            logger.warn('Cancel subscription userErrors during FREE downgrade:', cancelErrors);
+          } else {
+            logger.info('Shopify subscription cancelled during FREE downgrade:', subscriptionId);
+          }
+        } catch (cancelError) {
+          logger.error('Failed to cancel Shopify subscription during FREE downgrade (continuing):', cancelError.message);
+        }
+      }
+    } catch (lookupError) {
+      logger.error('Failed to look up existing subscription (continuing):', lookupError.message);
+    }
+
     await query(
-      `UPDATE shops SET subscription_tier = $1, subscription_id = NULL, billing_interval = 'MONTHLY' WHERE shop_domain = $2`,
+      `UPDATE shops SET subscription_tier = $1, subscription_id = NULL, billing_interval = 'MONTHLY', updated_at = CURRENT_TIMESTAMP WHERE shop_domain = $2`,
       [tierKey, session.shop]
     );
     return { success: true, tier: tierKey, confirmationUrl: null };
@@ -601,6 +637,120 @@ export function getAvailableTiers() {
   }));
 }
 
+/**
+ * Map a price amount back to a tier key by comparing against known tier prices
+ * @param {number} price - The price amount from Shopify
+ * @param {boolean} isAnnual - Whether this is an annual subscription
+ * @returns {string} The tier key (FREE, GROWTH, PROFESSIONAL, ENTERPRISE)
+ */
+function mapPriceToTier(price, isAnnual) {
+  const amount = parseFloat(price);
+  for (const [key, tier] of Object.entries(SUBSCRIPTION_TIERS)) {
+    const tierPrice = isAnnual ? tier.annualPrice : tier.price;
+    if (tierPrice === amount) {
+      return key;
+    }
+  }
+  logger.warn('Could not map price to tier:', { price, isAnnual });
+  return null;
+}
+
+/**
+ * Sync subscription status from Shopify's ground truth
+ * Queries currentAppInstallation.activeSubscriptions and reconciles the DB
+ * @param {Object} session - Shopify session with accessToken
+ * @param {Object} [authContext] - Auth context for token exchange retry
+ */
+export async function syncSubscriptionStatus(session, authContext = null) {
+  const response = await shopifyGraphqlRequest({
+    session,
+    query: `
+      query {
+        currentAppInstallation {
+          activeSubscriptions {
+            id
+            name
+            status
+            createdAt
+            currentPeriodEnd
+            lineItems {
+              plan {
+                pricingDetails {
+                  ... on AppRecurringPricing {
+                    interval
+                    price {
+                      amount
+                      currencyCode
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `,
+    authContext,
+  });
+
+  const subscriptions = response.data?.currentAppInstallation?.activeSubscriptions || [];
+  logger.info('Active subscriptions from Shopify:', JSON.stringify(subscriptions));
+
+  if (subscriptions.length === 0) {
+    // No active Shopify subscription — ensure DB reflects FREE tier
+    logger.info('No active subscriptions, setting shop to FREE:', session.shop);
+    await query(
+      `UPDATE shops
+       SET subscription_tier = 'FREE',
+           subscription_id = NULL,
+           billing_interval = 'MONTHLY',
+           updated_at = CURRENT_TIMESTAMP
+       WHERE shop_domain = $1`,
+      [session.shop]
+    );
+    return;
+  }
+
+  const activeSub = subscriptions[0];
+  const pricingDetails = activeSub.lineItems[0]?.plan?.pricingDetails;
+  const price = parseFloat(pricingDetails?.price?.amount || '0');
+  const interval = pricingDetails?.interval;
+  const isAnnual = interval === 'ANNUAL';
+  const tierKey = mapPriceToTier(price, isAnnual);
+
+  if (!tierKey) {
+    // Could not map the Shopify price to a known tier — skip DB update to avoid silent downgrade
+    logger.error('Skipping subscription sync — unknown price/tier mapping:', { shop: session.shop, price, isAnnual });
+    return;
+  }
+
+  // Use Shopify's actual period dates when available, fall back to calculated dates
+  const cycleStart = activeSub.createdAt ? new Date(activeSub.createdAt) : new Date();
+  const cycleEnd = activeSub.currentPeriodEnd
+    ? new Date(activeSub.currentPeriodEnd)
+    : (() => {
+        const end = new Date();
+        if (isAnnual) end.setFullYear(end.getFullYear() + 1);
+        else end.setDate(end.getDate() + 30);
+        return end;
+      })();
+
+  logger.info('Syncing subscription from Shopify:', { shop: session.shop, tierKey, subscriptionId: activeSub.id, isAnnual });
+
+  await query(
+    `UPDATE shops
+     SET subscription_tier = $1,
+         subscription_id = $2,
+         billing_cycle_start = $3,
+         billing_cycle_end = $4,
+         billing_interval = $5,
+         trial_used_at = COALESCE(trial_used_at, CURRENT_TIMESTAMP),
+         updated_at = CURRENT_TIMESTAMP
+     WHERE shop_domain = $6`,
+    [tierKey, activeSub.id, cycleStart, cycleEnd, isAnnual ? 'ANNUAL' : 'MONTHLY', session.shop]
+  );
+}
+
 export default {
   SUBSCRIPTION_TIERS,
   TRIAL_DAYS,
@@ -608,6 +758,7 @@ export default {
   createSubscription,
   confirmSubscription,
   cancelSubscription,
+  syncSubscriptionStatus,
   getSubscriptionStatus,
   getMonthlyRecommendationCount,
   canMakeRecommendation,

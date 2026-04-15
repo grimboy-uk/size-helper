@@ -189,7 +189,12 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
           });
           const cancelErrors = cancelResponse.data?.appSubscriptionCancel?.userErrors;
           if (cancelErrors?.length > 0) {
-            logger.warn('Cancel subscription userErrors during FREE downgrade:', cancelErrors);
+            const isAlreadyInactive = cancelErrors.some(e => e.message?.includes('InvalidTransitionError'));
+            if (isAlreadyInactive) {
+              logger.info('Subscription already inactive on Shopify during FREE downgrade (stale subscription_id will be cleared):', subscriptionId);
+            } else {
+              logger.warn('Cancel subscription userErrors during FREE downgrade:', cancelErrors);
+            }
           } else {
             logger.info('Shopify subscription cancelled during FREE downgrade:', subscriptionId);
           }
@@ -440,7 +445,12 @@ export async function cancelSubscription(session, authContext = null) {
 
         const { appSubscriptionCancel } = response.data;
         if (appSubscriptionCancel?.userErrors?.length > 0) {
-          logger.error('Subscription cancellation errors:', appSubscriptionCancel.userErrors);
+          const isAlreadyInactive = appSubscriptionCancel.userErrors.some(e => e.message?.includes('InvalidTransitionError'));
+          if (isAlreadyInactive) {
+            logger.info('Subscription already inactive on Shopify (stale subscription_id will be cleared):', subscriptionId);
+          } else {
+            logger.error('Subscription cancellation errors:', appSubscriptionCancel.userErrors);
+          }
           // Don't throw - still update database to downgrade locally
         } else {
           logger.info('Shopify subscription cancelled:', appSubscriptionCancel?.appSubscription);

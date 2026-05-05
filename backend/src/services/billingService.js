@@ -242,7 +242,11 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
     }
   }
 
+  // Use test charges on non-production environments so dev-store billing works
+  // (dev stores require test: true to enable the Approve button)
+  const isTestCharge = process.env.NODE_ENV !== 'production';
   logger.info('Billing config:', {
+    isTestCharge,
     NODE_ENV: process.env.NODE_ENV,
     price,
     interval,
@@ -257,7 +261,7 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
         returnUrl: $returnUrl
         lineItems: $lineItems
         ${trialDays > 0 ? 'trialDays: $trialDays' : ''}
-        test: false
+        test: ${isTestCharge}
       ) {
         appSubscription {
           id

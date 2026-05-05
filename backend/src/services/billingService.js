@@ -242,12 +242,7 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
     }
   }
 
-  // Test charges only work on development stores
-  // Development/staging (NODE_ENV !== 'production'): test: true - creates test subscriptions
-  // Production (NODE_ENV === 'production'): test: false - creates real subscriptions
-  const isTestCharge = process.env.NODE_ENV !== 'production';
   logger.info('Billing config:', {
-    isTestCharge,
     NODE_ENV: process.env.NODE_ENV,
     price,
     interval,
@@ -262,7 +257,7 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
         returnUrl: $returnUrl
         lineItems: $lineItems
         ${trialDays > 0 ? 'trialDays: $trialDays' : ''}
-        test: ${isTestCharge}
+        test: false
       ) {
         appSubscription {
           id
@@ -321,24 +316,6 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
     }
 
     const subscriptionId = appSubscriptionCreate.appSubscription.id;
-    // Extract the numeric charge ID from the GID for the callback URL
-    const chargeId = subscriptionId.split('/').pop();
-
-    // For test charges on dev stores, the approve button is greyed out and no redirect happens
-    // Auto-confirm the subscription immediately after successful API response
-    if (isTestCharge) {
-      logger.info('Test charge detected - auto-confirming subscription');
-      await confirmSubscription(session.shop, tierKey, chargeId, isAnnual);
-      return {
-        success: true,
-        tier: tierKey,
-        subscriptionId,
-        confirmationUrl: null, // No redirect needed for test charges
-        trialDays: appSubscriptionCreate.appSubscription.trialDays,
-        isAnnual,
-        autoConfirmed: true,
-      };
-    }
 
     return {
       success: true,

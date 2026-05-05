@@ -141,3 +141,12 @@ cd backend && npm run dev    # Start with --watch
 cd backend && npm start      # Production start
 shopify app dev              # Full Shopify dev mode with tunnel
 ```
+
+# Session Memory Sync
+At the end of every session, append a brief summary of:
+- What was built or changed today
+- Any decisions made and why
+- Current status of each active task
+- Anything the next session should know first
+
+Write this to: ~/Documents/Wrenbys/pm/pm-shared/references/session-log.md

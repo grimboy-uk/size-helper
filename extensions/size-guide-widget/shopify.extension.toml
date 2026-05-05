@@ -1,6 +1,6 @@
 # Learn more about configuring this extension at https://shopify.dev/docs/apps/theme-app-extensions
 
-api_version = "2024-01"
+api_version = "2025-01"
 
 [[extensions]]
 uid = "49cfd369-4393-6b61-11b0-955bc0e2303acf8cce55"

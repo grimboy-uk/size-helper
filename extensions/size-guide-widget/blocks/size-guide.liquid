@@ -859,17 +859,10 @@
       selectedBodyShape: null,
 
       async init() {
-        // Check if product has a size guide
-        console.log(`apiBase: ${this.apiBase}`);
-        console.log(`shop: ${this.shop}`);
-        console.log(`productId: ${this.productId}`);
         try {
           const response = await fetch(
-            `${this.apiBase}/has-size-guide?shop=${this.shop}&productId=${this.productId}`, {
-            headers: {
-              'ngrok-skip-browser-warning': 'true'
-            }
-          }).then(response => {
+            `${this.apiBase}/has-size-guide?shop=${this.shop}&productId=${this.productId}`
+          ).then(response => {
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
               throw new TypeError("Response wasn't JSON");
@@ -877,7 +870,6 @@
             return response.json();
           })
           .then(data => {
-            console.log(data);
             if (data.hasSizeGuide) {
               document.getElementById('size-helper-widget').style.display = 'block';
               this.attachEventListeners();
@@ -930,11 +922,8 @@
       async loadSizeChart() {
         try {
           const response = await fetch(
-            `${this.apiBase}/size-chart?shop=${this.shop}&productId=${this.productId}`, {
-            headers: {
-              'ngrok-skip-browser-warning': 'true'
-            }
-          });
+            `${this.apiBase}/size-chart?shop=${this.shop}&productId=${this.productId}`
+          );
           this.sizeChart = await response.json();
 
           // Set notation from template (default to US if not specified)

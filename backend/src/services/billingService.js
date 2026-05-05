@@ -164,52 +164,41 @@ export async function createSubscription(session, tierKey, returnUrl, isAnnual =
   }
 
   if (tier.price === 0) {
-    // Free tier - cancel existing Shopify subscription (if any) then update the database
-    try {
-      const existing = await query(
-        `SELECT subscription_id FROM shops WHERE shop_domain = $1`,
-        [session.shop]
-      );
-      const subscriptionId = existing.rows[0]?.subscription_id;
-      if (subscriptionId) {
-        logger.info('Cancelling existing Shopify subscription before downgrade to FREE:', { shop: session.shop, subscriptionId });
-        try {
-          const cancelResponse = await shopifyGraphqlRequest({
-            session,
-            query: `
-              mutation AppSubscriptionCancel($id: ID!) {
-                appSubscriptionCancel(id: $id) {
-                  appSubscription { id status }
-                  userErrors { field message }
-                }
-              }
-            `,
-            variables: { id: subscriptionId },
-            authContext,
-          });
-          const cancelErrors = cancelResponse.data?.appSubscriptionCancel?.userErrors;
-          if (cancelErrors?.length > 0) {
-            const isAlreadyInactive = cancelErrors.some(e => e.message?.includes('InvalidTransitionError'));
-            if (isAlreadyInactive) {
-              logger.info('Subscription already inactive on Shopify during FREE downgrade (stale subscription_id will be cleared):', subscriptionId);
-            } else {
-              logger.warn('Cancel subscription userErrors during FREE downgrade:', cancelErrors);
+    const existing = await query(
+      `SELECT subscription_id FROM shops WHERE shop_domain = $1`,
+      [session.shop]
+    );
+    const subscriptionId = existing.rows[0]?.subscription_id;
+    if (subscriptionId) {
+      logger.info('Cancelling existing Shopify subscription before downgrade to FREE:', { shop: session.shop, subscriptionId });
+      const cancelResponse = await shopifyGraphqlRequest({
+        session,
+        query: `
+          mutation AppSubscriptionCancel($id: ID!) {
+            appSubscriptionCancel(id: $id) {
+              appSubscription { id status }
+              userErrors { field message }
             }
-          } else {
-            logger.info('Shopify subscription cancelled during FREE downgrade:', subscriptionId);
           }
-        } catch (cancelError) {
-          logger.error('Failed to cancel Shopify subscription during FREE downgrade (continuing):', cancelError.message);
+        `,
+        variables: { id: subscriptionId },
+        authContext,
+      });
+      const cancelErrors = cancelResponse.data?.appSubscriptionCancel?.userErrors;
+      if (cancelErrors?.length > 0) {
+        const isAlreadyInactive = cancelErrors.some(e => e.message?.includes('InvalidTransitionError'));
+        if (isAlreadyInactive) {
+          logger.info('Subscription already inactive on Shopify during FREE downgrade (stale subscription_id will be cleared):', subscriptionId);
+        } else {
+          throw new Error(cancelErrors[0].message);
         }
+      } else {
+        logger.info('Shopify subscription cancelled during FREE downgrade:', subscriptionId);
       }
-    } catch (lookupError) {
-      logger.error('Failed to look up existing subscription (continuing):', lookupError.message);
     }
 
-    await query(
-      `UPDATE shops SET subscription_tier = $1, subscription_id = NULL, billing_interval = 'MONTHLY', updated_at = CURRENT_TIMESTAMP WHERE shop_domain = $2`,
-      [tierKey, session.shop]
-    );
+    // Confirm from Shopify ground truth before writing to DB
+    await syncSubscriptionStatus(session, authContext);
     return { success: true, tier: tierKey, confirmationUrl: null };
   }
 
@@ -400,7 +389,6 @@ export async function cancelSubscription(session, authContext = null) {
     logger.info('Cancelling subscription:', { shop: session.shop, subscriptionId });
 
     if (subscriptionId) {
-      // Cancel via Shopify GraphQL
       const mutation = `
         mutation AppSubscriptionCancel($id: ID!) {
           appSubscriptionCancel(id: $id) {
@@ -416,45 +404,29 @@ export async function cancelSubscription(session, authContext = null) {
         }
       `;
 
-      try {
-        const response = await shopifyGraphqlRequest({
-          session,
-          query: mutation,
-          variables: { id: subscriptionId },
-          authContext,
-        });
+      const response = await shopifyGraphqlRequest({
+        session,
+        query: mutation,
+        variables: { id: subscriptionId },
+        authContext,
+      });
 
-        const { appSubscriptionCancel } = response.data;
-        if (appSubscriptionCancel?.userErrors?.length > 0) {
-          const isAlreadyInactive = appSubscriptionCancel.userErrors.some(e => e.message?.includes('InvalidTransitionError'));
-          if (isAlreadyInactive) {
-            logger.info('Subscription already inactive on Shopify (stale subscription_id will be cleared):', subscriptionId);
-          } else {
-            logger.error('Subscription cancellation errors:', appSubscriptionCancel.userErrors);
-          }
-          // Don't throw - still update database to downgrade locally
+      const { appSubscriptionCancel } = response.data;
+      if (appSubscriptionCancel?.userErrors?.length > 0) {
+        const isAlreadyInactive = appSubscriptionCancel.userErrors.some(e => e.message?.includes('InvalidTransitionError'));
+        if (isAlreadyInactive) {
+          logger.info('Subscription already inactive on Shopify (stale subscription_id will be cleared):', subscriptionId);
         } else {
-          logger.info('Shopify subscription cancelled:', appSubscriptionCancel?.appSubscription);
+          throw new Error(appSubscriptionCancel.userErrors[0].message);
         }
-      } catch (shopifyError) {
-        logger.error('Shopify API error during cancellation:', shopifyError.message);
-        // Don't throw - still update database to downgrade locally
-        // The subscription might already be cancelled or invalid
+      } else {
+        logger.info('Shopify subscription cancelled:', appSubscriptionCancel?.appSubscription);
       }
     }
 
-    // Update database to free tier
-    await query(
-      `UPDATE shops
-       SET subscription_tier = 'FREE',
-           subscription_id = NULL,
-           billing_interval = 'MONTHLY',
-           updated_at = CURRENT_TIMESTAMP
-       WHERE shop_domain = $1`,
-      [session.shop]
-    );
-
-    logger.info('Subscription cancelled successfully:', session.shop);
+    // Confirm cancellation from Shopify ground truth before updating DB
+    await syncSubscriptionStatus(session, authContext);
+    logger.info('Subscription cancellation confirmed via sync:', session.shop);
     return { success: true };
   } catch (error) {
     logger.error('Failed to cancel subscription:', error);

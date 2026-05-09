@@ -883,6 +883,9 @@
       },
 
       attachEventListeners() {
+        // Move modal to <body> so it escapes any ancestor stacking context (theme transforms, etc.)
+        document.body.appendChild(document.getElementById('size-guide-modal'));
+
         // Open modal
         document.getElementById('size-guide-btn').addEventListener('click', () => this.openModal());
 

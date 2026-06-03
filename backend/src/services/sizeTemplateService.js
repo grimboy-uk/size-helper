@@ -12,9 +12,9 @@ export const PRODUCT_CATEGORIES = {
     description: 'T-shirts, shirts, blouses, sweaters',
     defaultFields: [
       { key: 'chest', label: 'Chest', required: true },
-      { key: 'waist', label: 'Waist', required: true },
+      { key: 'shoulder', label: 'Shoulder', required: true },
       { key: 'length', label: 'Length', required: true },
-      { key: 'shoulder', label: 'Shoulder', required: false },
+      { key: 'sleeve', label: 'Sleeve Length', required: true },
     ],
   },
   BOTTOMS: {

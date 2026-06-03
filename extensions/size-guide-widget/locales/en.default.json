@@ -1,0 +1,54 @@
+{
+  "trigger": {
+    "button": "Size Guide"
+  },
+  "modal": {
+    "loading": "Loading size chart..."
+  },
+  "chart": {
+    "unit_cm": "cm",
+    "unit_in": "inches",
+    "find_my_size_cta": "Find My Size"
+  },
+  "questionnaire": {
+    "usual_size_q": "What size do you usually wear?",
+    "length_q": "What length do you prefer?",
+    "length_short": "Short",
+    "length_regular": "Regular",
+    "length_long": "Long",
+    "body_shape_q": "How would you describe your body shape?",
+    "fit_q": "What fit do you prefer?",
+    "fit_tight": "Fitted",
+    "fit_regular": "Regular",
+    "fit_loose": "Relaxed",
+    "measurements_toggle": "I know my measurements (optional)",
+    "back_to_chart": "Back to Size Chart",
+    "submit_cta": "Get My Recommendation"
+  },
+  "result": {
+    "confidence_high": "Great match!",
+    "confidence_medium": "Good match",
+    "confidence_low": "Best estimate",
+    "try_again_cta": "Try Again",
+    "continue_shopping_cta": "Continue Shopping"
+  },
+  "errors": {
+    "limit_reached": "This store has reached its monthly size recommendation limit. You can still use the size chart to find your size manually.",
+    "submit_failed": "Sorry, we couldn't get your size recommendation. Please try again.",
+    "load_failed": "Unable to load size chart"
+  },
+  "accessibility": {
+    "close_modal": "Close size guide"
+  },
+  "measurements": {
+    "chest": "Chest",
+    "waist": "Waist",
+    "hip": "Hip",
+    "length": "Length",
+    "shoulder": "Shoulder",
+    "inseam": "Inseam",
+    "thigh": "Thigh",
+    "sleeve": "Sleeve length",
+    "width": "Width"
+  }
+}

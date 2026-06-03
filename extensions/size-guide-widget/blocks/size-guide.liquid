@@ -23,7 +23,7 @@
 <div id="size-guide-modal" class="size-guide-modal" style="display: none;">
   <div class="size-guide-modal-overlay"></div>
   <div class="size-guide-modal-content">
-    <button type="button" class="size-guide-modal-close" aria-label="Close">&times;</button>
+    <button type="button" class="size-guide-modal-close" aria-label="{{ 't:accessibility.close_modal' | t }}">&times;</button>
 
     <div class="size-guide-header">
       <h2>{{ block.settings.modal_title }}</h2>
@@ -45,8 +45,8 @@
         <div class="size-chart-area">
           <div class="size-chart-controls">
             <div class="size-guide-unit-toggle">
-              <button type="button" class="unit-btn active" data-unit="cm">cm</button>
-              <button type="button" class="unit-btn" data-unit="in">inches</button>
+              <button type="button" class="unit-btn active" data-unit="cm">{{ 't:chart.unit_cm' | t }}</button>
+              <button type="button" class="unit-btn" data-unit="in">{{ 't:chart.unit_in' | t }}</button>
             </div>
             <div class="size-notation-select">
               <select id="size-notation-dropdown">
@@ -60,12 +60,12 @@
             </div>
           </div>
           <div id="size-chart-container">
-            <p class="loading-text">Loading size chart...</p>
+            <p class="loading-text">{{ 't:modal.loading' | t }}</p>
           </div>
         </div>
       </div>
       <button type="button" class="size-guide-btn-primary" id="find-my-size-btn" onclick="sizeHelper.goToStep(2)" style="display: none;">
-        Find My Size
+        {{ 't:chart.find_my_size_cta' | t }}
       </button>
     </div>
 
@@ -73,7 +73,7 @@
     <div class="size-guide-step" data-step="2" style="display: none;">
       <form id="size-finder-form">
         <div class="form-section">
-          <label class="form-label" style="font-weight: bold;">What size do you usually wear? <span id="usual-size-notation" class="notation-label"></span></label>
+          <label class="form-label" style="font-weight: bold;">{{ 't:questionnaire.usual_size_q' | t }} <span id="usual-size-notation" class="notation-label"></span></label>
           <div class="fit-options" id="usual-size-options">
             <!-- Size options will be populated dynamically based on template -->
             <label class="fit-option">
@@ -84,51 +84,51 @@
         </div>
 
         <div class="form-section" id="length-preference-section" style="display: none;">
-          <label class="form-label" style="font-weight: bold;">What length do you prefer?</label>
+          <label class="form-label" style="font-weight: bold;">{{ 't:questionnaire.length_q' | t }}</label>
           <div class="fit-options" id="length-options">
             <label class="fit-option">
               <input type="radio" name="length-preference" value="S">
-              <span>Short</span>
+              <span>{{ 't:questionnaire.length_short' | t }}</span>
             </label>
             <label class="fit-option">
               <input type="radio" name="length-preference" value="R" checked>
-              <span>Regular</span>
+              <span>{{ 't:questionnaire.length_regular' | t }}</span>
             </label>
             <label class="fit-option">
               <input type="radio" name="length-preference" value="L">
-              <span>Long</span>
+              <span>{{ 't:questionnaire.length_long' | t }}</span>
             </label>
           </div>
         </div>
 
         <div class="form-section">
-          <label class="form-label" style="font-weight: bold;">How would you describe your body shape?</label>
+          <label class="form-label" style="font-weight: bold;">{{ 't:questionnaire.body_shape_q' | t }}</label>
           <div class="body-shapes" id="body-shapes">
             <!-- Body shapes will be loaded dynamically -->
           </div>
         </div>
 
         <div class="form-section">
-          <label class="form-label" style="font-weight: bold;">What fit do you prefer?</label>
+          <label class="form-label" style="font-weight: bold;">{{ 't:questionnaire.fit_q' | t }}</label>
           <div class="fit-options">
             <label class="fit-option">
               <input type="radio" name="fit" value="tight">
-              <span>Fitted</span>
+              <span>{{ 't:questionnaire.fit_tight' | t }}</span>
             </label>
             <label class="fit-option">
               <input type="radio" name="fit" value="regular" checked>
-              <span>Regular</span>
+              <span>{{ 't:questionnaire.fit_regular' | t }}</span>
             </label>
             <label class="fit-option">
               <input type="radio" name="fit" value="loose">
-              <span>Relaxed</span>
+              <span>{{ 't:questionnaire.fit_loose' | t }}</span>
             </label>
           </div>
         </div>
 
         <div class="form-section collapsible">
           <button type="button" class="collapsible-toggle" onclick="sizeHelper.toggleMeasurements()">
-            <span>I know my measurements (optional)</span>
+            <span>{{ 't:questionnaire.measurements_toggle' | t }}</span>
             <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="6,9 12,15 18,9"/>
             </svg>
@@ -142,10 +142,10 @@
 
         <div class="step-buttons">
           <button type="button" class="size-guide-btn-secondary" onclick="sizeHelper.goToStep(1)">
-            Back to Size Chart
+            {{ 't:questionnaire.back_to_chart' | t }}
           </button>
           <button type="submit" class="size-guide-btn-primary">
-            Get My Recommendation
+            {{ 't:questionnaire.submit_cta' | t }}
           </button>
         </div>
       </form>
@@ -157,7 +157,7 @@
         <div class="recommended-size" id="recommended-size">M</div>
         <div class="confidence-badge" id="confidence-badge">
           <span class="confidence-icon">✓</span>
-          <span id="confidence-text">Good match</span>
+          <span id="confidence-text">{{ 't:result.confidence_medium' | t }}</span>
         </div>
       </div>
       <div class="recommendation-reasoning" id="recommendation-reasoning">
@@ -165,10 +165,10 @@
       </div>
       <div class="step-buttons">
         <button type="button" class="size-guide-btn-secondary" onclick="sizeHelper.goToStep(2)">
-          Try Again
+          {{ 't:result.try_again_cta' | t }}
         </button>
         <button type="button" class="size-guide-btn-primary" onclick="sizeHelper.closeModal()">
-          Continue Shopping
+          {{ 't:result.continue_shopping_cta' | t }}
         </button>
       </div>
     </div>
@@ -784,10 +784,72 @@
       font-size: 56px;
     }
   }
+
+  .measurement-legend-table {
+    margin-top: 12px;
+    font-size: 13px;
+  }
+
+  .measurement-legend-table table {
+    border-collapse: collapse;
+    width: auto;
+  }
+
+  .measurement-legend-table td {
+    padding: 3px 8px 3px 0;
+    vertical-align: middle;
+    line-height: 1.4;
+  }
+
+  .legend-letter {
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 12px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    padding: 2px 6px !important;
+    text-align: center;
+    min-width: 22px;
+    color: #444;
+  }
+
+  .legend-label {
+    color: #555;
+  }
 </style>
+
+<script type="application/json" id="size-helper-i18n">
+  {
+    "result": {
+      "confidence_high":   {{ 't:result.confidence_high'   | t | json }},
+      "confidence_medium": {{ 't:result.confidence_medium' | t | json }},
+      "confidence_low":    {{ 't:result.confidence_low'    | t | json }},
+      "try_again_cta":     {{ 't:result.try_again_cta'     | t | json }},
+      "continue_shopping_cta": {{ 't:result.continue_shopping_cta' | t | json }}
+    },
+    "errors": {
+      "limit_reached":  {{ 't:errors.limit_reached'  | t | json }},
+      "submit_failed":  {{ 't:errors.submit_failed'  | t | json }},
+      "load_failed":    {{ 't:errors.load_failed'    | t | json }}
+    },
+    "measurements": {
+      "chest":    {{ 't:measurements.chest'    | t | json }},
+      "waist":    {{ 't:measurements.waist'    | t | json }},
+      "hip":      {{ 't:measurements.hip'      | t | json }},
+      "length":   {{ 't:measurements.length'   | t | json }},
+      "shoulder": {{ 't:measurements.shoulder' | t | json }},
+      "inseam":   {{ 't:measurements.inseam'   | t | json }},
+      "thigh":    {{ 't:measurements.thigh'    | t | json }},
+      "sleeve":   {{ 't:measurements.sleeve'   | t | json }},
+      "width":    {{ 't:measurements.width'    | t | json }}
+    }
+  }
+</script>
 
 <script>
   (function() {
+    const I18N = JSON.parse(document.getElementById('size-helper-i18n').textContent);
+
     // Asset URLs generated by Shopify CDN
     // These are the default illustrations - the actual illustration type comes from the API
     const ILLUSTRATION_ASSETS = {
@@ -805,6 +867,21 @@
       // Legacy fallbacks
       'top': '{{ "size-guide-top-jumper.png" | asset_url }}',
       'bottom': '{{ "size-guide-bottom-trousers.png" | asset_url }}'
+    };
+
+    // Maps illustration type → ordered field keys for the legend (A=index 0, B=index 1, …)
+    const ILLUSTRATION_LETTER_MAP = {
+      'top-jumper':            ['chest', 'shoulder', 'length', 'sleeve'],
+      'top-hoodie':            ['chest', 'shoulder', 'length', 'sleeve'],
+      'top-blouse':            ['chest', 'shoulder', 'length', 'sleeve'],
+      'top-shirt-long-sleeve': ['chest', 'shoulder', 'length', 'sleeve'],
+      'top-polo-tee':          ['chest', 'shoulder', 'length', 'sleeve'],
+      'bottom-trousers':       ['waist', 'hip', 'inseam', 'thigh'],
+      'bottom-shorts':         ['waist', 'hip', 'inseam', 'thigh'],
+      'shoe':                  ['length', 'width'],
+      'dress':                 ['chest', 'waist', 'hip', 'length'],
+      'top':                   ['chest', 'shoulder', 'length', 'sleeve'],
+      'bottom':                ['waist', 'hip', 'inseam', 'thigh']
     };
 
     // Size notation conversion tables
@@ -970,7 +1047,7 @@
         } catch (error) {
           console.error('Size Helper: Error loading size chart', error);
           document.getElementById('size-chart-container').innerHTML =
-            '<p class="loading-text">Unable to load size chart</p>';
+            `<p class="loading-text">${I18N.errors.load_failed}</p>`;
         }
       },
 
@@ -1094,6 +1171,28 @@
             </table>
           </div>
         `;
+
+        // Legend type uses the template's own illustrationType (or category default).
+        // Separately, we only render the letter legend when an illustration image is actually shown —
+        // letters without an annotated figure to point at are meaningless.
+        const illustrationType = this.sizeChart.illustrationType;
+        const categoryTypeMap = {
+          TOPS: 'top-jumper', BOTTOMS: 'bottom-trousers', DRESSES: 'dress',
+          OUTERWEAR: 'top-jumper', FOOTWEAR: 'shoe', ACCESSORIES: 'top-jumper', CUSTOM: 'top-jumper'
+        };
+        const legendType = illustrationType || (categoryTypeMap[this.sizeChart.category] || 'top-jumper');
+        const hasIllustration = !!ILLUSTRATION_ASSETS[legendType];
+
+        const letterFields = ILLUSTRATION_LETTER_MAP[legendType];
+        if (hasIllustration && letterFields && letterFields.length > 0) {
+          const rows = letterFields.map((fieldKey, i) => {
+            const letter = String.fromCharCode(65 + i);
+            const templateField = fields.find(f => f.key === fieldKey);
+            const label = templateField ? templateField.label : (I18N.measurements[fieldKey] || fieldKey);
+            return `<tr><td class="legend-letter">${letter}</td><td class="legend-label">${label}</td></tr>`;
+          }).join('');
+          html += `<div class="measurement-legend-table"><table><tbody>${rows}</tbody></table></div>`;
+        }
 
         container.innerHTML = html;
       },
@@ -1285,41 +1384,37 @@
 
       updateMeasurementIllustration() {
         const imgEl = document.getElementById('measurement-image');
+        const illustrationContainer = document.getElementById('measurement-illustration');
+        const illustrationType = this.sizeChart.illustrationType;
         const category = this.sizeChart.category;
 
-        // Check if template specifies an illustration type
-        const illustrationType = this.sizeChart.illustrationType;
+        const categoryTypeMap = {
+          TOPS: 'top-jumper',
+          BOTTOMS: 'bottom-trousers',
+          DRESSES: 'dress',
+          OUTERWEAR: 'top-jumper',
+          FOOTWEAR: 'shoe',
+          ACCESSORIES: 'top-jumper',
+          CUSTOM: 'top-jumper'
+        };
 
-        // If illustration type is specified in template, use it directly
-        if (illustrationType && ILLUSTRATION_ASSETS[illustrationType]) {
-          imgEl.src = ILLUSTRATION_ASSETS[illustrationType];
-          imgEl.alt = `${illustrationType.replace('-', ' ')} measurement guide`;
-        } else {
-          // Fallback: Map categories to default illustration types
-          const categoryTypeMap = {
-            TOPS: 'top-jumper',
-            BOTTOMS: 'bottom-trousers',
-            DRESSES: 'top-blouse',
-            OUTERWEAR: 'top-jumper',
-            FOOTWEAR: 'shoe',
-            ACCESSORIES: 'top-jumper',
-            CUSTOM: 'top-jumper'
-          };
-
-          const defaultType = categoryTypeMap[category] || 'top-jumper';
-          imgEl.src = ILLUSTRATION_ASSETS[defaultType];
-          imgEl.alt = `${defaultType.replace('-', ' ')} measurement guide`;
-        }
-
-        imgEl.style.display = 'block';
-        imgEl.width = 240;
-        imgEl.height = 320;
+        const resolvedType = (illustrationType && ILLUSTRATION_ASSETS[illustrationType])
+          ? illustrationType
+          : (categoryTypeMap[category] || 'top-jumper');
 
         // Remove any existing inline SVG (from previous implementation)
-        const illustrationContainer = document.getElementById('measurement-illustration');
         const existingSvg = illustrationContainer.querySelector('svg');
-        if (existingSvg) {
-          existingSvg.remove();
+        if (existingSvg) existingSvg.remove();
+
+        if (ILLUSTRATION_ASSETS[resolvedType]) {
+          imgEl.src = ILLUSTRATION_ASSETS[resolvedType];
+          imgEl.alt = `${resolvedType.replace(/-/g, ' ')} measurement guide`;
+          imgEl.style.display = 'block';
+          imgEl.width = 240;
+          imgEl.height = 320;
+          illustrationContainer.style.display = '';
+        } else {
+          illustrationContainer.style.display = 'none';
         }
       },
 
@@ -1408,8 +1503,7 @@
           if (result.error) {
             // Handle specific error cases
             if (response.status === 429) {
-              // Monthly limit reached
-              this.showError('This store has reached its monthly size recommendation limit. You can still use the size chart to find your size manually.');
+              this.showError(I18N.errors.limit_reached);
             } else {
               this.showError(result.error);
             }
@@ -1421,7 +1515,7 @@
 
         } catch (error) {
           console.error('Size Helper: Error getting recommendation', error);
-          this.showError('Sorry, we couldn\'t get your size recommendation. Please try again.');
+          this.showError(I18N.errors.submit_failed);
         }
       },
 
@@ -1451,13 +1545,13 @@
 
         badge.className = 'confidence-badge';
         if (result.confidence === 'high') {
-          confidenceText.textContent = 'Great match!';
+          confidenceText.textContent = I18N.result.confidence_high;
         } else if (result.confidence === 'medium') {
           badge.classList.add('medium');
-          confidenceText.textContent = 'Good match';
+          confidenceText.textContent = I18N.result.confidence_medium;
         } else {
           badge.classList.add('low');
-          confidenceText.textContent = 'Best estimate';
+          confidenceText.textContent = I18N.result.confidence_low;
         }
 
         const reasoning = document.getElementById('recommendation-reasoning');
@@ -1488,55 +1582,55 @@
 
 {% schema %}
 {
-  "name": "Size Guide",
+  "name": "t:name",
   "target": "section",
   "settings": [
     {
       "type": "text",
       "id": "button_text",
-      "label": "Button Text",
+      "label": "t:settings.button_text.label",
       "default": "Size Guide"
     },
     {
       "type": "text",
       "id": "modal_title",
-      "label": "Modal Title",
+      "label": "t:settings.modal_title.label",
       "default": "Find Your Perfect Fit"
     },
     {
       "type": "text",
       "id": "modal_subtitle",
-      "label": "Modal Subtitle",
+      "label": "t:settings.modal_subtitle.label",
       "default": "Use our size guide to find the best size for you"
     },
     {
       "type": "color",
       "id": "button_background",
-      "label": "Button Background",
+      "label": "t:settings.button_background.label",
       "default": "#ffffff"
     },
     {
       "type": "color",
       "id": "button_text_color",
-      "label": "Button Text Color",
+      "label": "t:settings.button_text_color.label",
       "default": "#333333"
     },
     {
       "type": "color",
       "id": "button_border_color",
-      "label": "Button Border Color",
+      "label": "t:settings.button_border_color.label",
       "default": "#dddddd"
     },
     {
       "type": "color",
       "id": "button_hover_background",
-      "label": "Button Hover Background",
+      "label": "t:settings.button_hover_background.label",
       "default": "#f5f5f5"
     },
     {
       "type": "color",
       "id": "button_hover_text_color",
-      "label": "Button Hover Text Color",
+      "label": "t:settings.button_hover_text_color.label",
       "default": "#000000"
     }
   ]

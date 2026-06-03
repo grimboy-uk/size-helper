@@ -1,0 +1,29 @@
+{
+  "name": "Size Guide",
+  "settings": {
+    "button_text": {
+      "label": "Button Text"
+    },
+    "modal_title": {
+      "label": "Modal Title"
+    },
+    "modal_subtitle": {
+      "label": "Modal Subtitle"
+    },
+    "button_background": {
+      "label": "Button Background"
+    },
+    "button_text_color": {
+      "label": "Button Text Color"
+    },
+    "button_border_color": {
+      "label": "Button Border Color"
+    },
+    "button_hover_background": {
+      "label": "Button Hover Background"
+    },
+    "button_hover_text_color": {
+      "label": "Button Hover Text Color"
+    }
+  }
+}

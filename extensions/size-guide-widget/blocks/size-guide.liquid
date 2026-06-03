@@ -23,7 +23,7 @@
 <div id="size-guide-modal" class="size-guide-modal" style="display: none;">
   <div class="size-guide-modal-overlay"></div>
   <div class="size-guide-modal-content">
-    <button type="button" class="size-guide-modal-close" aria-label="{{ 't:accessibility.close_modal' | t }}">&times;</button>
+    <button type="button" class="size-guide-modal-close" aria-label="{{ 'accessibility.close_modal' | t }}">&times;</button>
 
     <div class="size-guide-header">
       <h2>{{ block.settings.modal_title }}</h2>
@@ -45,8 +45,8 @@
         <div class="size-chart-area">
           <div class="size-chart-controls">
             <div class="size-guide-unit-toggle">
-              <button type="button" class="unit-btn active" data-unit="cm">{{ 't:chart.unit_cm' | t }}</button>
-              <button type="button" class="unit-btn" data-unit="in">{{ 't:chart.unit_in' | t }}</button>
+              <button type="button" class="unit-btn active" data-unit="cm">{{ 'chart.unit_cm' | t }}</button>
+              <button type="button" class="unit-btn" data-unit="in">{{ 'chart.unit_in' | t }}</button>
             </div>
             <div class="size-notation-select">
               <select id="size-notation-dropdown">
@@ -60,12 +60,12 @@
             </div>
           </div>
           <div id="size-chart-container">
-            <p class="loading-text">{{ 't:modal.loading' | t }}</p>
+            <p class="loading-text">{{ 'modal.loading' | t }}</p>
           </div>
         </div>
       </div>
       <button type="button" class="size-guide-btn-primary" id="find-my-size-btn" onclick="sizeHelper.goToStep(2)" style="display: none;">
-        {{ 't:chart.find_my_size_cta' | t }}
+        {{ 'chart.find_my_size_cta' | t }}
       </button>
     </div>
 
@@ -73,7 +73,7 @@
     <div class="size-guide-step" data-step="2" style="display: none;">
       <form id="size-finder-form">
         <div class="form-section">
-          <label class="form-label" style="font-weight: bold;">{{ 't:questionnaire.usual_size_q' | t }} <span id="usual-size-notation" class="notation-label"></span></label>
+          <label class="form-label" style="font-weight: bold;">{{ 'questionnaire.usual_size_q' | t }} <span id="usual-size-notation" class="notation-label"></span></label>
           <div class="fit-options" id="usual-size-options">
             <!-- Size options will be populated dynamically based on template -->
             <label class="fit-option">
@@ -84,51 +84,51 @@
         </div>
 
         <div class="form-section" id="length-preference-section" style="display: none;">
-          <label class="form-label" style="font-weight: bold;">{{ 't:questionnaire.length_q' | t }}</label>
+          <label class="form-label" style="font-weight: bold;">{{ 'questionnaire.length_q' | t }}</label>
           <div class="fit-options" id="length-options">
             <label class="fit-option">
               <input type="radio" name="length-preference" value="S">
-              <span>{{ 't:questionnaire.length_short' | t }}</span>
+              <span>{{ 'questionnaire.length_short' | t }}</span>
             </label>
             <label class="fit-option">
               <input type="radio" name="length-preference" value="R" checked>
-              <span>{{ 't:questionnaire.length_regular' | t }}</span>
+              <span>{{ 'questionnaire.length_regular' | t }}</span>
             </label>
             <label class="fit-option">
               <input type="radio" name="length-preference" value="L">
-              <span>{{ 't:questionnaire.length_long' | t }}</span>
+              <span>{{ 'questionnaire.length_long' | t }}</span>
             </label>
           </div>
         </div>
 
         <div class="form-section">
-          <label class="form-label" style="font-weight: bold;">{{ 't:questionnaire.body_shape_q' | t }}</label>
+          <label class="form-label" style="font-weight: bold;">{{ 'questionnaire.body_shape_q' | t }}</label>
           <div class="body-shapes" id="body-shapes">
             <!-- Body shapes will be loaded dynamically -->
           </div>
         </div>
 
         <div class="form-section">
-          <label class="form-label" style="font-weight: bold;">{{ 't:questionnaire.fit_q' | t }}</label>
+          <label class="form-label" style="font-weight: bold;">{{ 'questionnaire.fit_q' | t }}</label>
           <div class="fit-options">
             <label class="fit-option">
               <input type="radio" name="fit" value="tight">
-              <span>{{ 't:questionnaire.fit_tight' | t }}</span>
+              <span>{{ 'questionnaire.fit_tight' | t }}</span>
             </label>
             <label class="fit-option">
               <input type="radio" name="fit" value="regular" checked>
-              <span>{{ 't:questionnaire.fit_regular' | t }}</span>
+              <span>{{ 'questionnaire.fit_regular' | t }}</span>
             </label>
             <label class="fit-option">
               <input type="radio" name="fit" value="loose">
-              <span>{{ 't:questionnaire.fit_loose' | t }}</span>
+              <span>{{ 'questionnaire.fit_loose' | t }}</span>
             </label>
           </div>
         </div>
 
         <div class="form-section collapsible">
           <button type="button" class="collapsible-toggle" onclick="sizeHelper.toggleMeasurements()">
-            <span>{{ 't:questionnaire.measurements_toggle' | t }}</span>
+            <span>{{ 'questionnaire.measurements_toggle' | t }}</span>
             <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="6,9 12,15 18,9"/>
             </svg>
@@ -142,10 +142,10 @@
 
         <div class="step-buttons">
           <button type="button" class="size-guide-btn-secondary" onclick="sizeHelper.goToStep(1)">
-            {{ 't:questionnaire.back_to_chart' | t }}
+            {{ 'questionnaire.back_to_chart' | t }}
           </button>
           <button type="submit" class="size-guide-btn-primary">
-            {{ 't:questionnaire.submit_cta' | t }}
+            {{ 'questionnaire.submit_cta' | t }}
           </button>
         </div>
       </form>
@@ -157,7 +157,7 @@
         <div class="recommended-size" id="recommended-size">M</div>
         <div class="confidence-badge" id="confidence-badge">
           <span class="confidence-icon">✓</span>
-          <span id="confidence-text">{{ 't:result.confidence_medium' | t }}</span>
+          <span id="confidence-text">{{ 'result.confidence_medium' | t }}</span>
         </div>
       </div>
       <div class="recommendation-reasoning" id="recommendation-reasoning">
@@ -165,10 +165,10 @@
       </div>
       <div class="step-buttons">
         <button type="button" class="size-guide-btn-secondary" onclick="sizeHelper.goToStep(2)">
-          {{ 't:result.try_again_cta' | t }}
+          {{ 'result.try_again_cta' | t }}
         </button>
         <button type="button" class="size-guide-btn-primary" onclick="sizeHelper.closeModal()">
-          {{ 't:result.continue_shopping_cta' | t }}
+          {{ 'result.continue_shopping_cta' | t }}
         </button>
       </div>
     </div>
@@ -821,27 +821,27 @@
 <script type="application/json" id="size-helper-i18n">
   {
     "result": {
-      "confidence_high":   {{ 't:result.confidence_high'   | t | json }},
-      "confidence_medium": {{ 't:result.confidence_medium' | t | json }},
-      "confidence_low":    {{ 't:result.confidence_low'    | t | json }},
-      "try_again_cta":     {{ 't:result.try_again_cta'     | t | json }},
-      "continue_shopping_cta": {{ 't:result.continue_shopping_cta' | t | json }}
+      "confidence_high":   {{ 'result.confidence_high'   | t | json }},
+      "confidence_medium": {{ 'result.confidence_medium' | t | json }},
+      "confidence_low":    {{ 'result.confidence_low'    | t | json }},
+      "try_again_cta":     {{ 'result.try_again_cta'     | t | json }},
+      "continue_shopping_cta": {{ 'result.continue_shopping_cta' | t | json }}
     },
     "errors": {
-      "limit_reached":  {{ 't:errors.limit_reached'  | t | json }},
-      "submit_failed":  {{ 't:errors.submit_failed'  | t | json }},
-      "load_failed":    {{ 't:errors.load_failed'    | t | json }}
+      "limit_reached":  {{ 'errors.limit_reached'  | t | json }},
+      "submit_failed":  {{ 'errors.submit_failed'  | t | json }},
+      "load_failed":    {{ 'errors.load_failed'    | t | json }}
     },
     "measurements": {
-      "chest":    {{ 't:measurements.chest'    | t | json }},
-      "waist":    {{ 't:measurements.waist'    | t | json }},
-      "hip":      {{ 't:measurements.hip'      | t | json }},
-      "length":   {{ 't:measurements.length'   | t | json }},
-      "shoulder": {{ 't:measurements.shoulder' | t | json }},
-      "inseam":   {{ 't:measurements.inseam'   | t | json }},
-      "thigh":    {{ 't:measurements.thigh'    | t | json }},
-      "sleeve":   {{ 't:measurements.sleeve'   | t | json }},
-      "width":    {{ 't:measurements.width'    | t | json }}
+      "chest":    {{ 'measurements.chest'    | t | json }},
+      "waist":    {{ 'measurements.waist'    | t | json }},
+      "hip":      {{ 'measurements.hip'      | t | json }},
+      "length":   {{ 'measurements.length'   | t | json }},
+      "shoulder": {{ 'measurements.shoulder' | t | json }},
+      "inseam":   {{ 'measurements.inseam'   | t | json }},
+      "thigh":    {{ 'measurements.thigh'    | t | json }},
+      "sleeve":   {{ 'measurements.sleeve'   | t | json }},
+      "width":    {{ 'measurements.width'    | t | json }}
     }
   }
 </script>

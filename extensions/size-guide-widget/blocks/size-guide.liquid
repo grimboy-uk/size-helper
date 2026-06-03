@@ -648,24 +648,23 @@
   }
 
   .measurement-illustration {
-    flex: 0 0 280px;
+    flex: 0 0 268px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #f9f9f9;
+    background: #f6f8f9;
+    border: 1px solid #e4e6e8;
     border-radius: 12px;
-    padding: 20px;
+    padding: 20px 16px 16px;
   }
 
   .measurement-illustration img {
-    width: 240px;
-    height: 320px;
+    width: 228px;
+    height: 304px;
     object-fit: contain;
-    border-radius: 8px;
   }
 
   .measurement-legend {
-    margin-top: 12px;
     width: 100%;
   }
 
@@ -735,12 +734,12 @@
     }
 
     .measurement-illustration {
-      flex: 0 0 200px;
+      flex: 0 0 210px;
     }
 
     .measurement-illustration img {
-      width: 160px;
-      height: 213px;
+      width: 175px;
+      height: 233px;
     }
   }
 
@@ -763,7 +762,7 @@
     .measurement-illustration {
       flex: none;
       width: 100%;
-      max-width: 240px;
+      max-width: 260px;
       margin: 0 auto 16px;
     }
 
@@ -786,35 +785,41 @@
   }
 
   .measurement-legend-table {
-    margin-top: 12px;
-    font-size: 13px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #dde0e3;
+    width: 100%;
   }
 
   .measurement-legend-table table {
     border-collapse: collapse;
-    width: auto;
+    width: 100%;
   }
 
   .measurement-legend-table td {
-    padding: 3px 8px 3px 0;
+    padding: 3px 0;
     vertical-align: middle;
     line-height: 1.4;
   }
 
   .legend-letter {
-    font-family: monospace;
+    font-family: ui-monospace, 'SFMono-Regular', monospace;
     font-weight: 700;
-    font-size: 12px;
-    background: #f0f0f0;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    background: #2a2e35;
+    color: #fff;
     border-radius: 4px;
     padding: 2px 6px !important;
     text-align: center;
-    min-width: 22px;
-    color: #444;
+    min-width: 20px;
+    display: inline-block;
   }
 
   .legend-label {
-    color: #555;
+    color: #4a5260;
+    font-size: 12.5px;
+    padding-left: 10px !important;
   }
 </style>
 
@@ -1184,13 +1189,16 @@
         const hasIllustration = !!ILLUSTRATION_ASSETS[legendType];
 
         const letterFields = ILLUSTRATION_LETTER_MAP[legendType];
+        const legendEl = document.getElementById('measurement-legend');
         if (hasIllustration && letterFields && letterFields.length > 0) {
           const rows = letterFields.map((fieldKey, i) => {
             const letter = String.fromCharCode(65 + i);
             const label = I18N.measurements[fieldKey] || fieldKey;
             return `<tr><td class="legend-letter">${letter}</td><td class="legend-label">${label}</td></tr>`;
           }).join('');
-          html += `<div class="measurement-legend-table"><table><tbody>${rows}</tbody></table></div>`;
+          if (legendEl) legendEl.innerHTML = `<div class="measurement-legend-table"><table><tbody>${rows}</tbody></table></div>`;
+        } else {
+          if (legendEl) legendEl.innerHTML = '';
         }
 
         container.innerHTML = html;

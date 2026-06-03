@@ -1187,8 +1187,7 @@
         if (hasIllustration && letterFields && letterFields.length > 0) {
           const rows = letterFields.map((fieldKey, i) => {
             const letter = String.fromCharCode(65 + i);
-            const templateField = fields.find(f => f.key === fieldKey);
-            const label = templateField ? templateField.label : (I18N.measurements[fieldKey] || fieldKey);
+            const label = I18N.measurements[fieldKey] || fieldKey;
             return `<tr><td class="legend-letter">${letter}</td><td class="legend-label">${label}</td></tr>`;
           }).join('');
           html += `<div class="measurement-legend-table"><table><tbody>${rows}</tbody></table></div>`;

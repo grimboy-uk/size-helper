@@ -895,7 +895,7 @@
               <select class="form-select" id="category" required>
                 <option value="">Select a category...</option>
                 <option value="TOPS">Tops (T-shirts, shirts, blouses)</option>
-                <option value="BOTTOMS">Bottoms (Trousers, jeans)</option>
+                <option value="BOTTOMS">Bottoms (Trousers, jeans, skirts)</option>
                 <!--<option value="DRESSES">Dresses & Jumpsuits</option>
                 <option value="OUTERWEAR">Outerwear (Jackets, coats)</option>
                 <option value="FOOTWEAR">Footwear (Shoes, boots)</option>
@@ -1250,8 +1250,8 @@
       TOPS: [
         { value: 'top-jumper', label: 'Jumper / Sweater', free: true },
         { value: 'top-hoodie', label: 'Hoodie', free: false },
-        { value: 'top-polo-tee', label: 'Polo T-Shirt', free: false },
-        { value: 'top-crew-tee', label: 'Crew T-Shirt', free: false },
+        { value: 'top-polo-tee', label: 'Polo neck T-Shirt', free: false },
+        { value: 'top-crew-tee', label: 'Crew neck T-Shirt', free: false },
         { value: 'top-shirt-long-sleeve', label: 'Long Sleeve Shirt', free: false },
         { value: 'top-blouse', label: 'Blouse', free: false },
       ],
@@ -1261,10 +1261,13 @@
         { value: 'bottom-shorts', label: 'Shorts (Coming Soon)', free: false, disabled: true },
       ],
       DRESSES: [
-        { value: 'dress', label: 'Dress / Jumpsuit', free: true },
+        { value: 'dress', label: 'Dress', free: true },
       ],
       OUTERWEAR: [
         { value: 'top-jumper', label: 'Jacket / Coat', free: true },
+      ],
+      WORKWEAR: [
+        { value: 'dress', label: 'Jumpsuit (Coming Soon)', free: false, disabled: true },
       ],
       FOOTWEAR: [
         { value: 'shoe', label: 'Shoes / Boots', free: true },

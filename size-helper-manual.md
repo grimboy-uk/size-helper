@@ -143,7 +143,7 @@ Click **+ Create Template** to open the template form. If you have reached your 
 | Field | Description |
 |---|---|
 | **Template Name** | A descriptive name for the template (e.g., "Men's T-Shirts", "Women's Jeans") |
-| **Category** | The product type — **Tops** (T-shirts, shirts, blouses) or **Bottoms** (trousers, jeans) |
+| **Category** | The product type — **Tops** (T-shirts, shirts, blouses) or **Bottoms** (trousers, jeans, skirts) |
 | **Clothing Illustration** | The image shown in the size guide modal alongside the size chart. Options depend on the category and your plan |
 | **Template Type** | Choose between **Size Chart + Size Helper** (includes the "Find My Size" questionnaire) or **Size Chart Only** |
 

@@ -36,9 +36,6 @@
         <!-- Left: Measurement Illustration -->
         <div class="measurement-illustration" id="measurement-illustration">
           <img src="{{ 'size-guide-top-jumper.png' | asset_url }}" alt="Measurement guide" id="measurement-image" loading="lazy" width="240" height="320">
-          <div class="measurement-legend" id="measurement-legend">
-            <!-- Legend items will be populated dynamically -->
-          </div>
         </div>
 
         <!-- Right: Size Chart -->
@@ -64,6 +61,10 @@
           </div>
         </div>
       </div>
+
+      <!-- Full-width measurement legend below the illustration+chart row -->
+      <div class="measurement-legend" id="measurement-legend"></div>
+
       <button type="button" class="size-guide-btn-primary" id="find-my-size-btn" onclick="sizeHelper.goToStep(2)" style="display: none;">
         {{ 'chart.find_my_size_cta' | t }}
       </button>
@@ -665,7 +666,7 @@
   }
 
   .measurement-legend {
-    width: 100%;
+    margin-top: 16px;
   }
 
   .legend-item {
@@ -797,7 +798,7 @@
   }
 
   .measurement-legend-table td {
-    padding: 3px 0;
+    padding: 5px 0;
     vertical-align: middle;
     line-height: 1.4;
   }
@@ -820,6 +821,14 @@
     color: #4a5260;
     font-size: 12.5px;
     padding-left: 10px !important;
+    white-space: nowrap;
+  }
+
+  .legend-description {
+    color: #6b7280;
+    font-size: 12px;
+    padding-left: 16px !important;
+    line-height: 1.5;
   }
 </style>
 
@@ -847,6 +856,18 @@
       "thigh":    {{ 'measurements.thigh'    | t | json }},
       "sleeve":   {{ 'measurements.sleeve'   | t | json }},
       "width":    {{ 'measurements.width'    | t | json }}
+    },
+    "measurement_descriptions": {
+      "chest":       {{ 'measurement_descriptions.chest'       | t | json }},
+      "waist":       {{ 'measurement_descriptions.waist'       | t | json }},
+      "hip":         {{ 'measurement_descriptions.hip'         | t | json }},
+      "length":      {{ 'measurement_descriptions.length'      | t | json }},
+      "shoulder":    {{ 'measurement_descriptions.shoulder'    | t | json }},
+      "inseam":      {{ 'measurement_descriptions.inseam'      | t | json }},
+      "thigh":       {{ 'measurement_descriptions.thigh'       | t | json }},
+      "sleeve":      {{ 'measurement_descriptions.sleeve'      | t | json }},
+      "width":       {{ 'measurement_descriptions.width'       | t | json }},
+      "foot_length": {{ 'measurement_descriptions.foot_length' | t | json }}
     }
   }
 </script>
@@ -1191,10 +1212,13 @@
         const letterFields = ILLUSTRATION_LETTER_MAP[legendType];
         const legendEl = document.getElementById('measurement-legend');
         if (hasIllustration && letterFields && letterFields.length > 0) {
+          const isShoe = legendType === 'shoe';
           const rows = letterFields.map((fieldKey, i) => {
             const letter = String.fromCharCode(65 + i);
             const label = I18N.measurements[fieldKey] || fieldKey;
-            return `<tr><td class="legend-letter">${letter}</td><td class="legend-label">${label}</td></tr>`;
+            const descKey = isShoe && fieldKey === 'length' ? 'foot_length' : fieldKey;
+            const desc = (I18N.measurement_descriptions && I18N.measurement_descriptions[descKey]) || '';
+            return `<tr><td class="legend-letter">${letter}</td><td class="legend-label">${label}</td><td class="legend-description">${desc}</td></tr>`;
           }).join('');
           if (legendEl) legendEl.innerHTML = `<div class="measurement-legend-table"><table><tbody>${rows}</tbody></table></div>`;
         } else {

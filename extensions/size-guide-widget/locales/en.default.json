@@ -50,5 +50,17 @@
     "thigh": "Thigh",
     "sleeve": "Sleeve length",
     "width": "Width"
+  },
+  "measurement_descriptions": {
+    "chest": "Measure around the fullest part of your chest, keeping the tape horizontal.",
+    "waist": "Measure around your natural waistline at the narrowest point.",
+    "hip": "Measure around the fullest part of your hips and seat.",
+    "length": "Measure from the highest shoulder point straight down to the hem.",
+    "shoulder": "Measure straight across the back from shoulder seam to shoulder seam.",
+    "inseam": "Measure from the crotch point down the inner leg to the ankle.",
+    "thigh": "Measure around the fullest part of the upper thigh.",
+    "sleeve": "Measure from the shoulder seam along the outer arm to the cuff.",
+    "width": "Measure across the widest part of the foot.",
+    "foot_length": "Measure from the tip of the longest toe to the back of the heel."
   }
 }

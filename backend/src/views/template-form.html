@@ -701,6 +701,166 @@
     .quota-count.at-limit {
       color: #d72c0d;
     }
+    .csv-modal {
+      background: white;
+      border: none;
+      border-radius: 10px;
+      width: 720px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      padding: 0;
+    }
+    .csv-modal::backdrop {
+      background: rgba(0,0,0,0.5);
+    }
+    .csv-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid #e1e3e5;
+    }
+    .csv-modal-header h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: #202223;
+    }
+    .csv-modal-close {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: #6d7175;
+      line-height: 1;
+      padding: 0 4px;
+    }
+    .csv-modal-close:hover { color: #202223; }
+    .csv-modal-body { padding: 20px 24px; }
+    .csv-modal-footer {
+      display: flex;
+      gap: 10px;
+      padding: 16px 24px;
+      border-top: 1px solid #e1e3e5;
+      justify-content: flex-end;
+    }
+    .csv-unit-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .csv-unit-row label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #202223;
+      white-space: nowrap;
+    }
+    .csv-unit-warn {
+      font-size: 12px;
+      color: #b57a00;
+      background: #fff8e6;
+      border: 1px solid #f5c76b;
+      border-radius: 4px;
+      padding: 3px 8px;
+      display: none;
+    }
+    .csv-textarea {
+      width: 100%;
+      height: 160px;
+      font-family: monospace;
+      font-size: 13px;
+      padding: 10px;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      resize: vertical;
+      color: #202223;
+    }
+    .csv-textarea.placeholder-active { color: #999; }
+    .csv-textarea:focus { outline: none; border-color: #2a9d6e; box-shadow: 0 0 0 1px #2a9d6e; }
+    .csv-format-hint {
+      font-size: 12px;
+      color: #6d7175;
+      margin-top: 6px;
+    }
+    .csv-preview-section { margin-top: 18px; }
+    .csv-preview-section h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #202223;
+      margin: 0 0 10px 0;
+    }
+    .csv-preview-table-wrap {
+      overflow-x: auto;
+      border: 1px solid #e1e3e5;
+      border-radius: 6px;
+    }
+    .csv-preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .csv-preview-table th {
+      background: #f8f9fa;
+      padding: 8px 10px;
+      border-bottom: 1px solid #e1e3e5;
+      font-weight: 500;
+      color: #202223;
+      white-space: nowrap;
+    }
+    .csv-preview-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #f1f2f3;
+      color: #202223;
+    }
+    .csv-preview-table tr:last-child td { border-bottom: none; }
+    .csv-map-select {
+      padding: 4px 8px;
+      font-size: 12px;
+      border: 1px solid #c9cccf;
+      border-radius: 4px;
+      background: white;
+      max-width: 140px;
+    }
+    .csv-map-select:focus { outline: none; border-color: #2a9d6e; }
+    .csv-warn-text {
+      font-size: 12px;
+      color: #b57a00;
+      margin-top: 8px;
+    }
+    .csv-merge-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .csv-merge-btn {
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid #c9cccf;
+      background: white;
+      color: #202223;
+      transition: all 0.15s;
+    }
+    .csv-merge-btn.active {
+      background: #2a9d6e;
+      color: white;
+      border-color: #2a9d6e;
+    }
+    .size-chart-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .csv-action-btns {
+      display: flex;
+      gap: 8px;
+    }
   </style>
 </head>
 <body>
@@ -884,7 +1044,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Size Chart *</label>
+          <div class="size-chart-label-row">
+            <label class="form-label" style="margin-bottom:0;">Size Chart *</label>
+            <div class="csv-action-btns">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="openImportModal()">&#8659; Import CSV</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="exportCSV()">&#8657; Export CSV</button>
+            </div>
+          </div>
           <p class="form-hint">Toggle sizes on/off and enter measurements. Only enabled sizes will be shown to customers.</p>
           <div class="size-table-wrapper">
             <div class="size-btn-row" id="smaller-btn-row" style="display: none;">
@@ -960,6 +1126,48 @@
       </form>
     </div>
   </div>
+
+  <!-- CSV Import Modal -->
+  <dialog class="csv-modal" id="csv-modal" aria-labelledby="csv-modal-title">
+      <div class="csv-modal-header">
+        <h3 id="csv-modal-title">Import Size Chart from CSV</h3>
+        <button class="csv-modal-close" onclick="closeImportModal()" aria-label="Close">&times;</button>
+      </div>
+      <div class="csv-modal-body">
+        <div class="csv-unit-row">
+          <label for="csv-unit-select">Values are in:</label>
+          <div class="unit-toggle">
+            <button type="button" class="unit-btn active" id="csv-unit-cm" onclick="setCsvUnit('cm')">Centimeters (cm)</button>
+            <button type="button" class="unit-btn" id="csv-unit-in" onclick="setCsvUnit('in')">Inches (in)</button>
+          </div>
+          <span class="csv-unit-warn" id="csv-unit-warn"></span>
+        </div>
+        <textarea id="csv-textarea" class="csv-textarea placeholder-active" spellcheck="false"></textarea>
+        <p class="csv-format-hint">Paste a CSV with size names in the first column and measurement values in subsequent columns. Column headers should match your measurement field names. You can also paste with sizes as column headers and measurements as rows.</p>
+
+        <div class="csv-preview-section" id="csv-preview-section" style="display:none;">
+          <h4>Preview &amp; Column Mapping</h4>
+          <div class="csv-preview-table-wrap">
+            <table class="csv-preview-table" id="csv-preview-table">
+              <thead id="csv-preview-head"></thead>
+              <tbody id="csv-preview-body"></tbody>
+            </table>
+          </div>
+          <p class="csv-warn-text" id="csv-warn-text" style="display:none;"></p>
+          <div id="csv-has-sizes-section" style="display:none;">
+            <p style="font-size:13px;font-weight:600;color:#202223;margin:14px 0 6px;">If the template already has sizes:</p>
+            <div class="csv-merge-row">
+              <button type="button" class="csv-merge-btn active" id="csv-mode-merge" onclick="setCsvMode('merge')">Merge (add new sizes only)</button>
+              <button type="button" class="csv-merge-btn" id="csv-mode-replace" onclick="setCsvMode('replace')">Replace all sizes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="csv-modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeImportModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" id="csv-import-btn" onclick="applyCSVImport()" style="display:none;">Import sizes</button>
+      </div>
+  </dialog>
 
   {{authHelpers}}
 
@@ -1049,6 +1257,7 @@
       ],
       BOTTOMS: [
         { value: 'bottom-trousers', label: 'Trousers / Jeans', free: true },
+        { value: 'bottom-skirt', label: 'Skirt', free: false },
         { value: 'bottom-shorts', label: 'Shorts (Coming Soon)', free: false, disabled: true },
       ],
       DRESSES: [
@@ -2001,6 +2210,356 @@
         showToast(error.message || 'Failed to save template', true);
       }
     });
+
+    // ─── CSV Import/Export ───────────────────────────────────────────────────
+
+    const CSV_PLACEHOLDER = `Size,Chest,Shoulder,Length,Sleeve\nXS,32,38,60,58\nS,34,40,62,60\nM,38,42,65,63\nL,42,44,68,66\nXL,46,46,71,69`;
+
+    let csvParsed = null;   // { headers: [], rows: [[]] } after parsing
+    let csvColMap = [];     // per-column mapping: fieldKey | '__new__' | '__skip__'
+    let csvImportMode = 'merge'; // 'merge' | 'replace'
+    let csvUnit = 'cm';
+
+    function openImportModal() {
+      const modal = document.getElementById('csv-modal');
+      const ta = document.getElementById('csv-textarea');
+      ta.value = CSV_PLACEHOLDER;
+      ta.classList.add('placeholder-active');
+      ta.addEventListener('focus', clearPlaceholder, { once: true });
+      ta.addEventListener('input', onCsvInput);
+
+      csvUnit = measurementUnit;
+      updateCsvUnitButtons();
+
+      document.getElementById('csv-preview-section').style.display = 'none';
+      document.getElementById('csv-import-btn').style.display = 'none';
+      document.getElementById('csv-unit-warn').style.display = 'none';
+      csvParsed = null;
+
+      modal.showModal();
+
+      // Try clipboard auto-fill
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        navigator.clipboard.readText().then(text => {
+          if (text && text.includes(',') && !ta.classList.contains('placeholder-active') === false) {
+            // Only auto-fill if user hasn't already typed
+            if (ta.classList.contains('placeholder-active')) {
+              ta.value = text;
+              ta.classList.remove('placeholder-active');
+              parseAndPreviewCSV(text);
+            }
+          }
+        }).catch(() => {});
+      }
+    }
+
+    function closeImportModal() {
+      const modal = document.getElementById('csv-modal');
+      modal.close();
+      document.getElementById('csv-textarea').removeEventListener('input', onCsvInput);
+    }
+
+    // Native <dialog> fires 'cancel' on Escape — run our cleanup
+    document.getElementById('csv-modal').addEventListener('cancel', (e) => {
+      e.preventDefault();
+      closeImportModal();
+    });
+
+    function clearPlaceholder() {
+      const ta = document.getElementById('csv-textarea');
+      if (ta.classList.contains('placeholder-active')) {
+        ta.value = '';
+        ta.classList.remove('placeholder-active');
+      }
+    }
+
+    let csvDebounceTimer = null;
+    function onCsvInput() {
+      clearTimeout(csvDebounceTimer);
+      csvDebounceTimer = setTimeout(() => {
+        const text = document.getElementById('csv-textarea').value.trim();
+        if (text) parseAndPreviewCSV(text);
+        else {
+          document.getElementById('csv-preview-section').style.display = 'none';
+          document.getElementById('csv-import-btn').style.display = 'none';
+        }
+      }, 300);
+    }
+
+    function setCsvUnit(unit) {
+      csvUnit = unit;
+      updateCsvUnitButtons();
+      checkUnitMismatch();
+    }
+
+    function updateCsvUnitButtons() {
+      document.getElementById('csv-unit-cm').classList.toggle('active', csvUnit === 'cm');
+      document.getElementById('csv-unit-in').classList.toggle('active', csvUnit !== 'cm');
+    }
+
+    function setCsvMode(mode) {
+      csvImportMode = mode;
+      document.getElementById('csv-mode-merge').classList.toggle('active', mode === 'merge');
+      document.getElementById('csv-mode-replace').classList.toggle('active', mode === 'replace');
+    }
+
+    // Parse CSV text into { headers, rows } respecting quoted fields
+    function parseCSVText(text) {
+      const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+      if (lines.length < 2) return null;
+
+      function parseLine(line) {
+        const result = [];
+        let cur = '', inQuote = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') {
+            if (inQuote && line[i + 1] === '"') { cur += '"'; i++; }
+            else inQuote = !inQuote;
+          } else if (ch === ',' && !inQuote) {
+            result.push(cur.trim()); cur = '';
+          } else {
+            cur += ch;
+          }
+        }
+        result.push(cur.trim());
+        return result;
+      }
+
+      const rawHeaders = parseLine(lines[0]);
+      const rawRows = lines.slice(1).map(parseLine);
+      return { headers: rawHeaders, rows: rawRows };
+    }
+
+    // Detect orientation: row-oriented (sizes as rows) vs column-oriented (sizes as columns)
+    // Row-oriented: first header is blank, "Size", "size", or a known size name
+    // Column-oriented: first column header matches a known measurement label
+    function detectOrientation(parsed) {
+      const firstHeader = (parsed.headers[0] || '').toLowerCase().trim();
+      const knownSizeNames = new Set(['xs','s','m','l','xl','xxs','2xs','3xs','2xl','3xl','4xl','5xl','6xl',
+        '26','28','30','32','34','36','38','40','42','44']);
+      const sizeIndicators = ['size', 'sizes', 'name', ''];
+
+      if (sizeIndicators.includes(firstHeader)) return 'row';
+
+      // Check if first header looks like a size name
+      if (knownSizeNames.has(firstHeader)) return 'column';
+
+      // Check if second header onwards looks like size names (column-oriented)
+      const restHeaders = parsed.headers.slice(1).map(h => h.toLowerCase().trim());
+      const sizeMatchCount = restHeaders.filter(h => knownSizeNames.has(h)).length;
+      if (sizeMatchCount >= restHeaders.length * 0.5) return 'column';
+
+      return 'row';
+    }
+
+    // Transpose a parsed CSV (swap rows/cols) to normalise column-oriented to row-oriented
+    function transposeCSV(parsed) {
+      // headers[0] = blank, headers[1..] = size names
+      // rows[i][0] = measurement label, rows[i][1..] = values
+      const newHeaders = ['Size', ...parsed.rows.map(r => r[0] || '')];
+      const sizeNames = parsed.headers.slice(1);
+      const newRows = sizeNames.map((size, si) =>
+        [size, ...parsed.rows.map(r => r[si + 1] || '')]
+      );
+      return { headers: newHeaders, rows: newRows };
+    }
+
+    // Fuzzy-match a CSV header to a measurementFields label
+    function fuzzyMatchField(header) {
+      const h = header.toLowerCase().replace(/[^a-z0-9]/g, '');
+      for (const f of measurementFields) {
+        const l = f.label.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (h === l || h.startsWith(l) || l.startsWith(h)) return f.key;
+      }
+      return null;
+    }
+
+    function checkUnitMismatch() {
+      if (!csvParsed) return;
+      const allValues = csvParsed.rows.flatMap(r => r.slice(1).map(v => parseFloat(v))).filter(v => !isNaN(v));
+      if (allValues.length === 0) return;
+      const avg = allValues.reduce((a, b) => a + b, 0) / allValues.length;
+      const warnEl = document.getElementById('csv-unit-warn');
+      if (csvUnit === 'cm' && avg < 25) {
+        warnEl.textContent = 'Values look like inches — did you mean inches?';
+        warnEl.style.display = 'inline';
+      } else if (csvUnit === 'in' && avg > 50) {
+        warnEl.textContent = 'Values look like centimetres — did you mean cm?';
+        warnEl.style.display = 'inline';
+      } else {
+        warnEl.style.display = 'none';
+      }
+    }
+
+    function parseAndPreviewCSV(text) {
+      let parsed = parseCSVText(text);
+      if (!parsed) return;
+
+      const orientation = detectOrientation(parsed);
+      if (orientation === 'column') parsed = transposeCSV(parsed);
+      csvParsed = parsed;
+
+      // Build column mapping (skip first col = size names)
+      const dataHeaders = parsed.headers.slice(1);
+      csvColMap = dataHeaders.map(h => fuzzyMatchField(h) || '__new__');
+
+      checkUnitMismatch();
+      renderCSVPreview();
+    }
+
+    function renderCSVPreview() {
+      const parsed = csvParsed;
+      const dataHeaders = parsed.headers.slice(1);
+
+      // Build mapping header row
+      const mapOptions = [
+        ...measurementFields.map(f => `<option value="${f.key}">${escapeHtml(f.label)}</option>`),
+        '<option value="__new__">New field</option>',
+        '<option value="__skip__">Skip</option>'
+      ].join('');
+
+      const theadHtml = `
+        <tr>
+          <th>Size</th>
+          ${dataHeaders.map((h, i) => `
+            <th>
+              <div style="font-size:11px;color:#6d7175;margin-bottom:4px;">${escapeHtml(h)}</div>
+              <select class="csv-map-select" onchange="csvColMap[${i}]=this.value;renderCSVPreview()">
+                ${measurementFields.map(f => `<option value="${f.key}" ${csvColMap[i] === f.key ? 'selected' : ''}>${escapeHtml(f.label)}</option>`).join('')}
+                <option value="__new__" ${csvColMap[i] === '__new__' ? 'selected' : ''}>New field</option>
+                <option value="__skip__" ${csvColMap[i] === '__skip__' ? 'selected' : ''}>Skip</option>
+              </select>
+            </th>
+          `).join('')}
+        </tr>`;
+
+      const tbodyHtml = parsed.rows.slice(0, 8).map(row => `
+        <tr>
+          <td><strong>${escapeHtml(row[0] || '')}</strong></td>
+          ${dataHeaders.map((_, i) => `<td>${escapeHtml(row[i + 1] || '')}</td>`).join('')}
+        </tr>
+      `).join('') + (parsed.rows.length > 8 ? `<tr><td colspan="${dataHeaders.length + 1}" style="color:#6d7175;font-style:italic;padding:6px 10px;">…and ${parsed.rows.length - 8} more rows</td></tr>` : '');
+
+      document.getElementById('csv-preview-head').innerHTML = theadHtml;
+      document.getElementById('csv-preview-body').innerHTML = tbodyHtml;
+      document.getElementById('csv-preview-section').style.display = 'block';
+
+      // Warnings for required fields with no mapping
+      const mappedKeys = new Set(csvColMap.filter(k => k !== '__skip__' && k !== '__new__'));
+      const missingRequired = measurementFields.filter(f => f.required && !mappedKeys.has(f.key));
+      const warnEl = document.getElementById('csv-warn-text');
+      if (missingRequired.length > 0) {
+        warnEl.textContent = `Warning: required field(s) not mapped: ${missingRequired.map(f => f.label).join(', ')}`;
+        warnEl.style.display = 'block';
+      } else {
+        warnEl.style.display = 'none';
+      }
+
+      // Show merge/replace option if template already has sizes
+      const hasExistingSizes = Object.values(sizeData).some(d => d.enabled);
+      document.getElementById('csv-has-sizes-section').style.display = hasExistingSizes ? 'block' : 'none';
+
+      const importCount = parsed.rows.filter(r => r[0] && r[0].trim()).length;
+      const importBtn = document.getElementById('csv-import-btn');
+      importBtn.textContent = `Import ${importCount} size${importCount !== 1 ? 's' : ''}`;
+      importBtn.style.display = 'inline-flex';
+    }
+
+    function applyCSVImport() {
+      if (!csvParsed) return;
+
+      const dataHeaders = csvParsed.headers.slice(1);
+
+      // Create new fields for any '__new__' mapped columns
+      const newFieldMap = {}; // index → new fieldKey
+      dataHeaders.forEach((h, i) => {
+        if (csvColMap[i] === '__new__') {
+          const key = 'custom_' + Date.now() + '_' + i;
+          newFieldMap[i] = key;
+          measurementFields.push({ key, label: h, required: false });
+        }
+      });
+
+      // Replace mode: disable all existing sizes
+      if (csvImportMode === 'replace') {
+        Object.keys(sizeData).forEach(s => {
+          sizeData[s].enabled = false;
+          sizeData[s].measurements = {};
+        });
+      }
+
+      let imported = 0;
+      csvParsed.rows.forEach(row => {
+        const rawName = (row[0] || '').trim();
+        if (!rawName) return;
+
+        const sizeName = rawName.toUpperCase();
+
+        // Ensure the size exists in sizeData (for non-standard / waist sizes)
+        if (!sizeData[sizeName]) {
+          sizeData[sizeName] = { enabled: false, measurements: {} };
+        }
+
+        sizeData[sizeName].enabled = true;
+        if (csvImportMode === 'replace') sizeData[sizeName].measurements = {};
+
+        dataHeaders.forEach((_, i) => {
+          const mappedKey = csvColMap[i] === '__new__' ? newFieldMap[i] : csvColMap[i];
+          if (!mappedKey || mappedKey === '__skip__') return;
+          const val = parseFloat(row[i + 1]);
+          if (!isNaN(val)) {
+            sizeData[sizeName].measurements[mappedKey] = val;
+          }
+        });
+        imported++;
+      });
+
+      // Expand smaller/larger sections if imported sizes fall in those ranges
+      if (sizeStyle === 'letter') {
+        const smallerSizes = ALL_SIZES.slice(0, DEFAULT_VISIBLE_START);
+        const largerSizes = ALL_SIZES.slice(DEFAULT_VISIBLE_END + 1);
+        if (smallerSizes.some(s => sizeData[s] && sizeData[s].enabled)) showingSmallerSizes = true;
+        if (largerSizes.some(s => sizeData[s] && sizeData[s].enabled)) showingLargerSizes = true;
+      }
+
+      renderFields();
+      renderSizeTable();
+      closeImportModal();
+      showToast(`Imported ${imported} size${imported !== 1 ? 's' : ''} successfully`);
+    }
+
+    function exportCSV() {
+      const sizes = getSizesArray();
+      if (sizes.length === 0) {
+        showToast('No sizes to export', true);
+        return;
+      }
+
+      const headers = ['Size', ...measurementFields.map(f => f.label)];
+      const rows = sizes.map(s => [
+        s.name,
+        ...measurementFields.map(f => s.measurements[f.key] !== undefined ? s.measurements[f.key] : '')
+      ]);
+
+      const csvContent = [headers, ...rows]
+        .map(row => row.map(cell => {
+          const str = String(cell);
+          return str.includes(',') || str.includes('"') ? `"${str.replace(/"/g, '""')}"` : str;
+        }).join(','))
+        .join('\n');
+
+      const name = (document.getElementById('name').value || 'size-chart').replace(/[^a-z0-9]/gi, '-').toLowerCase();
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${name}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ─── End CSV Import/Export ────────────────────────────────────────────────
 
     init();
   </script>

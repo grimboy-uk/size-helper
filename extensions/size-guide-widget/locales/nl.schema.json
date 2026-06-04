@@ -1,0 +1,29 @@
+{
+  "name": "Maatgids",
+  "settings": {
+    "button_text": {
+      "label": "Knoptekst"
+    },
+    "modal_title": {
+      "label": "Modal-titel"
+    },
+    "modal_subtitle": {
+      "label": "Modal-ondertitel"
+    },
+    "button_background": {
+      "label": "Knopachtergrond"
+    },
+    "button_text_color": {
+      "label": "Knoptekstkleur"
+    },
+    "button_border_color": {
+      "label": "Knoprandkleur"
+    },
+    "button_hover_background": {
+      "label": "Hover-achtergrond"
+    },
+    "button_hover_text_color": {
+      "label": "Hover-tekstkleur"
+    }
+  }
+}

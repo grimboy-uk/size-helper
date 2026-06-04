@@ -1,0 +1,29 @@
+{
+  "name": "Größenberater",
+  "settings": {
+    "button_text": {
+      "label": "Schaltflächentext"
+    },
+    "modal_title": {
+      "label": "Modal-Titel"
+    },
+    "modal_subtitle": {
+      "label": "Modal-Untertitel"
+    },
+    "button_background": {
+      "label": "Schaltflächenhintergrund"
+    },
+    "button_text_color": {
+      "label": "Schaltflächentextfarbe"
+    },
+    "button_border_color": {
+      "label": "Schaltflächenrahmenfarbe"
+    },
+    "button_hover_background": {
+      "label": "Hover-Hintergrundfarbe"
+    },
+    "button_hover_text_color": {
+      "label": "Hover-Textfarbe"
+    }
+  }
+}

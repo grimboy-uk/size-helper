@@ -1,0 +1,66 @@
+{
+  "trigger": {
+    "button": "Storleksguide"
+  },
+  "modal": {
+    "loading": "Laddar storlekstabell..."
+  },
+  "chart": {
+    "unit_cm": "cm",
+    "unit_in": "tum",
+    "find_my_size_cta": "Hitta min storlek"
+  },
+  "questionnaire": {
+    "usual_size_q": "Vilken storlek brukar du ha?",
+    "length_q": "Vilken längd föredrar du?",
+    "length_short": "Kort",
+    "length_regular": "Normal",
+    "length_long": "Lång",
+    "body_shape_q": "Hur skulle du beskriva din kroppsform?",
+    "fit_q": "Vilken passform föredrar du?",
+    "fit_tight": "Tajt",
+    "fit_regular": "Normal",
+    "fit_loose": "Ledig",
+    "measurements_toggle": "Jag känner till mina mått (valfritt)",
+    "back_to_chart": "Tillbaka till storlekstabellen",
+    "submit_cta": "Få min rekommendation"
+  },
+  "result": {
+    "confidence_high": "Perfekt match!",
+    "confidence_medium": "Bra match",
+    "confidence_low": "Bästa uppskattning",
+    "try_again_cta": "Försök igen",
+    "continue_shopping_cta": "Fortsätt handla"
+  },
+  "errors": {
+    "limit_reached": "Den här butiken har nått sin månatliga gräns för storleksrekommendationer. Du kan fortfarande använda storlekstabellen för att hitta din storlek manuellt.",
+    "submit_failed": "Tyvärr kunde vi inte hämta din storleksrekommendation. Försök igen.",
+    "load_failed": "Det gick inte att ladda storlekstabellen"
+  },
+  "accessibility": {
+    "close_modal": "Stäng storleksguiden"
+  },
+  "measurements": {
+    "chest": "Bröst",
+    "waist": "Midja",
+    "hip": "Höft",
+    "length": "Längd",
+    "shoulder": "Axlar",
+    "inseam": "Innerbenlängd",
+    "thigh": "Lår",
+    "sleeve": "Armlängd",
+    "width": "Bredd"
+  },
+  "measurement_descriptions": {
+    "chest": "Mät runt den fullaste delen av bröstet, håll måttbandet vågrätt.",
+    "waist": "Mät runt din naturliga midjelinje vid den smalaste punkten.",
+    "hip": "Mät runt den fullaste delen av höfterna och sätet.",
+    "length": "Mät från den högsta skulderpunkten rakt ned till fållen.",
+    "shoulder": "Mät rakt över ryggen från söm till söm på axlarna.",
+    "inseam": "Mät från grenen längs insidan av benet till ankeln.",
+    "thigh": "Mät runt den fullaste delen av det övre låret.",
+    "sleeve": "Mät från axelsömmen längs ytterkanten av armen till manschetten.",
+    "width": "Mät den bredaste delen av foten.",
+    "foot_length": "Mät från spetsen på den längsta tån till hälen."
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "trigger": {
+    "button": "Maattabel"
+  },
+  "modal": {
+    "loading": "Maattabel laden..."
+  },
+  "chart": {
+    "unit_cm": "cm",
+    "unit_in": "inch",
+    "find_my_size_cta": "Vind mijn maat"
+  },
+  "questionnaire": {
+    "usual_size_q": "Welke maat draag je gewoonlijk?",
+    "length_q": "Welke lengte heb je voorkeur voor?",
+    "length_short": "Kort",
+    "length_regular": "Normaal",
+    "length_long": "Lang",
+    "body_shape_q": "Hoe zou je je lichaamsvorm omschrijven?",
+    "fit_q": "Welke pasvorm heb je voorkeur voor?",
+    "fit_tight": "Strak",
+    "fit_regular": "Normaal",
+    "fit_loose": "Ruim",
+    "measurements_toggle": "Ik ken mijn maten (optioneel)",
+    "back_to_chart": "Terug naar maattabel",
+    "submit_cta": "Mijn aanbeveling ontvangen"
+  },
+  "result": {
+    "confidence_high": "Perfecte match!",
+    "confidence_medium": "Goede match",
+    "confidence_low": "Beste schatting",
+    "try_again_cta": "Opnieuw proberen",
+    "continue_shopping_cta": "Doorgaan met winkelen"
+  },
+  "errors": {
+    "limit_reached": "Deze winkel heeft zijn maandelijkse limiet voor maataanbevelingen bereikt. U kunt de maattabel nog steeds gebruiken om uw maat handmatig te vinden.",
+    "submit_failed": "Sorry, we konden uw maataanbeveling niet ophalen. Probeer het opnieuw.",
+    "load_failed": "Maattabel kan niet worden geladen"
+  },
+  "accessibility": {
+    "close_modal": "Maatgids sluiten"
+  },
+  "measurements": {
+    "chest": "Borst",
+    "waist": "Taille",
+    "hip": "Heupen",
+    "length": "Lengte",
+    "shoulder": "Schouder",
+    "inseam": "Binnenbeenlengte",
+    "thigh": "Dij",
+    "sleeve": "Mouwen lengte",
+    "width": "Breedte"
+  },
+  "measurement_descriptions": {
+    "chest": "Meet rondom het volste deel van uw borst, houd het meetlint horizontaal.",
+    "waist": "Meet rondom uw natuurlijke taillijn op het smalste punt.",
+    "hip": "Meet rondom het volste deel van uw heupen en zitvlak.",
+    "length": "Meet van het hoogste schouderpunt recht naar beneden tot de zoom.",
+    "shoulder": "Meet rechtuit over de rug van schoudernaat tot schoudernaat.",
+    "inseam": "Meet vanaf de kruis langs de binnenkant van het been tot de enkel.",
+    "thigh": "Meet rondom het volste deel van het bovenbeen.",
+    "sleeve": "Meet van de schoudernaat langs de buitenkant van de arm tot de manchet.",
+    "width": "Meet het breedste deel van de voet.",
+    "foot_length": "Meet van de punt van de langste teen tot de hiel."
+  }
+}

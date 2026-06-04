@@ -1,0 +1,29 @@
+{
+  "name": "尺码指南",
+  "settings": {
+    "button_text": {
+      "label": "按钮文字"
+    },
+    "modal_title": {
+      "label": "弹窗标题"
+    },
+    "modal_subtitle": {
+      "label": "弹窗副标题"
+    },
+    "button_background": {
+      "label": "按钮背景色"
+    },
+    "button_text_color": {
+      "label": "按钮文字颜色"
+    },
+    "button_border_color": {
+      "label": "按钮边框颜色"
+    },
+    "button_hover_background": {
+      "label": "悬停背景色"
+    },
+    "button_hover_text_color": {
+      "label": "悬停文字颜色"
+    }
+  }
+}

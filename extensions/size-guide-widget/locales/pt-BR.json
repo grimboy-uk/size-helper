@@ -1,0 +1,66 @@
+{
+  "trigger": {
+    "button": "Guia de tamanhos"
+  },
+  "modal": {
+    "loading": "Carregando tabela de tamanhos..."
+  },
+  "chart": {
+    "unit_cm": "cm",
+    "unit_in": "polegadas",
+    "find_my_size_cta": "Encontrar meu tamanho"
+  },
+  "questionnaire": {
+    "usual_size_q": "Qual tamanho você normalmente usa?",
+    "length_q": "Qual comprimento você prefere?",
+    "length_short": "Curto",
+    "length_regular": "Normal",
+    "length_long": "Longo",
+    "body_shape_q": "Como você descreveria o seu tipo de corpo?",
+    "fit_q": "Qual caimento você prefere?",
+    "fit_tight": "Justo",
+    "fit_regular": "Regular",
+    "fit_loose": "Folgado",
+    "measurements_toggle": "Eu sei minhas medidas (opcional)",
+    "back_to_chart": "Voltar à tabela de tamanhos",
+    "submit_cta": "Obter minha recomendação"
+  },
+  "result": {
+    "confidence_high": "Combinação perfeita!",
+    "confidence_medium": "Boa combinação",
+    "confidence_low": "Melhor estimativa",
+    "try_again_cta": "Tentar novamente",
+    "continue_shopping_cta": "Continuar comprando"
+  },
+  "errors": {
+    "limit_reached": "Esta loja atingiu seu limite mensal de recomendações de tamanho. Você ainda pode usar a tabela de tamanhos para encontrar seu tamanho manualmente.",
+    "submit_failed": "Desculpe, não conseguimos obter sua recomendação de tamanho. Por favor, tente novamente.",
+    "load_failed": "Não foi possível carregar a tabela de tamanhos"
+  },
+  "accessibility": {
+    "close_modal": "Fechar guia de tamanhos"
+  },
+  "measurements": {
+    "chest": "Busto",
+    "waist": "Cintura",
+    "hip": "Quadril",
+    "length": "Comprimento",
+    "shoulder": "Ombro",
+    "inseam": "Entrepernas",
+    "thigh": "Coxa",
+    "sleeve": "Comprimento de manga",
+    "width": "Largura"
+  },
+  "measurement_descriptions": {
+    "chest": "Meça em volta da parte mais cheia do seu peito, mantendo a fita horizontal.",
+    "waist": "Meça em volta de sua cintura natural no ponto mais estreito.",
+    "hip": "Meça em volta da parte mais cheia do seu quadril e nádegas.",
+    "length": "Meça do ponto mais alto do ombro reto para baixo até a bainha.",
+    "shoulder": "Meça em linha reta pelas costas de costura a costura dos ombros.",
+    "inseam": "Meça a partir da virilha pela parte interna da perna até o tornozelo.",
+    "thigh": "Meça em volta da parte mais cheia da parte superior da coxa.",
+    "sleeve": "Meça a partir da costura do ombro ao longo do braço externo até o punho.",
+    "width": "Meça a parte mais larga do pé.",
+    "foot_length": "Meça da ponta do dedo mais longo até o calcanhar."
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "trigger": {
+    "button": "Größentabelle"
+  },
+  "modal": {
+    "loading": "Größentabelle wird geladen..."
+  },
+  "chart": {
+    "unit_cm": "cm",
+    "unit_in": "Zoll",
+    "find_my_size_cta": "Meine Größe finden"
+  },
+  "questionnaire": {
+    "usual_size_q": "Welche Größe tragen Sie normalerweise?",
+    "length_q": "Welche Länge bevorzugen Sie?",
+    "length_short": "Kurz",
+    "length_regular": "Normal",
+    "length_long": "Lang",
+    "body_shape_q": "Wie würden Sie Ihre Körperform beschreiben?",
+    "fit_q": "Welche Passform bevorzugen Sie?",
+    "fit_tight": "Eng anliegend",
+    "fit_regular": "Normal",
+    "fit_loose": "Locker",
+    "measurements_toggle": "Ich kenne meine Maße (optional)",
+    "back_to_chart": "Zurück zur Größentabelle",
+    "submit_cta": "Empfehlung erhalten"
+  },
+  "result": {
+    "confidence_high": "Perfekte Übereinstimmung!",
+    "confidence_medium": "Gute Übereinstimmung",
+    "confidence_low": "Beste Schätzung",
+    "try_again_cta": "Erneut versuchen",
+    "continue_shopping_cta": "Weiter einkaufen"
+  },
+  "errors": {
+    "limit_reached": "Dieser Shop hat sein monatliches Limit für Größenempfehlungen erreicht. Sie können die Größentabelle weiterhin nutzen, um Ihre Größe manuell zu finden.",
+    "submit_failed": "Leider konnten wir Ihre Größenempfehlung nicht abrufen. Bitte versuchen Sie es erneut.",
+    "load_failed": "Größentabelle konnte nicht geladen werden"
+  },
+  "accessibility": {
+    "close_modal": "Größenberater schließen"
+  },
+  "measurements": {
+    "chest": "Brust",
+    "waist": "Taille",
+    "hip": "Hüfte",
+    "length": "Länge",
+    "shoulder": "Schulter",
+    "inseam": "Innenbeinlänge",
+    "thigh": "Oberschenkel",
+    "sleeve": "Ärmellänge",
+    "width": "Breite"
+  },
+  "measurement_descriptions": {
+    "chest": "Messen Sie um den vollsten Teil Ihrer Brust, das Maßband waagrecht halten.",
+    "waist": "Messen Sie um Ihre natürliche Taillenlinie an der schmalsten Stelle.",
+    "hip": "Messen Sie um den vollsten Teil Ihrer Hüfte und Ihres Gesäßes.",
+    "length": "Messen Sie vom höchsten Schulterpunkt gerade nach unten bis zum Saum.",
+    "shoulder": "Messen Sie gerade über den Rücken von Schulternaht zu Schulternaht.",
+    "inseam": "Messen Sie vom Schritt die Innenseite des Beins bis zum Knöchel.",
+    "thigh": "Messen Sie um den vollsten Teil des Oberschenkels.",
+    "sleeve": "Messen Sie von der Schulternaht entlang der Außenseite des Arms bis zur Manschette.",
+    "width": "Messen Sie über den breitesten Teil des Fußes.",
+    "foot_length": "Messen Sie von der Spitze des längsten Zehs bis zur Ferse."
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "Guida alle taglie",
+  "settings": {
+    "button_text": {
+      "label": "Testo del pulsante"
+    },
+    "modal_title": {
+      "label": "Titolo del modale"
+    },
+    "modal_subtitle": {
+      "label": "Sottotitolo del modale"
+    },
+    "button_background": {
+      "label": "Sfondo del pulsante"
+    },
+    "button_text_color": {
+      "label": "Colore del testo del pulsante"
+    },
+    "button_border_color": {
+      "label": "Colore del bordo del pulsante"
+    },
+    "button_hover_background": {
+      "label": "Sfondo al passaggio del cursore"
+    },
+    "button_hover_text_color": {
+      "label": "Colore del testo al passaggio del cursore"
+    }
+  }
+}

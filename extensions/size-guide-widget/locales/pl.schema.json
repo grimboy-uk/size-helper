@@ -1,0 +1,29 @@
+{
+  "name": "Przewodnik po rozmiarach",
+  "settings": {
+    "button_text": {
+      "label": "Tekst przycisku"
+    },
+    "modal_title": {
+      "label": "Tytuł okna"
+    },
+    "modal_subtitle": {
+      "label": "Podtytuł okna"
+    },
+    "button_background": {
+      "label": "Tło przycisku"
+    },
+    "button_text_color": {
+      "label": "Kolor tekstu przycisku"
+    },
+    "button_border_color": {
+      "label": "Kolor obramowania przycisku"
+    },
+    "button_hover_background": {
+      "label": "Tło po najechaniu"
+    },
+    "button_hover_text_color": {
+      "label": "Kolor tekstu po najechaniu"
+    }
+  }
+}

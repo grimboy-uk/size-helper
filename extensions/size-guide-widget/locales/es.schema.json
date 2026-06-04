@@ -1,0 +1,29 @@
+{
+  "name": "Guía de tallas",
+  "settings": {
+    "button_text": {
+      "label": "Texto del botón"
+    },
+    "modal_title": {
+      "label": "Título del modal"
+    },
+    "modal_subtitle": {
+      "label": "Subtítulo del modal"
+    },
+    "button_background": {
+      "label": "Fondo del botón"
+    },
+    "button_text_color": {
+      "label": "Color del texto del botón"
+    },
+    "button_border_color": {
+      "label": "Color del borde del botón"
+    },
+    "button_hover_background": {
+      "label": "Fondo al pasar el cursor"
+    },
+    "button_hover_text_color": {
+      "label": "Color del texto al pasar el cursor"
+    }
+  }
+}

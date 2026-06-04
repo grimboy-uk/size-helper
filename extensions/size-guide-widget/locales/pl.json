@@ -1,0 +1,66 @@
+{
+  "trigger": {
+    "button": "Przewodnik po rozmiarach"
+  },
+  "modal": {
+    "loading": "Ładowanie tabeli rozmiarów..."
+  },
+  "chart": {
+    "unit_cm": "cm",
+    "unit_in": "cale",
+    "find_my_size_cta": "Znajdź mój rozmiar"
+  },
+  "questionnaire": {
+    "usual_size_q": "Jaki rozmiar zazwyczaj nosisz?",
+    "length_q": "Jaką długość preferujesz?",
+    "length_short": "Krótki",
+    "length_regular": "Regularny",
+    "length_long": "Długi",
+    "body_shape_q": "Jak opisałbyś swój typ sylwetki?",
+    "fit_q": "Jakie dopasowanie preferujesz?",
+    "fit_tight": "Dopasowane",
+    "fit_regular": "Regularne",
+    "fit_loose": "Luźne",
+    "measurements_toggle": "Znam swoje wymiary (opcjonalnie)",
+    "back_to_chart": "Powrót do tabeli rozmiarów",
+    "submit_cta": "Uzyskaj rekomendację"
+  },
+  "result": {
+    "confidence_high": "Idealne dopasowanie!",
+    "confidence_medium": "Dobre dopasowanie",
+    "confidence_low": "Najlepsza ocena",
+    "try_again_cta": "Spróbuj ponownie",
+    "continue_shopping_cta": "Kontynuuj zakupy"
+  },
+  "errors": {
+    "limit_reached": "Ten sklep osiągnął miesięczny limit rekomendacji rozmiarów. Możesz nadal korzystać z tabeli rozmiarów, aby ręcznie znaleźć swój rozmiar.",
+    "submit_failed": "Przepraszamy, nie udało się uzyskać rekomendacji rozmiaru. Spróbuj ponownie.",
+    "load_failed": "Nie można załadować tabeli rozmiarów"
+  },
+  "accessibility": {
+    "close_modal": "Zamknij przewodnik po rozmiarach"
+  },
+  "measurements": {
+    "chest": "Klatka piersiowa",
+    "waist": "Talia",
+    "hip": "Biodra",
+    "length": "Długość",
+    "shoulder": "Ramiona",
+    "inseam": "Krok",
+    "thigh": "Udo",
+    "sleeve": "Długość rękawa",
+    "width": "Szerokość"
+  },
+  "measurement_descriptions": {
+    "chest": "Zmierz wokół najszerszej części klatki piersiowej, trzymając taśmę poziomo.",
+    "waist": "Zmierz wokół naturalnej linii talii w najwęższym punkcie.",
+    "hip": "Zmierz wokół najszerszej części bioder i pośladków.",
+    "length": "Zmierz od najwyższego punktu barku prosto w dół do dołu.",
+    "shoulder": "Zmierz w linii prostej przez plecy od szwu do szwu ramion.",
+    "inseam": "Zmierz od kroku wzdłuż wewnętrznej strony nogi do kostki.",
+    "thigh": "Zmierz wokół najszerszej części górnej części uda.",
+    "sleeve": "Zmierz od szwu ramienia wzdłuż zewnętrznej części ramienia do mankietu.",
+    "width": "Zmierz najszerszą część stopy.",
+    "foot_length": "Zmierz od czubka najdłuższego palca do pięty."
+  }
+}

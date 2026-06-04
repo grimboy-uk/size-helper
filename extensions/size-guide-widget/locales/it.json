@@ -1,0 +1,66 @@
+{
+  "trigger": {
+    "button": "Guida alle taglie"
+  },
+  "modal": {
+    "loading": "Caricamento guida alle taglie..."
+  },
+  "chart": {
+    "unit_cm": "cm",
+    "unit_in": "pollici",
+    "find_my_size_cta": "Trova la mia taglia"
+  },
+  "questionnaire": {
+    "usual_size_q": "Che taglia indossi di solito?",
+    "length_q": "Che lunghezza preferisci?",
+    "length_short": "Corto",
+    "length_regular": "Normale",
+    "length_long": "Lungo",
+    "body_shape_q": "Come descriveresti la tua forma corporea?",
+    "fit_q": "Che vestibilità preferisci?",
+    "fit_tight": "Aderente",
+    "fit_regular": "Normale",
+    "fit_loose": "Ampia",
+    "measurements_toggle": "Conosco le mie misure (opzionale)",
+    "back_to_chart": "Torna alla guida alle taglie",
+    "submit_cta": "Ottieni il mio consiglio"
+  },
+  "result": {
+    "confidence_high": "Corrispondenza perfetta!",
+    "confidence_medium": "Buona corrispondenza",
+    "confidence_low": "Stima migliore",
+    "try_again_cta": "Riprova",
+    "continue_shopping_cta": "Continua lo shopping"
+  },
+  "errors": {
+    "limit_reached": "Questo negozio ha raggiunto il limite mensile di consigli sulla taglia. Puoi comunque utilizzare la guida alle taglie per trovare la tua taglia manualmente.",
+    "submit_failed": "Spiacenti, non è stato possibile ottenere il consiglio sulla taglia. Riprova.",
+    "load_failed": "Impossibile caricare la guida alle taglie"
+  },
+  "accessibility": {
+    "close_modal": "Chiudi la guida alle taglie"
+  },
+  "measurements": {
+    "chest": "Petto",
+    "waist": "Vita",
+    "hip": "Fianchi",
+    "length": "Lunghezza",
+    "shoulder": "Spalle",
+    "inseam": "Cavallo",
+    "thigh": "Coscia",
+    "sleeve": "Lunghezza manica",
+    "width": "Larghezza"
+  },
+  "measurement_descriptions": {
+    "chest": "Misura intorno alla parte più piena del petto, mantenendo il metro orizzontale.",
+    "waist": "Misura intorno alla tua vita naturale nel punto più stretto.",
+    "hip": "Misura intorno alla parte più piena dei fianchi e dei glutei.",
+    "length": "Misura dal punto più alto della spalla dritto verso il basso fino all'orlo.",
+    "shoulder": "Misura in linea retta attraverso la schiena da cucitura a cucitura delle spalle.",
+    "inseam": "Misura dal cavallo lungo la parte interna della gamba fino alla caviglia.",
+    "thigh": "Misura intorno alla parte più piena della coscia superiore.",
+    "sleeve": "Misura dalla cucitura della spalla lungo il braccio esterno fino al polsino.",
+    "width": "Misura la parte più larga del piede.",
+    "foot_length": "Misura dalla punta del dito più lungo al tallone."
+  }
+}

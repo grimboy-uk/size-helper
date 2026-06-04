@@ -1,0 +1,66 @@
+{
+  "trigger": {
+    "button": "Guía de tallas"
+  },
+  "modal": {
+    "loading": "Cargando la guía de tallas..."
+  },
+  "chart": {
+    "unit_cm": "cm",
+    "unit_in": "pulgadas",
+    "find_my_size_cta": "Encontrar mi talla"
+  },
+  "questionnaire": {
+    "usual_size_q": "¿Qué talla sueles llevar?",
+    "length_q": "¿Qué largo prefieres?",
+    "length_short": "Corto",
+    "length_regular": "Normal",
+    "length_long": "Largo",
+    "body_shape_q": "¿Cómo describirías tu tipo de cuerpo?",
+    "fit_q": "¿Qué ajuste prefieres?",
+    "fit_tight": "Ajustado",
+    "fit_regular": "Normal",
+    "fit_loose": "Holgado",
+    "measurements_toggle": "Conozco mis medidas (opcional)",
+    "back_to_chart": "Volver a la guía de tallas",
+    "submit_cta": "Obtener mi recomendación"
+  },
+  "result": {
+    "confidence_high": "¡Coincidencia perfecta!",
+    "confidence_medium": "Buena coincidencia",
+    "confidence_low": "Mejor estimación",
+    "try_again_cta": "Intentar de nuevo",
+    "continue_shopping_cta": "Seguir comprando"
+  },
+  "errors": {
+    "limit_reached": "Esta tienda ha alcanzado su límite mensual de recomendaciones de talla. Puedes seguir usando la guía de tallas para encontrar tu talla manualmente.",
+    "submit_failed": "Lo sentimos, no pudimos obtener tu recomendación de talla. Por favor, inténtalo de nuevo.",
+    "load_failed": "No se pudo cargar la guía de tallas"
+  },
+  "accessibility": {
+    "close_modal": "Cerrar la guía de tallas"
+  },
+  "measurements": {
+    "chest": "Pecho",
+    "waist": "Cintura",
+    "hip": "Cadera",
+    "length": "Largo",
+    "shoulder": "Hombro",
+    "inseam": "Entrepierna",
+    "thigh": "Muslo",
+    "sleeve": "Largo de manga",
+    "width": "Ancho"
+  },
+  "measurement_descriptions": {
+    "chest": "Mide alrededor de la parte más ancha del pecho, manteniendo la cinta horizontal.",
+    "waist": "Mide alrededor de tu cintura natural en el punto más estrecho.",
+    "hip": "Mide alrededor de la parte más ancha de tus caderas y glúteos.",
+    "length": "Mide desde el punto más alto del hombro hacia abajo hasta el dobladillo.",
+    "shoulder": "Mide en línea recta por la espalda de costura a costura de los hombros.",
+    "inseam": "Mide desde la entrepierna por el interior de la pierna hasta el tobillo.",
+    "thigh": "Mide alrededor de la parte más ancha de la parte superior del muslo.",
+    "sleeve": "Mide desde la costura del hombro a lo largo del brazo exterior hasta el puño.",
+    "width": "Mide la parte más ancha del pie.",
+    "foot_length": "Mide desde la punta del dedo más largo hasta el talón."
+  }
+}

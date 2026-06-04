@@ -1,0 +1,66 @@
+{
+  "trigger": {
+    "button": "Guide des tailles"
+  },
+  "modal": {
+    "loading": "Chargement du guide des tailles..."
+  },
+  "chart": {
+    "unit_cm": "cm",
+    "unit_in": "pouces",
+    "find_my_size_cta": "Trouver ma taille"
+  },
+  "questionnaire": {
+    "usual_size_q": "Quelle taille portez-vous habituellement ?",
+    "length_q": "Quelle longueur préférez-vous ?",
+    "length_short": "Court",
+    "length_regular": "Normal",
+    "length_long": "Long",
+    "body_shape_q": "Comment décririez-vous votre morphologie ?",
+    "fit_q": "Quelle coupe préférez-vous ?",
+    "fit_tight": "Ajustée",
+    "fit_regular": "Normale",
+    "fit_loose": "Décontractée",
+    "measurements_toggle": "Je connais mes mesures (optionnel)",
+    "back_to_chart": "Retour au guide des tailles",
+    "submit_cta": "Obtenir ma recommandation"
+  },
+  "result": {
+    "confidence_high": "Correspondance parfaite !",
+    "confidence_medium": "Bonne correspondance",
+    "confidence_low": "Meilleure estimation",
+    "try_again_cta": "Réessayer",
+    "continue_shopping_cta": "Continuer mes achats"
+  },
+  "errors": {
+    "limit_reached": "Cette boutique a atteint sa limite mensuelle de recommandations de taille. Vous pouvez toujours utiliser le guide des tailles pour trouver votre taille manuellement.",
+    "submit_failed": "Désolé, nous n'avons pas pu obtenir votre recommandation de taille. Veuillez réessayer.",
+    "load_failed": "Impossible de charger le guide des tailles"
+  },
+  "accessibility": {
+    "close_modal": "Fermer le guide des tailles"
+  },
+  "measurements": {
+    "chest": "Poitrine",
+    "waist": "Taille",
+    "hip": "Hanches",
+    "length": "Longueur",
+    "shoulder": "Épaules",
+    "inseam": "Entrejambe",
+    "thigh": "Cuisse",
+    "sleeve": "Longueur de manche",
+    "width": "Largeur"
+  },
+  "measurement_descriptions": {
+    "chest": "Mesurez autour de la partie la plus forte de votre poitrine, en maintenant le mètre horizontal.",
+    "waist": "Mesurez autour de votre taille naturelle à l'endroit le plus étroit.",
+    "hip": "Mesurez autour de la partie la plus forte de vos hanches et de vos fesses.",
+    "length": "Mesurez depuis le point d'épaule le plus haut jusqu'à l'ourlet.",
+    "shoulder": "Mesurez en ligne droite dans le dos d'une couture d'épaule à l'autre.",
+    "inseam": "Mesurez depuis l'entrejambe le long de la jambe intérieure jusqu'à la cheville.",
+    "thigh": "Mesurez autour de la partie la plus forte du haut de la cuisse.",
+    "sleeve": "Mesurez depuis la couture d'épaule le long du bras extérieur jusqu'au poignet.",
+    "width": "Mesurez la partie la plus large du pied.",
+    "foot_length": "Mesurez de la pointe du plus grand orteil jusqu'au talon."
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "サイズガイド",
+  "settings": {
+    "button_text": {
+      "label": "ボタンテキスト"
+    },
+    "modal_title": {
+      "label": "モーダルタイトル"
+    },
+    "modal_subtitle": {
+      "label": "モーダルサブタイトル"
+    },
+    "button_background": {
+      "label": "ボタン背景色"
+    },
+    "button_text_color": {
+      "label": "ボタンテキスト色"
+    },
+    "button_border_color": {
+      "label": "ボタン枠線色"
+    },
+    "button_hover_background": {
+      "label": "ホバー時背景色"
+    },
+    "button_hover_text_color": {
+      "label": "ホバー時テキスト色"
+    }
+  }
+}

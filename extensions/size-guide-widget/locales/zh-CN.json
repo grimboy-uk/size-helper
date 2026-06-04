@@ -1,0 +1,66 @@
+{
+  "trigger": {
+    "button": "尺码指南"
+  },
+  "modal": {
+    "loading": "正在加载尺码表..."
+  },
+  "chart": {
+    "unit_cm": "厘米",
+    "unit_in": "英寸",
+    "find_my_size_cta": "查找我的尺码"
+  },
+  "questionnaire": {
+    "usual_size_q": "您通常穿什么尺码？",
+    "length_q": "您偏好哪种长度？",
+    "length_short": "短款",
+    "length_regular": "常规",
+    "length_long": "长款",
+    "body_shape_q": "您如何描述您的体型？",
+    "fit_q": "您偏好哪种版型？",
+    "fit_tight": "修身",
+    "fit_regular": "常规",
+    "fit_loose": "宽松",
+    "measurements_toggle": "我知道自己的尺寸（可选）",
+    "back_to_chart": "返回尺码表",
+    "submit_cta": "获取我的推荐"
+  },
+  "result": {
+    "confidence_high": "完美匹配！",
+    "confidence_medium": "较好匹配",
+    "confidence_low": "最佳估算",
+    "try_again_cta": "重新尝试",
+    "continue_shopping_cta": "继续购物"
+  },
+  "errors": {
+    "limit_reached": "该店铺已达到本月尺码推荐次数上限。您仍可使用尺码表手动查找您的尺码。",
+    "submit_failed": "抱歉，我们无法获取您的尺码推荐。请重试。",
+    "load_failed": "无法加载尺码表"
+  },
+  "accessibility": {
+    "close_modal": "关闭尺码指南"
+  },
+  "measurements": {
+    "chest": "胸围",
+    "waist": "腰围",
+    "hip": "臀围",
+    "length": "衣长",
+    "shoulder": "肩宽",
+    "inseam": "裆长",
+    "thigh": "大腿围",
+    "sleeve": "袖长",
+    "width": "宽度"
+  },
+  "measurement_descriptions": {
+    "chest": "在胸部最丰满处水平围量一圈。",
+    "waist": "在最细的自然腰线处围量一圈。",
+    "hip": "在臀部最丰满处围量一圈。",
+    "length": "从最高肩点垂直量至下摆。",
+    "shoulder": "沿后背从一侧肩缝直量至另一侧肩缝。",
+    "inseam": "从裆部沿腿内侧量至踝部。",
+    "thigh": "在大腿最粗处围量一圈。",
+    "sleeve": "从肩缝沿外臂量至袖口。",
+    "width": "量脚掌最宽处的宽度。",
+    "foot_length": "从最长脚趾的趾尖量至脚跟。"
+  }
+}

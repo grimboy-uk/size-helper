@@ -1,0 +1,29 @@
+{
+  "name": "Guia de tamanhos",
+  "settings": {
+    "button_text": {
+      "label": "Texto do botão"
+    },
+    "modal_title": {
+      "label": "Título do modal"
+    },
+    "modal_subtitle": {
+      "label": "Subtítulo do modal"
+    },
+    "button_background": {
+      "label": "Fundo do botão"
+    },
+    "button_text_color": {
+      "label": "Cor do texto do botão"
+    },
+    "button_border_color": {
+      "label": "Cor da borda do botão"
+    },
+    "button_hover_background": {
+      "label": "Fundo ao passar o cursor"
+    },
+    "button_hover_text_color": {
+      "label": "Cor do texto ao passar o cursor"
+    }
+  }
+}

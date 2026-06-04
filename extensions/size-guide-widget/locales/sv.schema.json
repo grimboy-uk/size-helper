@@ -1,0 +1,29 @@
+{
+  "name": "Storleksguide",
+  "settings": {
+    "button_text": {
+      "label": "Knapptext"
+    },
+    "modal_title": {
+      "label": "Modal-rubrik"
+    },
+    "modal_subtitle": {
+      "label": "Modal-underrubrik"
+    },
+    "button_background": {
+      "label": "Knappbakgrund"
+    },
+    "button_text_color": {
+      "label": "Knapptextfärg"
+    },
+    "button_border_color": {
+      "label": "Knappkantfärg"
+    },
+    "button_hover_background": {
+      "label": "Hoverbakgrund"
+    },
+    "button_hover_text_color": {
+      "label": "Hovertextfärg"
+    }
+  }
+}

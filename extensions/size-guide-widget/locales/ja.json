@@ -1,0 +1,66 @@
+{
+  "trigger": {
+    "button": "サイズガイド"
+  },
+  "modal": {
+    "loading": "サイズ表を読み込んでいます..."
+  },
+  "chart": {
+    "unit_cm": "cm",
+    "unit_in": "インチ",
+    "find_my_size_cta": "サイズを探す"
+  },
+  "questionnaire": {
+    "usual_size_q": "普段どのサイズをお使いですか？",
+    "length_q": "どの丈をお好みですか？",
+    "length_short": "短め",
+    "length_regular": "普通",
+    "length_long": "長め",
+    "body_shape_q": "体型はどのように表現できますか？",
+    "fit_q": "どのフィット感をお好みですか？",
+    "fit_tight": "タイト",
+    "fit_regular": "レギュラー",
+    "fit_loose": "リラックス",
+    "measurements_toggle": "自分のサイズを知っています（任意）",
+    "back_to_chart": "サイズ表に戻る",
+    "submit_cta": "おすすめサイズを見る"
+  },
+  "result": {
+    "confidence_high": "ぴったり！",
+    "confidence_medium": "良い一致",
+    "confidence_low": "おすすめの推定",
+    "try_again_cta": "もう一度試す",
+    "continue_shopping_cta": "ショッピングを続ける"
+  },
+  "errors": {
+    "limit_reached": "このストアは今月のサイズ提案の上限に達しました。引き続きサイズ表を使って手動でサイズをご確認いただけます。",
+    "submit_failed": "申し訳ありません。サイズのおすすめを取得できませんでした。もう一度お試しください。",
+    "load_failed": "サイズ表を読み込めませんでした"
+  },
+  "accessibility": {
+    "close_modal": "サイズガイドを閉じる"
+  },
+  "measurements": {
+    "chest": "胸囲",
+    "waist": "ウエスト",
+    "hip": "ヒップ",
+    "length": "着丈",
+    "shoulder": "肩幅",
+    "inseam": "股下",
+    "thigh": "太もも",
+    "sleeve": "袖丈",
+    "width": "幅"
+  },
+  "measurement_descriptions": {
+    "chest": "バストの最も豊かな部分をぐるりと水平に測ってください。",
+    "waist": "最も細いウエストラインをぐるりと測ってください。",
+    "hip": "ヒップと座面の最も豊かな部分をぐるりと測ってください。",
+    "length": "肩の最も高い位置から裾まで真っすぐ測ってください。",
+    "shoulder": "背中の肩の縫い目から反対の肩の縫い目まで真っすぐ測ってください。",
+    "inseam": "股下から足首の内側まで測ってください。",
+    "thigh": "太ももの最も太い部分をぐるりと測ってください。",
+    "sleeve": "肩の縫い目から腕の外側を通って袖口まで測ってください。",
+    "width": "足の最も幅広い部分を測ってください。",
+    "foot_length": "最も長い指のつま先からかかとまで測ってください。"
+  }
+}

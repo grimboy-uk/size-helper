@@ -1,0 +1,29 @@
+{
+  "name": "Guide des tailles",
+  "settings": {
+    "button_text": {
+      "label": "Texte du bouton"
+    },
+    "modal_title": {
+      "label": "Titre de la fenêtre"
+    },
+    "modal_subtitle": {
+      "label": "Sous-titre de la fenêtre"
+    },
+    "button_background": {
+      "label": "Fond du bouton"
+    },
+    "button_text_color": {
+      "label": "Couleur du texte du bouton"
+    },
+    "button_border_color": {
+      "label": "Couleur de la bordure du bouton"
+    },
+    "button_hover_background": {
+      "label": "Fond au survol"
+    },
+    "button_hover_text_color": {
+      "label": "Couleur du texte au survol"
+    }
+  }
+}

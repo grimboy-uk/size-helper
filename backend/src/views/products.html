@@ -652,7 +652,7 @@
         showToast('Please select a template', true);
         return;
       }
-      const products = [...selectedProducts.values()];
+      const products = [...selectedProducts.values()].map(p => ({ productId: p.id, productTitle: p.title }));
       try {
         await apiPost('/api/products/assign-bulk', {
           products,

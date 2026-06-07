@@ -33,6 +33,11 @@ export async function registerWebhooks(session) {
         address: `${process.env.SHOPIFY_APP_URL}/api/webhooks/uninstall`,
         format: 'json',
       },
+      {
+        topic: 'orders/paid',
+        address: `${process.env.SHOPIFY_APP_URL}/api/webhooks/orders/paid`,
+        format: 'json',
+      },
     ];
 
     logger.debug('Creating REST client...');

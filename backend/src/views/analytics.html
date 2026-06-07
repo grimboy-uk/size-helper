@@ -78,6 +78,16 @@
       gap: 16px;
       margin-bottom: 24px;
     }
+    .funnel-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .funnel-card { background: #fff; border: 1px solid #dedad4; border-radius: 10px; padding: 20px; }
+    .funnel-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .funnel-card .value { font-size: 2rem; font-weight: 700; color: #252c30; }
+    .funnel-card .label { font-size: 0.8rem; color: #4b5563; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .funnel-card .sub-line { font-size: 0.82rem; color: #4b5563; margin-top: 6px; }
+    .trend-badge { font-size: 0.78rem; font-weight: 600; padding: 2px 8px; border-radius: 12px; white-space: nowrap; }
+    .trend-badge.positive { background: #d1fae5; color: #065f46; }
+    .trend-badge.negative { background: #fee2e2; color: #991b1b; }
+    .trend-badge.neutral { background: #f3f4f6; color: #6b7280; }
     .stat-card {
       background: #f8f9fa;
       border-radius: 8px;
@@ -129,6 +139,12 @@
     }
     .bar.secondary {
       background: #22c55e;
+    }
+    .bar.tertiary {
+      background: #f59e0b;
+    }
+    .bar.quaternary {
+      background: #8b5cf6;
     }
     .bar-label {
       font-size: 11px;
@@ -226,6 +242,7 @@
       .stats-grid {
         grid-template-columns: 1fr;
       }
+      .funnel-cards { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -251,18 +268,38 @@
         </select>
       </div>
 
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-value" id="stat-opens">0</div>
-          <div class="stat-label">Size Guide Opens</div>
+      <div class="funnel-cards">
+        <div class="funnel-card">
+          <div class="funnel-card-header">
+            <div class="value" id="funnel-opens">0</div>
+            <span id="trend-opens"></span>
+          </div>
+          <div class="label">Size Guide Opens</div>
+          <div class="sub-line" id="sublabel-opens">Top of funnel</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value" id="stat-recommendations">0</div>
-          <div class="stat-label">Recommendations Made</div>
+        <div class="funnel-card">
+          <div class="funnel-card-header">
+            <div class="value" id="funnel-recommendations">0</div>
+            <span id="trend-recommendations"></span>
+          </div>
+          <div class="label">Recommendations</div>
+          <div class="sub-line" id="sublabel-recommendations">—</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value" id="stat-conversion">0%</div>
-          <div class="stat-label">Conversion Rate</div>
+        <div class="funnel-card">
+          <div class="funnel-card-header">
+            <div class="value" id="funnel-add-to-cart">0</div>
+            <span id="trend-add-to-cart"></span>
+          </div>
+          <div class="label">Added to Cart</div>
+          <div class="sub-line" id="sublabel-add-to-cart">—</div>
+        </div>
+        <div class="funnel-card">
+          <div class="funnel-card-header">
+            <div class="value" id="funnel-revenue">£0.00</div>
+            <span id="trend-revenue"></span>
+          </div>
+          <div class="label">Revenue</div>
+          <div class="sub-line" id="sublabel-revenue">—</div>
         </div>
       </div>
 
@@ -279,6 +316,14 @@
           <div class="legend-item">
             <div class="legend-color" style="background: #22c55e;"></div>
             <span>Recommendations</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #f59e0b;"></div>
+            <span>Added to Cart</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #8b5cf6;"></div>
+            <span>Purchases</span>
           </div>
         </div>
       </div>
@@ -324,10 +369,29 @@
           apiGet('/api/analytics/recommendations?limit=20'),
         ]);
 
-        // Update stats
-        document.getElementById('stat-opens').textContent = (dashboardData.totals?.sizeGuideOpened || 0).toLocaleString();
-        document.getElementById('stat-recommendations').textContent = (dashboardData.totals?.recommendationMade || 0).toLocaleString();
-        document.getElementById('stat-conversion').textContent = (dashboardData.conversionRate || 0) + '%';
+        // Update funnel stats
+        const opens = dashboardData.opens ?? dashboardData.totals?.sizeGuideOpened ?? 0;
+        const recommendations = dashboardData.recommendations ?? dashboardData.totals?.recommendationMade ?? 0;
+        const addToCart = dashboardData.addToCart ?? dashboardData.totals?.addToCartAfterRec ?? 0;
+        const revenue = dashboardData.revenue ?? 0;
+        const trends = dashboardData.trends || {};
+
+        document.getElementById('funnel-opens').textContent = opens.toLocaleString();
+        document.getElementById('funnel-recommendations').textContent = recommendations.toLocaleString();
+        document.getElementById('funnel-add-to-cart').textContent = addToCart.toLocaleString();
+        document.getElementById('funnel-revenue').textContent = '£' + revenue.toFixed(2);
+
+        document.getElementById('trend-opens').innerHTML = trendBadge(trends.opens);
+        document.getElementById('trend-recommendations').innerHTML = trendBadge(trends.recommendations);
+        document.getElementById('trend-add-to-cart').innerHTML = trendBadge(trends.addToCart, true);
+        document.getElementById('trend-revenue').innerHTML = trendBadge(trends.revenue, true);
+
+        document.getElementById('sublabel-recommendations').textContent =
+          opens > 0 ? `${((recommendations / opens) * 100).toFixed(0)}% of opens` : '—';
+        document.getElementById('sublabel-add-to-cart').textContent =
+          recommendations > 0 ? `${((addToCart / recommendations) * 100).toFixed(0)}% of recommendations` : '—';
+        document.getElementById('sublabel-revenue').textContent =
+          addToCart > 0 ? `${((dashboardData.purchases ?? 0) / addToCart * 100).toFixed(0)}% of add to cart` : '—';
 
         // Render chart
         renderChart(timelineData.timeline);
@@ -344,6 +408,18 @@
       }
     }
 
+    function trendBadge(pct, showNewIfNull = false) {
+      if (pct === null || pct === undefined) {
+        if (showNewIfNull) {
+          return '<span class="trend-badge neutral">NEW</span>';
+        }
+        return '<span class="trend-badge neutral">No prior data</span>';
+      }
+      const sign = pct >= 0 ? '↑' : '↓';
+      const cls = pct >= 0 ? 'positive' : 'negative';
+      return `<span class="trend-badge ${cls}">${sign}${Math.abs(pct)}%</span>`;
+    }
+
     function renderChart(timeline) {
       const container = document.getElementById('chart-bars');
 
@@ -352,9 +428,14 @@
         return;
       }
 
+      const dayOpens = (day) => day.opens ?? day.sizeGuideOpened ?? 0;
+      const dayRecs = (day) => day.recommendations ?? day.recommendationMade ?? 0;
+      const dayCart = (day) => day.addToCart ?? 0;
+      const dayPurchases = (day) => day.purchases ?? 0;
+
       // Find max value for scaling
       const maxValue = Math.max(
-        ...timeline.map(d => Math.max(d.sizeGuideOpened || 0, d.recommendationMade || 0)),
+        ...timeline.map(d => Math.max(dayOpens(d), dayRecs(d), dayCart(d), dayPurchases(d))),
         1
       );
 
@@ -362,15 +443,19 @@
       const displayData = timeline.slice(-14);
 
       container.innerHTML = displayData.map(day => {
-        const opensHeight = ((day.sizeGuideOpened || 0) / maxValue) * 180;
-        const recsHeight = ((day.recommendationMade || 0) / maxValue) * 180;
+        const opensHeight = (dayOpens(day) / maxValue) * 180;
+        const recsHeight = (dayRecs(day) / maxValue) * 180;
+        const cartHeight = (dayCart(day) / maxValue) * 180;
+        const purchasesHeight = (dayPurchases(day) / maxValue) * 180;
         const dateLabel = new Date(day.date).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
 
         return `
           <div class="bar-group">
             <div style="display: flex; gap: 2px; align-items: flex-end; height: 180px;">
-              <div class="bar" style="height: ${opensHeight}px;" title="Opens: ${day.sizeGuideOpened || 0}"></div>
-              <div class="bar secondary" style="height: ${recsHeight}px;" title="Recommendations: ${day.recommendationMade || 0}"></div>
+              <div class="bar" style="height: ${opensHeight}px;" title="Opens: ${dayOpens(day)}"></div>
+              <div class="bar secondary" style="height: ${recsHeight}px;" title="Recommendations: ${dayRecs(day)}"></div>
+              <div class="bar tertiary" style="height: ${cartHeight}px;" title="Added to Cart: ${dayCart(day)}"></div>
+              <div class="bar quaternary" style="height: ${purchasesHeight}px;" title="Purchases: ${dayPurchases(day)}"></div>
             </div>
             <div class="bar-label">${dateLabel}</div>
           </div>
@@ -409,6 +494,9 @@
               <th>Opens</th>
               <th>Recommendations</th>
               <th>Conversion</th>
+              <th>Add to Cart</th>
+              <th>Purchases</th>
+              <th>Revenue</th>
             </tr>
           </thead>
           <tbody>
@@ -418,6 +506,9 @@
                 <td>${(p.opens || 0).toLocaleString()}</td>
                 <td>${(p.recommendations || 0).toLocaleString()}</td>
                 <td>${p.conversionRate || 0}%</td>
+                <td>${(p.addToCart || 0).toLocaleString()}</td>
+                <td>${(p.purchases || 0).toLocaleString()}</td>
+                <td>£${(p.revenue || 0).toFixed(2)}</td>
               </tr>
             `).join('')}
           </tbody>

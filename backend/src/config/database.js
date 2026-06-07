@@ -157,6 +157,10 @@ export async function initializeDatabase() {
       )
     `);
 
+    await client.query(`
+      ALTER TABLE analytics ADD COLUMN IF NOT EXISTS value DECIMAL(12,2);
+    `);
+
     // Create indexes
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_size_templates_shop ON size_templates(shop_domain);

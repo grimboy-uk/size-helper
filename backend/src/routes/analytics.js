@@ -5,6 +5,59 @@ import { SUBSCRIPTION_TIERS } from '../services/billingService.js';
 
 const router = express.Router();
 
+function computeTrend(current, previous) {
+  if (previous === 0) {
+    return null;
+  }
+  return Number((((current - previous) / previous) * 100).toFixed(1));
+}
+
+async function getPeriodMetrics(shopDomain, startDateStr, endDateStr = null) {
+  const params = [shopDomain, startDateStr];
+  let dateFilter = 'event_date >= $2';
+
+  if (endDateStr) {
+    dateFilter += ' AND event_date < $3';
+    params.push(endDateStr);
+  }
+
+  const totalsResult = await query(
+    `SELECT
+       event_type,
+       SUM(count) as total,
+       SUM(value) as total_value
+     FROM analytics
+     WHERE shop_domain = $1 AND ${dateFilter}
+     GROUP BY event_type`,
+    params
+  );
+
+  const metrics = {
+    opens: 0,
+    recommendations: 0,
+    addToCart: 0,
+    purchases: 0,
+    revenue: 0,
+  };
+
+  for (const row of totalsResult.rows) {
+    const total = Number.parseInt(row.total, 10) || 0;
+
+    if (row.event_type === 'size_guide_opened') {
+      metrics.opens = total;
+    } else if (row.event_type === 'recommendation_made') {
+      metrics.recommendations = total;
+    } else if (row.event_type === 'add_to_cart_after_rec') {
+      metrics.addToCart = total;
+    } else if (row.event_type === 'purchase_attributed') {
+      metrics.purchases = total;
+      metrics.revenue = Number.parseFloat(row.total_value) || 0;
+    }
+  }
+
+  return metrics;
+}
+
 // Helper function to format date as YYYY-MM-DD in local timezone
 function formatDateLocal(date) {
   const year = date.getFullYear();
@@ -34,39 +87,25 @@ router.get(
   asyncHandler(async (req, res) => {
     const shopDomain = res.locals.shopify.shopDomain;
     const { days = 30 } = req.query;
+    const daysNum = Number.parseInt(days, 10);
 
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - Number.parseInt(days, 10));
-    const startDateStr = formatDateLocal(startDate);
+    const currentStart = new Date();
+    currentStart.setDate(currentStart.getDate() - daysNum);
+    const currentStartStr = formatDateLocal(currentStart);
 
-    // Get total counts
-    const totalsResult = await query(
-      `SELECT
-         event_type,
-         SUM(count) as total
-       FROM analytics
-       WHERE shop_domain = $1 AND event_date >= $2
-       GROUP BY event_type`,
-      [shopDomain, startDateStr]
-    );
+    const previousEnd = new Date(currentStart);
+    const previousStart = new Date(previousEnd);
+    previousStart.setDate(previousStart.getDate() - daysNum);
+    const previousStartStr = formatDateLocal(previousStart);
 
-    const totals = {
-      sizeGuideOpened: 0,
-      recommendationMade: 0,
-    };
+    const [current, previous] = await Promise.all([
+      getPeriodMetrics(shopDomain, currentStartStr),
+      getPeriodMetrics(shopDomain, previousStartStr, currentStartStr),
+    ]);
 
-    for (const row of totalsResult.rows) {
-      if (row.event_type === 'size_guide_opened') {
-        totals.sizeGuideOpened = Number.parseInt(row.total, 10);
-      } else if (row.event_type === 'recommendation_made') {
-        totals.recommendationMade = Number.parseInt(row.total, 10);
-      }
-    }
-
-    // Calculate conversion rate
     const conversionRate =
-      totals.sizeGuideOpened > 0
-        ? ((totals.recommendationMade / totals.sizeGuideOpened) * 100).toFixed(1)
+      current.opens > 0
+        ? ((current.recommendations / current.opens) * 100).toFixed(1)
         : 0;
 
     // Get template count
@@ -85,10 +124,27 @@ router.get(
 
     res.json({
       period: `${days} days`,
-      totals,
+      totals: {
+        sizeGuideOpened: current.opens,
+        recommendationMade: current.recommendations,
+        addToCartAfterRec: current.addToCart,
+        purchaseAttributed: current.purchases,
+      },
       conversionRate: Number.parseFloat(conversionRate),
       templateCount,
       assignedProducts,
+      opens: current.opens,
+      recommendations: current.recommendations,
+      addToCart: current.addToCart,
+      purchases: current.purchases,
+      revenue: current.revenue,
+      trends: {
+        opens: computeTrend(current.opens, previous.opens),
+        recommendations: computeTrend(current.recommendations, previous.recommendations),
+        addToCart: computeTrend(current.addToCart, previous.addToCart),
+        purchases: computeTrend(current.purchases, previous.purchases),
+        revenue: computeTrend(current.revenue, previous.revenue),
+      },
     });
   })
 );
@@ -130,13 +186,25 @@ router.get(
           date,
           sizeGuideOpened: 0,
           recommendationMade: 0,
+          opens: 0,
+          recommendations: 0,
+          addToCart: 0,
+          purchases: 0,
         };
       }
 
+      const total = Number.parseInt(row.total, 10) || 0;
+
       if (row.event_type === 'size_guide_opened') {
-        timelineMap[date].sizeGuideOpened = Number.parseInt(row.total, 10);
+        timelineMap[date].sizeGuideOpened = total;
+        timelineMap[date].opens = total;
       } else if (row.event_type === 'recommendation_made') {
-        timelineMap[date].recommendationMade = Number.parseInt(row.total, 10);
+        timelineMap[date].recommendationMade = total;
+        timelineMap[date].recommendations = total;
+      } else if (row.event_type === 'add_to_cart_after_rec') {
+        timelineMap[date].addToCart = total;
+      } else if (row.event_type === 'purchase_attributed') {
+        timelineMap[date].purchases = total;
       }
     }
 
@@ -147,15 +215,19 @@ router.get(
     const end = new Date();
     end.setHours(23, 59, 59, 999); // Include all of today
 
+    const emptyDay = (dateStr) => ({
+      date: dateStr,
+      sizeGuideOpened: 0,
+      recommendationMade: 0,
+      opens: 0,
+      recommendations: 0,
+      addToCart: 0,
+      purchases: 0,
+    });
+
     while (current <= end) {
       const dateStr = formatDateLocal(current);
-      timeline.push(
-        timelineMap[dateStr] || {
-          date: dateStr,
-          sizeGuideOpened: 0,
-          recommendationMade: 0,
-        }
-      );
+      timeline.push(timelineMap[dateStr] || emptyDay(dateStr));
       current.setDate(current.getDate() + 1);
     }
 
@@ -193,7 +265,10 @@ router.get(
          a.product_id,
          pa.product_title,
          SUM(CASE WHEN a.event_type = 'size_guide_opened' THEN a.count ELSE 0 END) as opens,
-         SUM(CASE WHEN a.event_type = 'recommendation_made' THEN a.count ELSE 0 END) as recommendations
+         SUM(CASE WHEN a.event_type = 'recommendation_made' THEN a.count ELSE 0 END) as recommendations,
+         SUM(CASE WHEN a.event_type = 'add_to_cart_after_rec' THEN a.count ELSE 0 END) as add_to_cart,
+         SUM(CASE WHEN a.event_type = 'purchase_attributed' THEN a.count ELSE 0 END) as purchases,
+         SUM(CASE WHEN a.event_type = 'purchase_attributed' THEN a.value ELSE 0 END) as revenue
        FROM analytics a
        LEFT JOIN product_assignments pa ON a.product_id = pa.product_id AND a.shop_domain = pa.shop_domain
        WHERE a.shop_domain = $1 AND a.event_date >= $2 AND a.product_id IS NOT NULL
@@ -208,6 +283,9 @@ router.get(
       productTitle: row.product_title || `Product ${row.product_id}`,
       opens: Number.parseInt(row.opens, 10),
       recommendations: Number.parseInt(row.recommendations, 10),
+      addToCart: Number.parseInt(row.add_to_cart, 10),
+      purchases: Number.parseInt(row.purchases, 10),
+      revenue: Number.parseFloat(row.revenue) || 0,
       conversionRate:
         row.opens > 0 ? ((row.recommendations / row.opens) * 100).toFixed(1) : 0,
     }));

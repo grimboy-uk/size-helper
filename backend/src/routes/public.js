@@ -8,6 +8,8 @@ import { createLogger } from '../utils/logger.js';
 const router = express.Router();
 const logger = createLogger('PublicRoute');
 
+const ALLOWED_TRACK_EVENTS = new Set(['add_to_cart_after_rec']);
+
 /**
  * GET /api/public/size-chart
  * Get size chart for a product (public endpoint for storefront)
@@ -106,6 +108,39 @@ router.post(
       }
       throw error;
     }
+  })
+);
+
+/**
+ * POST /api/public/track
+ * Record client-side storefront events (e.g. add-to-cart after recommendation)
+ */
+router.post(
+  '/track',
+  asyncHandler(async (req, res) => {
+    const { shop, productId, event } = req.body;
+
+    if (!shop) {
+      return res.status(400).json({ error: 'Shop is required' });
+    }
+
+    if (!productId) {
+      return res.status(400).json({ error: 'Product ID is required' });
+    }
+
+    if (!event || !ALLOWED_TRACK_EVENTS.has(event)) {
+      return res.status(400).json({ error: 'Invalid or unsupported event type' });
+    }
+
+    await query(
+      `INSERT INTO analytics (shop_domain, product_id, event_type, event_date, count)
+       VALUES ($1, $2, $3, CURRENT_DATE, 1)
+       ON CONFLICT (shop_domain, product_id, event_type, event_date)
+       DO UPDATE SET count = analytics.count + 1`,
+      [shop, productId, event]
+    );
+
+    res.json({ ok: true });
   })
 );
 

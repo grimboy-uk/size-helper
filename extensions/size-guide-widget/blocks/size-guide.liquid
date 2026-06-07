@@ -1600,6 +1600,47 @@
         } else {
           reasoning.style.display = 'none';
         }
+
+        sessionStorage.setItem(`rms_rec_${this.productId}`, Date.now().toString());
+
+        if (!window._rmsCartListenerAttached) {
+          window._rmsCartListenerAttached = true;
+
+          function rmsFireCartTracking() {
+            const pageProductId = window.ShopifyAnalytics?.meta?.product?.id?.toString();
+            if (pageProductId && sessionStorage.getItem(`rms_rec_${pageProductId}`)) {
+              sessionStorage.removeItem(`rms_rec_${pageProductId}`);
+              fetch('/apps/size-helper/api/public/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  shop: window.Shopify?.shop,
+                  productId: pageProductId,
+                  event: 'add_to_cart_after_rec'
+                })
+              }).catch(() => {});
+            }
+          }
+
+          // Form-based add-to-cart (some themes)
+          document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form.action && form.action.includes('/cart/add')) {
+              rmsFireCartTracking();
+            }
+          });
+
+          // AJAX-based add-to-cart (Dawn and most modern themes use fetch to /cart/add.js)
+          const _rmsFetch = window.fetch;
+          window.fetch = function(...args) {
+            const url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+            const method = (args[1]?.method || 'GET').toUpperCase();
+            if (method === 'POST' && url.includes('/cart/add')) {
+              rmsFireCartTracking();
+            }
+            return _rmsFetch.apply(this, args);
+          };
+        }
       }
     };
 

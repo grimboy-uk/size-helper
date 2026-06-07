@@ -119,5 +119,72 @@ router.post('/shop/redact', webhookVerification, async (req, res) => {
   }
 });
 
+/**
+ * Attribute a paid order line item to size guide analytics when a recent recommendation exists.
+ */
+async function attributePurchaseLineItem(shopDomain, lineItem) {
+  const productId = lineItem.product_id;
+  if (!productId) {
+    return;
+  }
+
+  const assignment = await query(
+    `SELECT 1 FROM product_assignments WHERE shop_domain = $1 AND product_id = $2 LIMIT 1`,
+    [shopDomain, productId]
+  );
+  if (assignment.rows.length === 0) {
+    return;
+  }
+
+  const recommendation = await query(
+    `SELECT id FROM size_recommendations
+     WHERE shop_domain = $1 AND product_id = $2 AND created_at > NOW() - INTERVAL '2 hours'
+     LIMIT 1`,
+    [shopDomain, productId]
+  );
+  if (recommendation.rows.length === 0) {
+    return;
+  }
+
+  const lineValue = parseFloat(lineItem.price) * lineItem.quantity;
+  if (!Number.isFinite(lineValue)) {
+    return;
+  }
+
+  await query(
+    `INSERT INTO analytics (shop_domain, product_id, event_type, event_date, count, value)
+     VALUES ($1, $2, 'purchase_attributed', CURRENT_DATE, 1, $3)
+     ON CONFLICT (shop_domain, product_id, event_type, event_date)
+     DO UPDATE SET count = analytics.count + 1, value = analytics.value + EXCLUDED.value`,
+    [shopDomain, productId, lineValue]
+  );
+}
+
+/**
+ * Handle orders/paid webhook — attribute revenue to products with recent size recommendations.
+ */
+export async function handleOrderPaid(shopDomain, order) {
+  const lineItems = order?.line_items || [];
+  await Promise.all(lineItems.map((lineItem) => attributePurchaseLineItem(shopDomain, lineItem)));
+}
+
+/**
+ * POST /api/webhooks/orders/paid
+ * Handle paid order — attribute purchases to recent size recommendations
+ */
+router.post('/orders/paid', webhookVerification, async (req, res) => {
+  try {
+    const shopDomain = req.headers['x-shopify-shop-domain'];
+    logger.info('Order paid webhook received:', shopDomain);
+
+    await handleOrderPaid(shopDomain, req.body);
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    logger.error('Error handling order paid webhook:', error);
+    res.status(500).json({ error: 'Internal error' });
+  }
+});
+
 export { webhookVerification };
 export default router;

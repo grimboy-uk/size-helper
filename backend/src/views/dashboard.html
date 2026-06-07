@@ -261,6 +261,91 @@
     .upgrade-banner .btn-primary {
       flex-shrink: 0;
     }
+    .release-notes-card {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      border-top: 3px solid #2a9d6e;
+    }
+    .release-notes-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .release-notes-badge {
+      display: inline-block;
+      background: #e8f5ee;
+      color: #2a9d6e;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .release-notes-dismiss {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #9ca3af;
+      padding: 4px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s, background 0.15s;
+    }
+    .release-notes-dismiss:hover {
+      color: #374151;
+      background: #f3f4f6;
+    }
+    .release-notes-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #202223;
+      margin: 0 0 20px 0;
+    }
+    .release-notes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .release-note-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .release-note-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      line-height: 1;
+      margin-top: 1px;
+    }
+    .release-note-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #202223;
+      margin-bottom: 3px;
+    }
+    .release-note-desc {
+      font-size: 12px;
+      color: #6d7175;
+      line-height: 1.5;
+      margin: 0;
+    }
+    @media (max-width: 768px) {
+      .release-notes-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 480px) {
+      .release-notes-grid {
+        grid-template-columns: 1fr;
+      }
+    }
     @media (max-width: 768px) {
       .feature-grid {
         grid-template-columns: 1fr;
@@ -286,6 +371,63 @@
   </header>
 
   <div class="page-container">
+
+    <div class="release-notes-card" id="release-notes" style="display: none;">
+      <div class="release-notes-header">
+        <span class="release-notes-badge">What's New</span>
+        <button class="release-notes-dismiss" id="dismiss-release-notes" aria-label="Dismiss release notes">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <h3 class="release-notes-title">RMS Size Helper — v1.0 Highlights</h3>
+      <div class="release-notes-grid">
+        <div class="release-note-item">
+          <span class="release-note-icon">&#128229;</span>
+          <div>
+            <div class="release-note-title">CSV Import &amp; Export</div>
+            <p class="release-note-desc">Import size charts directly from spreadsheets and export your data at any time.</p>
+          </div>
+        </div>
+        <div class="release-note-item">
+          <span class="release-note-icon">&#128248;</span>
+          <div>
+            <div class="release-note-title">Full Garment Illustration Library</div>
+            <p class="release-note-desc">Measurement diagrams for every category: t-shirts, crew tees, polos, shirts, jumpers, hoodies, trousers, shorts, skirts, and shoes.</p>
+          </div>
+        </div>
+        <div class="release-note-item">
+          <span class="release-note-icon">&#128207;</span>
+          <div>
+            <div class="release-note-title">Multi-Region Size Notations</div>
+            <p class="release-note-desc">Auto-convert sizes between US, UK, EU, AU, JP, and CN standards — men's and women's.</p>
+          </div>
+        </div>
+        <div class="release-note-item">
+          <span class="release-note-icon">&#128269;</span>
+          <div>
+            <div class="release-note-title">Find My Size Questionnaire</div>
+            <p class="release-note-desc">Body-shape-aware recommendations help customers choose confidently and reduce sizing returns.</p>
+          </div>
+        </div>
+        <div class="release-note-item">
+          <span class="release-note-icon">&#127757;</span>
+          <div>
+            <div class="release-note-title">10 Languages Supported</div>
+            <p class="release-note-desc">The storefront widget is fully localised: English, French, German, Spanish, Italian, Dutch, Polish, Japanese, Chinese, and Portuguese.</p>
+          </div>
+        </div>
+        <div class="release-note-item">
+          <span class="release-note-icon">&#128200;</span>
+          <div>
+            <div class="release-note-title">Analytics Dashboard</div>
+            <p class="release-note-desc">Track size guide opens, recommendation usage, and conversion rates across all your products.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="card">
       <h2 class="card-title">Size Chart + Helper</h2>
       <div class="status-banner" id="status-banner">
@@ -463,6 +605,18 @@
     }
 
     loadDashboard();
+
+    (function initReleaseNotes() {
+      const DISMISSED_KEY = 'sizer-release-notes-v1-dismissed';
+      const card = document.getElementById('release-notes');
+      if (!localStorage.getItem(DISMISSED_KEY)) {
+        card.style.display = 'block';
+      }
+      document.getElementById('dismiss-release-notes').addEventListener('click', function () {
+        card.style.display = 'none';
+        localStorage.setItem(DISMISSED_KEY, '1');
+      });
+    })();
   </script>
 </body>
 </html>

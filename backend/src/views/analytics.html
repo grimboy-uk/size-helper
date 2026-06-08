@@ -134,7 +134,6 @@
     .bar {
       flex: 1;
       min-width: 3px;
-      max-width: 18px;
       background: #3b82f6;
       border-radius: 4px 4px 0 0;
       min-height: 4px;
@@ -454,7 +453,7 @@
 
         return `
           <div class="bar-group">
-            <div style="display: flex; gap: 2px; align-items: flex-end; height: 180px;">
+            <div style="display: flex; gap: 2px; align-items: flex-end; height: 180px; width: 100%;">
               <div class="bar" style="height: ${opensHeight}px;" title="Opens: ${dayOpens(day)}"></div>
               <div class="bar secondary" style="height: ${recsHeight}px;" title="Recommendations: ${dayRecs(day)}"></div>
               <div class="bar tertiary" style="height: ${cartHeight}px;" title="Added to Cart: ${dayCart(day)}"></div>

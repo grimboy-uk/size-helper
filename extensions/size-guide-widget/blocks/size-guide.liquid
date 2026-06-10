@@ -1068,11 +1068,10 @@
             findMySizeBtn.style.display = showSizeHelper ? 'block' : 'none';
           }
 
-          // Show/hide powered-by logo based on subscription tier
-          // Only visible for FREE tier
+          // Show/hide powered-by logo — visible for FREE tier or shops in FORCE_BRANDING_SHOPS
           const poweredByEl = document.getElementById('powered-by-rms');
           if (poweredByEl) {
-            poweredByEl.style.display = this.subscriptionTier === 'FREE' ? 'block' : 'none';
+            poweredByEl.style.display = this.sizeChart.showBranding ? 'block' : 'none';
           }
         } catch (error) {
           console.error('Size Helper: Error loading size chart', error);

@@ -377,6 +377,14 @@ export async function getSizeChart(shopDomain, productId, displayUnit = null) {
     logger.error('Failed to fetch subscription tier:', error);
   }
 
+  // FORCE_BRANDING_SHOPS: comma-separated domains that always show the "Powered by RMS"
+  // link regardless of tier (used for promotional stores e.g. Wrenbys own store)
+  const forceBrandingShops = (process.env.FORCE_BRANDING_SHOPS || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const showBranding = subscriptionTier === 'FREE' || forceBrandingShops.includes(shopDomain);
+
   const templateUnit = template.measurement_unit;
   const outputUnit = displayUnit || templateUnit;
 
@@ -410,6 +418,7 @@ export async function getSizeChart(shopDomain, productId, displayUnit = null) {
     includeSizeHelper: template.include_size_helper !== false,
     illustrationType: template.illustration_type || null,
     subscriptionTier,
+    showBranding,
   };
 }
 

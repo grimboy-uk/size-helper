@@ -31,6 +31,7 @@ import publicRouter from './routes/public.js';
 import webhooksRouter from './routes/webhooks.js';
 import { setShopifyInstance, registerWebhooks } from './services/webhookService.js';
 import { startCleanupScheduler } from './services/cleanupService.js';
+import { readReferralCookie, reportPartnerEvent } from './services/partnerService.js';
 
 const logger = createLogger('Server');
 
@@ -157,6 +158,24 @@ app.get(
       );
 
       logger.info('Shop record created/updated:', session.shop);
+
+      // RMS Partner Programme — sticky, first-touch. Only writes partner_id
+      // if it isn't already set, so a reinstall without a fresh referral
+      // link never overwrites the original attribution.
+      const referralPartnerId = readReferralCookie(req);
+      if (referralPartnerId) {
+        try {
+          const attribution = await query(
+            `UPDATE shops SET partner_id = $1 WHERE shop_domain = $2 AND partner_id IS NULL`,
+            [referralPartnerId, session.shop]
+          );
+          if (attribution.rowCount > 0) {
+            await reportPartnerEvent({ partnerId: referralPartnerId, eventType: 'install', shopDomain: session.shop });
+          }
+        } catch (partnerError) {
+          logger.warn('Partner attribution failed:', partnerError.message);
+        }
+      }
 
       // Redirect to embedded app in Shopify Admin
       const redirectUrl = `https://${session.shop}/admin/apps/${process.env.SHOPIFY_API_KEY}`;

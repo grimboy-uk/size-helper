@@ -1,6 +1,7 @@
 import { query } from '../config/database.js';
 import { createLogger } from '../utils/logger.js';
 import { shopifyGraphqlRequest } from '../utils/shopifyGraphql.js';
+import { reportPartnerEvent } from './partnerService.js';
 
 const logger = createLogger('Billing');
 
@@ -659,6 +660,9 @@ export async function syncSubscriptionStatus(session, authContext = null) {
   const subscriptions = response.data?.currentAppInstallation?.activeSubscriptions || [];
   logger.info('Active subscriptions from Shopify:', JSON.stringify(subscriptions));
 
+  const partnerResult = await query(`SELECT partner_id FROM shops WHERE shop_domain = $1`, [session.shop]);
+  const partnerId = partnerResult.rows[0]?.partner_id;
+
   if (subscriptions.length === 0) {
     // No active Shopify subscription — ensure DB reflects FREE tier
     logger.info('No active subscriptions, setting shop to FREE:', session.shop);
@@ -671,6 +675,7 @@ export async function syncSubscriptionStatus(session, authContext = null) {
        WHERE shop_domain = $1`,
       [session.shop]
     );
+    void reportPartnerEvent({ partnerId, eventType: 'cancel', shopDomain: session.shop });
     return;
   }
 
@@ -712,6 +717,14 @@ export async function syncSubscriptionStatus(session, authContext = null) {
      WHERE shop_domain = $6`,
     [tierKey, activeSub.id, cycleStart, cycleEnd, isAnnual ? 'ANNUAL' : 'MONTHLY', session.shop]
   );
+
+  void reportPartnerEvent({
+    partnerId,
+    eventType: 'charge',
+    shopDomain: session.shop,
+    plan: tierKey,
+    amount: price,
+  });
 }
 
 export default {

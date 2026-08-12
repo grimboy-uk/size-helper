@@ -2,6 +2,7 @@ import express from 'express';
 import crypto from 'crypto';
 import { query } from '../config/database.js';
 import { createLogger } from '../utils/logger.js';
+import { reportPartnerEvent } from '../services/partnerService.js';
 
 const router = express.Router();
 const logger = createLogger('Webhooks');
@@ -43,6 +44,19 @@ router.post('/app/uninstalled', webhookVerification, async (req, res) => {
   try {
     const shopDomain = req.headers['x-shopify-shop-domain'];
     logger.info('App uninstalled webhook received:', shopDomain);
+
+    // Partner Programme — report churn before the shop row is deleted below.
+    // NOTE: unlike bis-app/returns-manager, this app deletes the shops row
+    // entirely on uninstall rather than preserving it, so a reinstall here
+    // will NOT retain the original partner attribution (partner_id goes with
+    // the row). Pre-existing behavior of this app, not introduced by this
+    // change — flagging since it differs from the other 3 RMS apps.
+    try {
+      const partnerResult = await query(`SELECT partner_id FROM shops WHERE shop_domain = $1`, [shopDomain]);
+      await reportPartnerEvent({ partnerId: partnerResult.rows[0]?.partner_id, eventType: 'cancel', shopDomain });
+    } catch (partnerError) {
+      logger.warn('Partner cancel report failed:', partnerError.message);
+    }
 
     // Delete shop data (cascades to related tables)
     await query(`DELETE FROM shops WHERE shop_domain = $1`, [shopDomain]);

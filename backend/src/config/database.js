@@ -159,6 +159,7 @@ export async function initializeDatabase() {
 
     await client.query(`
       ALTER TABLE analytics ADD COLUMN IF NOT EXISTS value DECIMAL(12,2);
+      ALTER TABLE shops ADD COLUMN IF NOT EXISTS partner_id VARCHAR(32);
     `);
 
     // Create indexes
